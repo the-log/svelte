@@ -29,6 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-netlify": "^1.0.0",
 		"@types/marked": "^4.0.8",
 		"marked": "^4.2.4"
 	}
