@@ -1,0 +1,61 @@
+/* Preferred box-sizing value */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	max-width: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+/* Remove list styles (bullets/numbers) */
+ol,
+ul,
+menu {
+	padding: 0;
+	list-style: none;
+}
+
+/* For images to not be able to exceed their container */
+img {
+	max-width: 100%;
+}
+
+/* reset default text opacity of input placeholder */
+::placeholder {
+	color: unset;
+}
+
+:where([hidden]) {
+	display: none;
+}
+
+.visually-hidden {
+	position: absolute !important;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	width: 1px;
+	height: 1px;
+	word-wrap: normal;
+}
+
+a {
+	color: inherit;
+}
+
+:where(ul, ol) {
+	margin: 0;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p) {
+	margin: 0 0 1rem;
+}
+
+:where(svg) {
+	fill: currentColor;
+}
