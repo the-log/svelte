@@ -3,17 +3,130 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<link rel="stylesheet" href="%sveltekit.assets%/global.css" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="preconnect" href="https://fonts.bunny.net" />
-		<link rel="stylesheet" href="https://fonts.bunny.net/css?family=open-sans:300,400,600,800" />
+		<link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
+		<title>The Leage of Ordinary Gentlemen</title>
 		%sveltekit.head%
-		<style>
+		<style id="reset-styles">
+			button {
+				all: unset;
+			}
+			:is(*, *::before, *::after, element) {
+				box-sizing: border-box;
+			}
+			 {
+				box-sizing: border-box;
+			}
+			ol,
+			ul,
+			menu {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			img {
+				max-width: 100%;
+			}
+			::placeholder {
+				color: unset;
+			}
+			:where([hidden]) {
+				display: none;
+			}
+			.visually-hidden {
+				position: absolute !important;
+				overflow: hidden;
+				clip: rect(1px, 1px, 1px, 1px);
+				width: 1px;
+				height: 1px;
+				word-wrap: normal;
+			}
+			a,
+			button {
+				color: inherit;
+			}
+			:where(h1, h2, h3, h4, h5, h6, p) {
+				margin: 0 0 1rem;
+			}
+			:where(svg) {
+				fill: currentColor;
+			}
+		</style>
+		<style id="global-styles">
 			:root {
-				font-family: Open Sans, sans-serif;
-				font-size: 16px;
+				--color-bg--1: #16191f;
+				--color-bg--2: #22252c;
+				--color-bg--3: #2c3139;
+
+				--color-accent--1: #9de49a;
+				--color-accent--2: #77d073;
+
+				--color-text--main: #ffffff;
+				--color-text--alt-1: #232529;
+				--color-text--alt-2: #16191f;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--color-bg--1: #16191f;
+					--color-bg--2: #22252c;
+					--color-bg--3: #2c3139;
+
+					--color-accent--1: #9de49a;
+					--color-accent--2: #77d073;
+
+					--color-text--main: #ffffff;
+					--color-text--alt-1: #232529;
+					--color-text--alt-2: #16191f;
+				}
+			}
+			:root {
+				font-family: Inter, Open Sans, Roboto, sans-serif;
+				font-size: 18px;
 				font-weight: 400;
-				color: #222;
+
+				color: var(--color-text--main);
+				background: var(--color-bg--1);
+			}
+			html,
+			body {
+				width: 100%;
+				overflow-x: hidden;
+				padding: 0;
+				margin: 0;
+			}
+			html {
+				height: 100%;
+			}
+			body {
+				height: 100%;
+				display: grid;
+				gap: 3rem;
+				grid-template-areas:
+					'nav head spacer'
+					'nav body spacer'
+					'nav foot spacer';
+				grid-template-columns: auto 1fr 0px;
+				grid-template-rows: auto 1fr auto;
+			}
+
+			#site-nav {
+				grid-area: nav;
+				background: var(--color-bg--2);
+			}
+			header {
+				grid-area: head;
+				max-width: 1280px;
+				padding-top: 3rem;
+			}
+			main {
+				grid-area: body;
+				max-width: 1280px;
+			}
+			footer {
+				grid-area: foot;
+				max-width: 1280px;
+				padding-bottom: 3rem;
 			}
 		</style>
 	</head>

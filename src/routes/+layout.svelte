@@ -6,6 +6,8 @@
   import { userStore, teamStore } from "src/misc/stores";
 
   let isLoggedIn: boolean;
+  let userName = '';
+
   userStore.subscribe((value) => {
 		isLoggedIn = Boolean(value);
 	});
@@ -16,6 +18,9 @@
 
     userStore.set(authenticatedItem);
     teamStore.set(authenticatedItem?.team?.abbreviation ?? null);
+
+    userName = authenticatedItem?.name || '';
+
     if (browser) {
       if (!isLoggedIn) {
         goto('/login');
@@ -53,70 +58,53 @@
   }
 </script>
 
-<style>
+<style lang="scss">
   nav {
-    margin: 0 0 2rem;
-    padding: 1rem 0 0 ;
-    box-shadow: 0 0 5px 5px rgba(0,0,0,0.1);
+    display: block;
     position: sticky;
     top: 0;
-    background-color: white;
-  }
-  nav ul {
-    display: flex;
-    width: 100%;
-    border-bottom: 1px solid rgb(230,230,230);
-    padding: 0 1rem
-  }
-  nav button {
-    all: unset;
-  }
-  nav :is(a, button) {
-    display: inline-block;
-    padding: 0.5rem;
-    border-bottom: 1px solid black;
-    margin-bottom: -1px;
-    text-decoration: none;
-    font-weight: bold;
-  }
 
-  nav :is(a, button):not(.is-active) {
-    opacity: 0.5;
-    border-bottom-color: transparent;
-  }
+    :is(button, a) {
+      display: block;
+      padding: 1rem;
+      border-left: 2px solid transparent;
+      text-decoration: none;
 
-  nav :is(a, button):not(.is-active):hover {
-    opacity: 0.75;
-    background: rgba(0,0,0,0.05);
-  }
+      &:hover {
+        color: var(--color-accent--2);
+        text-decoration: underline;
+      }
+    }
 
-  nav li.float-right {
-    margin-left: auto;
-  }
-
-  main, nav ul {
-    width: 100%;
-    max-width: 64rem;
-    margin: 0 auto;
-  }
-
-  main {
-    padding: 0 3rem;
+    :global(:is(button, a).is-active) {
+      background-color: var(--color-bg--1);
+      border-left-color: var(--color-accent--2);
+    }
   }
 </style>
 
-<nav>
-  <ul>
-    <li><a href="/">My Team</a></li>
-    <li><a href="/teams">League</a></li>
-    <li><a href="/players">Players</a></li>
-    <li><a href="/free-agency">Free Agency</a></li>
-    <li><a href="/rulebook">Rulebook</a></li>
-    {#if isLoggedIn}
-      <li class="float-right"><button on:click={logUserOut}>Log Out</button></li>
-    {/if}
-  </ul>
-</nav>
+<header>
+  <h1><span>The</span> League</h1>
+  <span>{userName}</span>
+</header>
+<div id="site-nav">
+  <nav>
+    <ul>
+      <li><button>Show Labels</button></li>
+      <li><a href="/">My Team</a></li>
+      <li><a href="/teams">League</a></li>
+      <li><a href="/players">Players</a></li>
+      <li><a href="/free-agency">Free Agency</a></li>
+      <li><a href="/rulebook">Rulebook</a></li>
+      {#if isLoggedIn}
+        <li class="float-right"><button on:click={logUserOut}>Log Out</button></li>
+      {/if}
+    </ul>
+  </nav>
+</div>
 <main>
   <slot />
 </main>
+<footer>
+  <p>&copy; 2023</p>
+</footer>

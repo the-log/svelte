@@ -8,6 +8,7 @@
 
   table {
     border-collapse: collapse;
+    width: 100%;
   }
 
   thead {
@@ -23,11 +24,10 @@
   }
 
   tbody tr:nth-child(even) {
-    background-color: #eee;
+
   }
 
   tbody tr:hover {
-    background-color: #ddd;
   }
 </style>
 

@@ -18,7 +18,10 @@
 
   function updateTable(take = 25, skip = 0, filters = {}, order = {positionThisYear: 'asc'}) {
     runQuery(queries["all-players"], {take, skip, filters, order})
-      .then(({data}) => {
+      .then(({data, errors}) => {
+
+        if (errors) return errors;
+
         const formatted = (data.players as Player[]).map(player => {
           const {name, position, team, contract} = player;
           const {team: logTeam, salary, years} = contract ?? {};
