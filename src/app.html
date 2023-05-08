@@ -117,7 +117,7 @@
 			header {
 				grid-area: head;
 				max-width: 1280px;
-				padding-top: 3rem;
+				padding-top: 2rem;
 			}
 			main {
 				grid-area: body;
@@ -126,7 +126,30 @@
 			footer {
 				grid-area: foot;
 				max-width: 1280px;
-				padding-bottom: 3rem;
+				padding-bottom: 2rem;
+			}
+
+			input {
+				all: unset;
+				padding: 0.5rem;
+				background: var(--color-bg--3);
+				border-bottom: 1px solid transparent;
+			}
+			input:focus {
+				border-color: var(--color-accent--2);
+			}
+			:is(button, a.button) {
+				display: inline-block;
+				padding: 0.5rem 1rem;
+				text-decoration: none;
+				white-space: nowrap;
+				background: var(--color-accent--2);
+				color: var(--color-text--alt-1);
+				cursor: pointer;
+			}
+			:is(button, a.button):hover {
+				text-decoration: underline;
+				background: var(--color-accent--1);
 			}
 		</style>
 	</head>

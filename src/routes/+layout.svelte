@@ -69,11 +69,16 @@
       padding: 1rem;
       border-left: 2px solid transparent;
       text-decoration: none;
+      width: 100%;
+      white-space: nowrap;
 
       &:hover {
-        color: var(--color-accent--2);
         text-decoration: underline;
       }
+    }
+
+    a:hover {
+      color: var(--color-accent--2);
     }
 
     :global(:is(button, a).is-active) {
