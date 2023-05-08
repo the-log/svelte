@@ -18,10 +18,7 @@
       if (response.message) {
         console.error(response.message);
       } else if (response.item) {
-        console.log("Logged in as: ", response.item);
-
         userStore.set(response.item);
-        teamStore.set(response.item.team.abbreviation);
         goto('/');
       } else {
         console.error(response);
@@ -30,10 +27,18 @@
   }
 </script>
 
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+</style>
 <h1>Login</h1>
 
 <form on:submit|preventDefault={attemptLogin}>
-  <input type="email" name="email" id="email" bind:value={email} />
-  <input type="password" name="password" id="password" bind:value={password} />
-  <input type="submit" value="submit" hidden>
+  <input type="email" name="email" id="email" placeholder="email" bind:value={email} />
+  <input type="password" name="password" id="password" placeholder="password" bind:value={password} />
+  <button type="submit">Submit</button>
 </form>
