@@ -22,7 +22,7 @@
             cells: [
               contract.player.name,
               contract.player.team,
-              '',
+              contract.player.position,
               formatMoney(contract.salary),
               contract.years
             ]

@@ -3,16 +3,12 @@
   import { browser } from "$app/environment";
 	import runQuery from 'src/utils/runQuery';
 	import queries from 'src/utils/queries';
-  import { userStore, teamStore } from "src/misc/stores";
+  import { userStore, teamStore, authStatusStore } from "src/misc/stores";
 
   let isLoggedIn: boolean;
   let userName = '';
 
-  userStore.subscribe((value) => {
-		isLoggedIn = Boolean(value);
-	});
-
-  runQuery(queries['authenticated-item']).then((authItem) => {
+  function authItemUpdated(authItem: any)  {
     const {data} = authItem;
     const {authenticatedItem} = data;
 
@@ -26,7 +22,19 @@
         goto('/login');
       }
     }
-  })
+  }
+
+  authStatusStore.subscribe((value) => {
+    isLoggedIn = value;
+    runQuery(queries['authenticated-item']).then(authItemUpdated)
+  });
+
+  userStore.subscribe((value) => {
+		isLoggedIn = Boolean(value);
+	});
+
+  runQuery(queries['authenticated-item']).then(authItemUpdated)
+
 
   beforeNavigate((navigation) => {
     if (!isLoggedIn && navigation.to?.route.id !== '/login') {
@@ -51,8 +59,7 @@
   function logUserOut() {
     runQuery(queries['end-session']).then(({data}) => {
       if (data.endSession) {
-        userStore.set(null);
-        goto('/login');
+        authStatusStore.set(false);
       }
     })
   }

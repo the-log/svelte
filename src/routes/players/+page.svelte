@@ -27,8 +27,6 @@
           const {team: logTeam, salary, years} = contract ?? {};
           const {abbreviation} = logTeam ?? {};
 
-          console.log(logTeam);
-
           return ({
             cells: [
               name,
