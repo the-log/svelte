@@ -113,6 +113,7 @@ export default {
           team
           position
           positionWeight
+          injuryStatus
         }
         status
         salary
@@ -135,11 +136,20 @@ export default {
           espn_id: $id
         }
       ) {
+        height
+        weight
+        age
+        debutYear
+        draftYear
+        draftRound
+        draftSelection
         fullStats
         pointsThisYear
         pointsLastYear
         pointsThisYearProj
         pointsThisWeekProj
+        outlooksByWeek,
+        seasonOutlook
       }
     }
   `

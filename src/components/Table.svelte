@@ -1,60 +1,63 @@
 <script lang="ts">
   import type { TableData } from '../types/defs';
   import Actions from "src/components/Actions.svelte";
-  export let data: TableData;
+  export let columns: number;
 </script>
 
 <style>
-
-  table {
-    border-collapse: collapse;
+  .tablegrid {
+    display: grid;
     width: 100%;
+    gap: 0.25rem 0;
+    grid-template-columns: repeat(var(--columns), auto) 1fr;
   }
 
-  thead {
-    text-align: left;
+  :global(.tablegrid-row) {
+    --row-min-height: calc(70px - 0.25rem);
+    background-color: var(--color-bg--3);
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    grid-template-rows: 1fr;
+    min-height: var(--row-min-height);
   }
 
-  th, td {
-    padding: 0 0.5rem;
+  :global(.tablegrid-cell) {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
   }
 
-  tbody td {
-    padding-block: 0.25rem;
+  :global(.tablegrid-thumbcell) {
+    background-color: var(--color-bg--2);
+    outline: 0.25rem solid var(--color-bg--1);
+    min-height: var(--row-min-height);
+    min-width: var(--row-min-height);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  tbody tr:nth-child(even) {
-
+  :global(.tablegrid-actions) {
+    justify-content: flex-end;
   }
 
-  tbody tr:hover {
+  :global(.tablegrid-header) {
+    background-color: var(--color-bg--2);
+  }
+
+  :global(.tablegrid-header > *) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  :global(.tray) {
+    grid-column: 1 / -1;
   }
 </style>
 
-<table>
-  {#if data.headers}
-    <thead>
-      <tr>
-        {#each data.headers as header}
-          <th>{@html header ? header : ''}</th>
-        {/each}
-      </tr>
-    </thead>
-  {/if}
-
-  {#if data.content}
-    <tbody>
-      {#each data.content as row}
-        <tr>
-          {#each row.cells as cell }
-            <td>{@html cell ? cell : ''}</td>
-          {/each}
-
-          {#if row.actions}
-            <td><Actions functions={row.actions}/></td>
-          {/if}
-        </tr>
-      {/each}
-    </tbody>
-  {/if}
-</table>
+<div class="tablegrid" style='--columns:{columns};'>
+    <slot />
+</div>
