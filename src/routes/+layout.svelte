@@ -5,6 +5,7 @@
 	import queries from 'src/utils/queries';
   import { userStore, teamStore, authStatusStore } from "src/misc/stores";
   import Icon from "src/components/Icon.svelte";
+  import UserMenu from 'src/components/UserMenu.svelte';
 
   let isLoggedIn: boolean;
   let userName = '';
@@ -61,6 +62,7 @@
     runQuery(queries['end-session']).then(({data}) => {
       if (data.endSession) {
         authStatusStore.set(false);
+        goto('/login');
       }
     })
   }
@@ -75,6 +77,20 @@
 </script>
 
 <style lang="scss">
+  header {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+  }
+  h1 {
+    font-style: italic;
+
+    span {
+      font-size: 1rem;
+      font-weight: normal;
+      color: var(--color-accent--2)
+    }
+  }
   nav {
     display: block;
     position: sticky;
@@ -108,8 +124,10 @@
 </style>
 
 <header>
-  <h1><span>The</span> League</h1>
-  <span>{userName}</span>
+  <h1>The League <span>of Ordinary Gentlemen</span></h1>
+  <UserMenu>
+    <button on:click={logUserOut}>Log Out</button>
+  </UserMenu>
 </header>
 <div id="site-nav">
   <nav>

@@ -48,7 +48,7 @@
     });
 </script>
 
-<h1>League</h1>
+<h1>Teams</h1>
 
 <Table columns={8}>
   <div class="tablegrid-header tablegrid-row">

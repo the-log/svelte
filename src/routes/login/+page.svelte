@@ -10,6 +10,8 @@
 
 
   function attemptLogin(e: SubmitEvent) {
+    console.log(e.target);
+
     const messageSpan = (e.target as HTMLFormElement).querySelector('.error')!;
     messageSpan.textContent = "";
 
@@ -22,14 +24,14 @@
       } = item.data;
 
       if (response.message) {
-        messageSpan.textContent = response.message;
-        console.error(response.message);
+        // messageSpan.textContent = response.message;
+        // console.error(response.message);
       } else if (response.item) {
         authStatusStore.set(true);
         goto('/');
       } else {
-        messageSpan.textContent = 'An error has occurred.';
-        console.error(response);
+        // messageSpan.textContent = 'An error has occurred.';
+        // console.error(response);
       }
     })
   }
@@ -46,8 +48,19 @@
 <h1>Login</h1>
 
 <form on:submit|preventDefault={attemptLogin}>
-  <input type="email" name="email" id="email" placeholder="email" bind:value={email} />
-  <input type="password" name="password" id="password" placeholder="password" bind:value={password} />
+  <sl-input
+    type="email"
+    placeholder="Email"
+    autocomplete="email"
+    on:sl-input={(e)=>{email = e.target.value}}
+  ></sl-input>
+  <sl-input
+    type="password"
+    placeholder="Password"
+    autocomplete="password"
+    on:sl-input={(e)=>{password = e.target.value}}
+  ></sl-input>
   <span class="error"></span>
-  <button type="submit">Submit</button>
+  <sl-button type="submit" variant="primary">Submit</sl-button>
+
 </form>

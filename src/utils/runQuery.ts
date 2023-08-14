@@ -14,5 +14,21 @@ export default async function runQuery(query: string, variables = {}) {
       query,
       variables,
     })
-  }).then(r => r.json())
+  })
+  .then(r => r.json())
+  .then(json => {
+    // console.log(json);
+
+    if (json.errors) {
+
+      document.documentElement.dispatchEvent(new CustomEvent('graphqlerror', {
+        bubbles: false,
+        cancelable: false,
+        composed: true,
+        detail: json
+      }))
+    }
+
+    return json;
+  })
 }

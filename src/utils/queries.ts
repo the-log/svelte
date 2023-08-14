@@ -61,6 +61,7 @@ export default {
         positionRank
         overallRank
         espn_id
+        injuryStatus
         contract {
           team {
             name
