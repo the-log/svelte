@@ -18,9 +18,6 @@
       const {data, errors} = resp;
       if (errors) return errors;
 
-      console.log(resp);
-
-
       playerData = (data.players as Player[]).map(player => {
         const {name, position, team, contract, injuryStatus} = player;
         const {team: logTeam, salary, years} = contract ?? {};
@@ -46,6 +43,20 @@
 </script>
 
 <style lang="scss">
+  form {
+    background-color: var(--sl-color-primary-800);
+    color: var(--color-text--alt-1);
+    margin-bottom: 2rem;
+    padding: 1rem;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  sl-input {
+    grid-column: 1 / -1;
+  }
+
   sl-radio {
     display: inline-block;
     margin-inline-start: var(--sl-spacing-small);
@@ -62,24 +73,24 @@
 </style>
 
 <h1>Players</h1>
-<form on:submit={(e) => {e.preventDefault()}}>
-  <sl-input on:sl-input={(e) => {console.log(e);}} placeholder="Player Name"></sl-input>
-  <sl-select placeholder="Position">
+<form on:submit|preventDefault={()=>{}} class="sl-theme-light">
+  <sl-input on:sl-input={(e) => {playerName = e.target.value}} placeholder="Player Name"></sl-input>
+  <sl-select on:sl-input={(e) => {playerPosition = e.target.value}} placeholder="Position">
     {#each positions as [abbr, position] }
       <sl-option value="{abbr}">{position}</sl-option>
     {/each}
   </sl-select>
-  <sl-select placeholder="Team">
+  <sl-select on:sl-input={(e) => {playerTeam = e.target.value}} placeholder="Team">
     {#each leagueTeams as [abbr, team] }
       <sl-option value="{abbr}">{team}</sl-option>
     {/each}
   </sl-select>
-  <sl-radio-group label="Available" name="isAvailable" value="3">
-    <sl-radio value="1">Yes</sl-radio>
-    <sl-radio value="2">No</sl-radio>
-    <sl-radio value="3">Either</sl-radio>
+  <sl-radio-group on:sl-input={(e) => {playerIsAvailable = e.target.value}} size="small" label="Available" name="isAvailable" value="3">
+    <sl-radio value="yes">Yes</sl-radio>
+    <sl-radio value="no">No</sl-radio>
+    <sl-radio value="">Either</sl-radio>
   </sl-radio-group>
-  <sl-radio-group label="Rookie" name="isRookie" value="3">
+  <sl-radio-group on:sl-input={(e) => {playerIsRookie = e.target.value}} size="small" label="Rookie" name="isRookie" value="3">
     <sl-radio value="1">Yes</sl-radio>
     <sl-radio value="2">No</sl-radio>
     <sl-radio value="3">Either</sl-radio>
