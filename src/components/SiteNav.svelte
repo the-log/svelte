@@ -26,6 +26,7 @@ nav {
     justify-content: space-around;
     font-size: 2rem;
     border-top: 1px solid var(--color-bg--1);
+    padding-bottom: 1.5rem;
   }
 
   :is(button, a) {
@@ -62,6 +63,7 @@ nav {
       border-top: none;
       flex-direction: column;
       justify-content: flex-start;
+      padding-bottom: 0;
     }
 
     :global(:is(button, a).is-active) {
