@@ -1,5 +1,5 @@
-const backendURL = 'https://api.log.football/api/graphql';
-// const backendURL = 'http://localhost:3000/api/graphql';
+// const backendURL = 'https://api.log.football/api/graphql';
+const backendURL = 'http://localhost:3000/api/graphql';
 
 export default async function runQuery(query: string, variables = {}) {
   return fetch(backendURL, {

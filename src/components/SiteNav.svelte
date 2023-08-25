@@ -19,6 +19,8 @@
 
 <style lang="scss">
 nav {
+  position: sticky;
+  top: 0;
   box-shadow: var(--sl-shadow-up);
   ul {
     display: flex;
@@ -29,30 +31,9 @@ nav {
     padding-bottom: 1.5rem;
   }
 
-  :is(button, a) {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 1rem;
-    border-left: 2px solid transparent;
-    border-bottom: 2px solid transparent;
-    text-decoration: none;
-    width: 100%;
-    white-space: nowrap;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  a:hover {
-    color: var(--color-accent--2);
-  }
-
-  :global(:is(button, a).is-active) {
-    background-color: var(--color-bg--1);
-    border-bottom-color: var(--color-accent--2);
+  sl-icon-button {
+    color: var(--color-text--main);
+    font-size: 1.5rem;
   }
 }
 

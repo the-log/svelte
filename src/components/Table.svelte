@@ -25,7 +25,8 @@
   :global(.tablegrid-cell) {
     padding: 1rem;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
   }
 
   :global(.tablegrid-thumbcell) {
@@ -40,7 +41,7 @@
   }
 
   :global(.tablegrid-actions) {
-    justify-content: flex-end;
+    align-items: flex-end;
   }
 
   :global(.tablegrid-header) {

@@ -103,6 +103,9 @@ export default {
               equals: $abbr
             }
           }
+          status: {
+            in: ["active", "dts", "ir", "waiver"]
+          }
         }
         orderBy: {
           salary: desc
@@ -115,6 +118,7 @@ export default {
           position
           positionWeight
           injuryStatus
+          positionRankProj
         }
         status
         salary
@@ -127,6 +131,34 @@ export default {
       ) {
         name
         contractTotals
+      }
+    }
+  `,
+  'rfas': `
+    query {
+      contracts (
+        where: {
+          status: {
+            equals: "rfa"
+          }
+        }
+        orderBy: {
+          salary: desc
+        }
+      ) {
+        player {
+          espn_id
+          name
+          team
+          position
+          positionWeight
+          injuryStatus
+          positionRankProj
+          overallRankProj
+        }
+        status
+        salary
+        years
       }
     }
   `,

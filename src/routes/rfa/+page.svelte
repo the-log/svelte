@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-	import objByProperty from 'src/utils/objByProperty';
-	import queries from 'src/utils/queries';
-	import runQuery from 'src/utils/runQuery';
-  import type { Contract, TableData } from 'src/types/defs';
 	import formatMoney from 'src/utils/formatMoney';
-	import Table from 'src/components/Table.svelte';
-  import Icon from 'src/components/Icon.svelte';
-  import formatLength from 'src/utils/formatLength';
+  import Table from 'src/components/Table.svelte'
+	import objByProperty from 'src/utils/objByProperty';
+	import runQuery from 'src/utils/runQuery';
+	import queries from 'src/utils/queries';
+  import type { Contract } from 'src/types/defs';
+  import { teamStore } from "src/misc/stores";
+	import { each } from 'svelte/internal';
+	import Icon from 'src/components/Icon.svelte';
+	import formatLength from 'src/utils/formatLength';
 
-  let teamAbbr = $page.params.name;
 
   let playerData: any[] = [
   ];
-  $: teamName = '';
   $: playerExtra = {};
   $: players = playerData;
 
 
-  runQuery(queries['contracts-by-team'], {
-    abbr: teamAbbr.toUpperCase()
-  }).then(({data}) => {
+  teamStore.subscribe((value) => {
+    if (!value) return null;
 
-      teamName = data.team.name;
+    runQuery(queries['rfas'], {})
+      .then(({data}) => {
+        console.log('DEBUG:', data);
 
         playerData = data.contracts
           .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
@@ -35,9 +35,11 @@
             years: contract.years,
             espn_id: contract.player.espn_id || 0,
             status: contract.player.injuryStatus.toLowerCase(),
-            rank: contract.player.positionRankProj,
+            ovr: contract.player.overallRankProj,
+            pos: contract.player.positionRankProj
           }));
       })
+  })
 
   function toggleCollapse(e: PointerEvent) {
     const button = (e!.target! as HTMLElement).closest('button')!;
@@ -112,24 +114,22 @@
   }
 </style>
 
-<h1>{teamName}</h1>
+<h1>My Team</h1>
 
-<Table columns={5}>
+<Table columns={4}>
   <div class="tablegrid-header tablegrid-row">
     <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
     <div class="tablegrid-cell">Name</div>
-    <div class="tablegrid-cell">Team</div>
-    <div class="tablegrid-cell">Salary</div>
-    <div class="tablegrid-cell">Years</div>
+    <div class="tablegrid-cell">Pos Rank</div>
+    <div class="tablegrid-cell">Ovr Rank</div>
   </div>
 
-  {#each players as { name, team, position, salary, years, espn_id, status, rank }}
+  {#each players as { name, team, position, salary, years, espn_id, status, pos, ovr }}
     <div class="tablegrid-row" data-player-id="{espn_id}">
       <div class="tablegrid-cell tablegrid-thumbcell" status="{status}">{position}</div>
-      <div class="tablegrid-cell">{name} ({rank})</div>
-      <div class="tablegrid-cell">{team}</div>
-      <div class="tablegrid-cell">{salary}</div>
-      <div class="tablegrid-cell">{years}</div>
+      <div class="tablegrid-cell">{name} ({position}/{team})</div>
+      <div class="tablegrid-cell">{pos}</div>
+      <div class="tablegrid-cell">{ovr}</div>
       <div class="tablegrid-cell tablegrid-actions">
         <button class="plain" on:click={toggleCollapse}>
           <Icon name="caret_circle" width="1.25em" height="1.25em" />

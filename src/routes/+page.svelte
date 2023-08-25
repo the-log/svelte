@@ -4,17 +4,42 @@
 	import objByProperty from 'src/utils/objByProperty';
 	import runQuery from 'src/utils/runQuery';
 	import queries from 'src/utils/queries';
-  import type { Contract } from 'src/types/defs';
+  import type { Contract, Player } from 'src/types/defs';
   import { teamStore } from "src/misc/stores";
-	import { each } from 'svelte/internal';
-	import Icon from 'src/components/Icon.svelte';
+	import { onMount } from 'svelte/internal';
 	import formatLength from 'src/utils/formatLength';
+	import Actions from 'src/components/Actions.svelte';
+
+  let isMobile: boolean;
 
 
-  let playerData: any[] = [
-  ];
+  $: active = [];
+  $: dts = [];
+  $: ir = [];
+  $: waived = [];
+
   $: playerExtra = {};
-  $: players = playerData;
+
+  function processContracts(contracts: any[]) {
+    return contracts
+      .sort(objByProperty.bind({path: 'salary', dir: 'desc'}))
+      .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
+      .map((contract: Contract) => {
+        const {player, status: contractStatus, years, salary} = contract;
+        const {name, team, position, espn_id, injuryStatus} = player;
+
+        return {
+          name,
+          team,
+          position,
+          salary: formatMoney(salary),
+          years,
+          espn_id,
+          status: injuryStatus.toLowerCase(),
+          type: contractStatus
+        }
+      });
+  }
 
 
   teamStore.subscribe((value) => {
@@ -22,56 +47,48 @@
 
     runQuery(queries['contracts-by-team'], {abbr: value})
       .then(({data}) => {
-        console.log(data.contracts);
-
-        playerData = data.contracts
-          .sort(objByProperty.bind({path: 'salary', dir: 'desc'}))
-          .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
-          .map((contract: Contract) => ({
-            name: contract.player.name,
-            team: contract.player.team,
-            position: contract.player.position,
-            salary: formatMoney(contract.salary),
-            years: contract.years,
-            espn_id: contract.player.espn_id || 0,
-            status: contract.player.injuryStatus.toLowerCase()
-          }));
-      })
+        active = processContracts(data.contracts.filter(c => c.status === 'active'));
+        dts = processContracts(data.contracts.filter(c => c.status === 'dts'));
+        ir = processContracts(data.contracts.filter(c => c.status === 'ir'));
+        waived = processContracts(data.contracts.filter(c => c.status === 'waived'));
+      });
   })
 
-  function toggleCollapse(e: PointerEvent) {
-    const button = (e!.target! as HTMLElement).closest('button')!;
-    const icon = button.querySelector('svg')!;
-    const row = button.closest('.tablegrid-row')!;
-    const tray = row.querySelector('.tray')! as HTMLElement;
+  // function toggleCollapse(e: PointerEvent) {
+  //   const button = (e!.target! as HTMLElement).closest('button')!;
+  //   const icon = button.querySelector('svg')!;
+  //   const row = button.closest('.tablegrid-row')!;
+  //   const tray = row.querySelector('.tray')! as HTMLElement;
 
-    icon.style.rotate = tray.hidden ? '180deg' : '0deg';
-    tray.hidden = !tray.hidden;
+  //   icon.style.rotate = tray.hidden ? '180deg' : '0deg';
+  //   tray.hidden = !tray.hidden;
 
-    const isOpen = !tray.hidden;
-    const id = row.dataset.playerId;
+  //   const isOpen = !tray.hidden;
+  //   const id = row.dataset.playerId;
 
-    if (isOpen && !playerExtra[id]) {
-      playerExtra[id] = true;
+  //   if (isOpen && !playerExtra[id]) {
+  //     playerExtra[id] = true;
 
-      runQuery(queries['stats-by-player'], {id: parseInt(id)})
-        .then(({data}) => {
-          playerExtra[id] = data.player;
-          console.log(playerExtra);
+  //     runQuery(queries['stats-by-player'], {id: parseInt(id)})
+  //       .then(({data}) => {
+  //         playerExtra[id] = data.player;
+  //       })
+  //   }
+  // }
 
-        })
-    }
-  }
+  onMount(() => {
+    const mq = window.matchMedia('(max-width:45rem)');
+    isMobile = mq.matches;
+    mq.addEventListener('change', () => {
+      isMobile = mq.matches;
+    });
+  });
 </script>
 
 <style lang="scss">
   .tray {
     grid-column: 1 / -1;
     padding: 1rem;
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: auto repeat(6, auto);
-    align-items: start;
 
     img {
       width: 100px;
@@ -85,11 +102,6 @@
       display: grid;
       grid-template-columns: auto auto;
       gap: 0.25rem 1rem;
-    }
-
-    p {
-      font-size: 0.85em;
-      margin: 0;
     }
 
     .game-stats {
@@ -110,46 +122,182 @@
   [status="questionable"] {
     border-color: goldenrod;
   }
+
+  .text-minor {
+    font-size: 0.85rem;
+    color: var(--sl-color-neutral-600);
+  }
+
+  h2 {
+    margin-top: 2rem;
+  }
 </style>
 
 <h1>My Team</h1>
 
-<Table columns={5}>
+<h2>Active</h2>
+<Table columns={3}>
   <div class="tablegrid-header tablegrid-row">
-    <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
-    <div class="tablegrid-cell">Name</div>
-    <div class="tablegrid-cell">Team</div>
+    <div class="tablegrid-cell">Player</div>
     <div class="tablegrid-cell">Salary</div>
     <div class="tablegrid-cell">Years</div>
   </div>
 
-  {#each players as { name, team, position, salary, years, espn_id, status }}
+  {#each active as { name, team, position, salary, years, espn_id, status, type }}
     <div class="tablegrid-row" data-player-id="{espn_id}">
-      <div class="tablegrid-cell tablegrid-thumbcell" status="{status}">{position}</div>
-      <div class="tablegrid-cell">{name}</div>
-      <div class="tablegrid-cell">{team}</div>
+      <div class="tablegrid-cell" status="{status}">
+        {name}
+        <span class="text-minor">{team} - {position}</span>
+      </div>
       <div class="tablegrid-cell">{salary}</div>
       <div class="tablegrid-cell">{years}</div>
-      <div class="tablegrid-cell tablegrid-actions">
-        <button class="plain" on:click={toggleCollapse}>
-          <Icon name="caret_circle" width="1.25em" height="1.25em" />
-        </button>
-      </div>
+      <Actions player={{name, position, team, espn_id, type}} />
       <div class="tray" hidden>
-        <img src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{espn_id}.png&w=350&h=254" alt="{name} headshot" />
+        <sl-tab-group>
+          <sl-tab slot="nav" panel="overview">Overview</sl-tab>
+          <sl-tab slot="nav" panel="outlook">Outlook</sl-tab>
+          <sl-tab slot="nav" panel="stats">Statistics</sl-tab>
 
-        <div class="bio-stats">
-          <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
-          <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
-          <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
-        </div>
+          <sl-tab-panel name="overview">
+            <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
+            <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
+            <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
+          </sl-tab-panel>
 
-        <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
+          <sl-tab-panel name="outlook">
+            <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
+          </sl-tab-panel>
 
-        <div class="game-stats">
-          <span>Last Year</span>        <span>{playerExtra[espn_id]?.pointsLastYear || ''}</span>
-          <span>This Year (proj)</span> <span>{playerExtra[espn_id]?.pointsThisYearProj || ''}</span>
-        </div>
+          <sl-tab-panel name="stats">
+            TODO.
+          </sl-tab-panel>
+        </sl-tab-group>
+      </div>
+    </div>
+  {/each}
+</Table>
+
+<h2>Practice Squad</h2>
+<Table columns={3}>
+  <div class="tablegrid-header tablegrid-row">
+    <div class="tablegrid-cell">Player</div>
+    <div class="tablegrid-cell">Salary</div>
+    <div class="tablegrid-cell">Years</div>
+  </div>
+
+  {#each dts as { name, team, position, salary, years, espn_id, status, type }}
+    <div class="tablegrid-row" data-player-id="{espn_id}">
+      <div class="tablegrid-cell" status="{status}">
+        {name}
+        <span class="text-minor">{team} - {position}</span>
+      </div>
+      <div class="tablegrid-cell">{salary}</div>
+      <div class="tablegrid-cell">{years}</div>
+      <Actions player={{name, position, team, espn_id, type}} />
+      <div class="tray" hidden>
+        <sl-tab-group>
+          <sl-tab slot="nav" panel="overview">Overview</sl-tab>
+          <sl-tab slot="nav" panel="outlook">Outlook</sl-tab>
+          <sl-tab slot="nav" panel="stats">Statistics</sl-tab>
+
+          <sl-tab-panel name="overview">
+            <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
+            <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
+            <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="outlook">
+            <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="stats">
+            TODO.
+          </sl-tab-panel>
+        </sl-tab-group>
+      </div>
+    </div>
+  {/each}
+</Table>
+
+<h2>Injured Reserve</h2>
+<Table columns={3}>
+  <div class="tablegrid-header tablegrid-row">
+    <div class="tablegrid-cell">Player</div>
+    <div class="tablegrid-cell">Salary</div>
+    <div class="tablegrid-cell">Years</div>
+  </div>
+
+  {#each ir as { name, team, position, salary, years, espn_id, status, type }}
+    <div class="tablegrid-row" data-player-id="{espn_id}">
+      <div class="tablegrid-cell" status="{status}">
+        {name}
+        <span class="text-minor">{team} - {position}</span>
+      </div>
+      <div class="tablegrid-cell">{salary}</div>
+      <div class="tablegrid-cell">{years}</div>
+      <Actions player={{name, position, team, espn_id, type}} />
+      <div class="tray" hidden>
+        <sl-tab-group>
+          <sl-tab slot="nav" panel="overview">Overview</sl-tab>
+          <sl-tab slot="nav" panel="outlook">Outlook</sl-tab>
+          <sl-tab slot="nav" panel="stats">Statistics</sl-tab>
+
+          <sl-tab-panel name="overview">
+            <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
+            <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
+            <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="outlook">
+            <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="stats">
+            TODO.
+          </sl-tab-panel>
+        </sl-tab-group>
+      </div>
+    </div>
+  {/each}
+</Table>
+
+<h2>Waived</h2>
+<Table columns={3}>
+  <div class="tablegrid-header tablegrid-row">
+    <div class="tablegrid-cell">Player</div>
+    <div class="tablegrid-cell">Salary</div>
+    <div class="tablegrid-cell">Years</div>
+  </div>
+
+  {#each waived as { name, team, position, salary, years, espn_id, status, type }}
+    <div class="tablegrid-row" data-player-id="{espn_id}">
+      <div class="tablegrid-cell" status="{status}">
+        {name}
+        <span class="text-minor">{team} - {position}</span>
+      </div>
+      <div class="tablegrid-cell">{salary}</div>
+      <div class="tablegrid-cell">{years}</div>
+      <Actions player={{name, position, team, espn_id, type}} />
+      <div class="tray" hidden>
+        <sl-tab-group>
+          <sl-tab slot="nav" panel="overview">Overview</sl-tab>
+          <sl-tab slot="nav" panel="outlook">Outlook</sl-tab>
+          <sl-tab slot="nav" panel="stats">Statistics</sl-tab>
+
+          <sl-tab-panel name="overview">
+            <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
+            <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
+            <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="outlook">
+            <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
+          </sl-tab-panel>
+
+          <sl-tab-panel name="stats">
+            TODO.
+          </sl-tab-panel>
+        </sl-tab-group>
       </div>
     </div>
   {/each}
