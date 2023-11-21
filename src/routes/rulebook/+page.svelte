@@ -1,5 +1,9 @@
 <script lang="ts">
   import { marked } from 'marked';
+  import { isMobile as layoutStore } from "src/misc/stores";
+
+  $: isMobile = null;
+  layoutStore.subscribe((value) => {isMobile = value});
 
   let pages: string[] = [];
 
@@ -9,7 +13,19 @@
       .then(fetchedPages => {
         pages = fetchedPages.map(fetchedPage => {
           if (fetchedPage.status === 'fulfilled') {
-            return marked.parse(fetchedPage.value)
+            let chapter = fetchedPage.value.split('\n');
+            let headline = chapter.filter(s => s.startsWith('##'))[0];
+            let body = chapter.filter(s => !s.startsWith('##'));
+
+            if (headline) {
+              headline = headline.substring(3);
+            }
+
+            if (body.length) {
+              body = marked.parse(body.join('\n'))
+            }
+
+            return { headline, body }
           }
         });
       });
@@ -19,28 +35,40 @@
 </script>
 
 <style>
-  .toc-section :global(ol),
-  .toc-section :global(ul) {
+  #rulebook {
+    margin-bottom: 1rem;
+  }
+
+  #rulebook :global(ol),
+  #rulebook :global(ul) {
     list-style-position: outside;
     padding-inline-start: 2rem;
   }
 
-  .toc-section :global(ol) {
+  #rulebook :global(ol) {
     list-style-type: decimal;
   }
 
-  .toc-section :global(ul) {
+  #rulebook :global(ul) {
     list-style-type: circle;
   }
 
-  .toc-section  :global(li) {
+  #rulebook  :global(li) {
     padding: 0.25rem 0;
   }
 </style>
 
 <h1>Rulebook</h1>
-{#each pages as page}
-  <section class="toc-section">
-    {@html page}
-  </section>
-{/each}
+
+<sl-tab-group id="rulebook" placement="{isMobile ? null : 'end'}">
+  {#each pages as page, i}
+    <sl-tab slot="nav" panel="chapter-{i}">{page.headline}</sl-tab>
+  {/each}
+
+  {#each pages as page, i}
+    <sl-tab-panel name="chapter-{i}">
+      <h2>{page.headline}</h2>
+      {@html page.body}
+    </sl-tab-panel>
+  {/each}
+</sl-tab-group>

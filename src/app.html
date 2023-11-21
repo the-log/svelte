@@ -15,7 +15,7 @@
 		<link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
 		<script
 			type="module"
-			src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.6.0/cdn/shoelace-autoloader.js"
+			src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.9.0/cdn/shoelace-autoloader.js"
 		></script>
 
 		<title>The Leage of Ordinary Gentlemen</title>
@@ -1097,6 +1097,43 @@
 				display: none;
 			}
 		</style>
+		<script>
+			console.log(
+				'%cThis app is intercepting the console for error tracking purposes.',
+				'font-size:1rem;font-weight:bold;'
+			);
+			window.logs = [];
+
+			console.native = {
+				log: console.log,
+				warn: console.warn,
+				error: console.error
+			};
+
+			console.log = (...args) => {
+				window.logs.push({
+					type: 'log',
+					args: [...args]
+				});
+				console.native.log(...args);
+			};
+
+			console.warn = (...args) => {
+				window.logs.push({
+					type: 'warn',
+					args: [...args]
+				});
+				console.native.warn(...args);
+			};
+
+			console.error = (...args) => {
+				window.logs.push({
+					type: 'error',
+					args: [...args]
+				});
+				console.native.error(...args);
+			};
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>

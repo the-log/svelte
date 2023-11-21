@@ -6,10 +6,8 @@ export const positions = [
   ["TE", "Tight End"],
   ["K", "Kicker"],
   ["LB", "Linebacker"],
-  ["DE", "Defensive End"],
-  ["DT", "Defensive Line"],
-  ["S", "Safety"],
-  ["CB", "Cornerback"],
+  ["DE,DT", "Defensive Line"],
+  ["S,CB", "Defensive Back"],
 ]
 
 export const leagueTeams = [

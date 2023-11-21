@@ -60,6 +60,12 @@ export default {
         positionWeight
         positionRank
         overallRank
+        positionRankProj
+        overallRankProj
+        pointsThisYear
+        pointsLastYear
+        pointsThisYearProj
+        pointsThisWeekProj
         espn_id
         injuryStatus
         contract {
@@ -69,6 +75,7 @@ export default {
           }
           salary
           years
+          status
         }
       }
     }
@@ -119,6 +126,7 @@ export default {
           positionWeight
           injuryStatus
           positionRankProj
+          pointsThisYearProj
         }
         status
         salary

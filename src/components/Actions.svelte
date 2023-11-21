@@ -1,5 +1,6 @@
 <script lang="ts">
   export let player;
+  export let isOwner: boolean;
 
   const { name, position, team, espn_id, type } = player;
 
@@ -35,15 +36,21 @@
         <sl-icon slot="prefix" name="person"></sl-icon>
         More Information
       </sl-menu-item>
-      <sl-divider></sl-divider>
-      <sl-menu-item action="drop">
-        <sl-icon slot="prefix" name="arrow-down"></sl-icon>
-        To Waivers
-      </sl-menu-item>
-      <sl-menu-item action="ir">
-        <sl-icon slot="prefix" name="bandaid"></sl-icon>
-        To IR
-      </sl-menu-item>
+      {#if isOwner}
+        <sl-divider></sl-divider>
+        <sl-menu-item action="drop">
+          <sl-icon slot="prefix" name="arrow-down"></sl-icon>
+          To Waivers
+        </sl-menu-item>
+        <sl-menu-item action="ir">
+          <sl-icon slot="prefix" name="bandaid"></sl-icon>
+          To IR
+        </sl-menu-item>
+        <sl-menu-item action="promote">
+          <sl-icon slot="prefix" name="arrow-up"></sl-icon>
+          To Active Roster
+        </sl-menu-item>
+      {/if}
     </sl-menu>
   </sl-dropdown>
 </div>

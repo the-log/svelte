@@ -50,8 +50,8 @@
 
   :global(.tablegrid-header > *) {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: flex-start;
   }
 
   :global(.tray) {

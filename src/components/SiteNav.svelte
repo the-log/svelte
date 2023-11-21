@@ -4,20 +4,55 @@
 
   function setActiveNav(route:string|undefined) {
     if (typeof route === 'string') {
-      Array.from(document.querySelectorAll('nav sl-icon-button'))
+      document.querySelectorAll("nav sl-icon-button")
         .forEach(item => {
-          const link = item.shadowRoot?.querySelector('a');
-          item.classList.toggle('is-active', link!.getAttribute('href') === route);
-        })
+          item.classList.toggle('is-active', item.matches(`sl-icon-button[href="${route}"]`))
+        });
     }
   }
 
   afterNavigate((navigation) => {
     setActiveNav(navigation.to?.route.id ?? undefined);
   })
+
+  function openDialog() {
+    document.querySelector('#issue-report').show();
+  }
+
+  async function submitReport(e) {
+    e.preventDefault();
+
+    const summary = e.target.querySelector('sl-textarea').value;
+    const { logs, navigator, location, innerHeight, innerWidth } = window;
+
+    const body = `
+## Report
+${summary}
+
+## Session Info
+${location.href}
+${navigator.userAgent}
+${innerWidth}px x ${innerHeight}px
+${JSON.stringify(logs)}
+    `;
+
+    const issue_data = {
+      summary,
+      path: location.href,
+      browser_type: navigator.userAgent,
+      browser_size: `${innerWidth}x${innerHeight}`,
+      logs,
+    }
+
+    const reqUrl = `https://api.val.town/v1/run/andy_blum.createIssue?args=[${JSON.stringify(issue_data)}]`;
+
+    const issue_url = await fetch(reqUrl).then(r => r.json());
+    console.log(issue_url);
+  }
 </script>
 
 <style lang="scss">
+
 nav {
   position: sticky;
   top: 0;
@@ -72,6 +107,10 @@ nav {
     border-left-color: var(--color-accent--1);
   }
 }
+
+#issue-report {
+  --width: min(800px, calc(100vw - 2rem))
+}
 </style>
 
 <nav>
@@ -101,5 +140,20 @@ nav {
         <sl-icon-button name="book" label="Rulebook" href="/rulebook"></sl-icon-button>
       </sl-tooltip>
     </li>
+    <li>
+      <sl-tooltip content="Report Issue" placement="right">
+        <sl-icon-button name="send-exclamation" label="Report Issue" on:click={openDialog}></sl-icon-button>
+      </sl-tooltip>
+    </li>
   </ul>
+  <div>
+    <sl-dialog label="Report An Issue" id="issue-report">
+      <form id="issue-form" on:submit={submitReport}>
+        <p>When submitted, your comments below and some information about your current session will be reported back to this site's github repository</p>
+        <sl-textarea placeholder="What went wrong?" filled resize="auto"></sl-textarea>
+        <p>&nbsp;</p>
+        <sl-button variant="primary" type="submit">Submit</sl-button>
+      </form>
+    </sl-dialog>
+  </div>
 </nav>

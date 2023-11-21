@@ -10,8 +10,6 @@
 
 
   function attemptLogin(e: SubmitEvent) {
-    console.log(e.target);
-
     const messageSpan = (e.target as HTMLFormElement).querySelector('.error')!;
     messageSpan.textContent = "";
 

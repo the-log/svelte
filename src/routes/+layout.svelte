@@ -3,9 +3,10 @@
   import { browser } from "$app/environment";
 	import runQuery from 'src/utils/runQuery';
 	import queries from 'src/utils/queries';
-  import { userStore, teamStore, authStatusStore } from "src/misc/stores";
+  import { userStore, teamStore, authStatusStore, isMobile } from "src/misc/stores";
   import UserMenu from 'src/components/UserMenu.svelte';
 	import SiteNav from 'src/components/SiteNav.svelte';
+	import { onMount } from 'svelte';
 
   let isLoggedIn: boolean;
   let userName = '';
@@ -54,6 +55,14 @@
       }
     })
   }
+
+  onMount(() => {
+    const mq = window.matchMedia('(max-width:45rem)');
+    isMobile.set(mq.matches);
+    mq.addEventListener('change', () => {
+      isMobile.set(mq.matches);
+    });
+  });
 </script>
 
 <style lang="scss">
@@ -87,17 +96,26 @@
     grid-area: nav;
     background: var(--color-bg--2);
     position: sticky;
+    z-index: 1;
     bottom: 0;
   }
 
   main {
     grid-area: body;
+
+    padding: 0 0.5rem;
+
+    @media (min-width: 45rem) {
+      padding: 0;
+    }
   }
 
   footer {
     grid-area: foot;
     padding-bottom: 2rem;
     text-align: center;
+    font-size: 0.85rem;
+    color: var(--sl-color-neutral-600);
   }
 </style>
 
@@ -114,5 +132,5 @@
   <slot />
 </main>
 <footer>
-  <p>&copy; 2023</p>
+  <p>&copy; 2010-{(new Date()).getFullYear()} The League of Ordinary Gentlemen. All Rights Reserved.</p>
 </footer>
