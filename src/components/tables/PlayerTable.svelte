@@ -2,13 +2,10 @@
   import Table from 'src/components/Table.svelte'
 	import Actions from 'src/components/Actions.svelte';
   import { isMobile as layoutStore } from "src/misc/stores";
+	import formatMoney from 'src/utils/formatMoney';
 
-  export let title: String;
+  export let title: String | undefined = undefined;
   export let players: any[];
-
-  $: {
-    console.log(players)
-  }
 
   $: sortConfig = {
     key: "pointsThisYearProj",
@@ -86,9 +83,11 @@
 </style>
 
 {#if players.length}
-  <h2>{title}</h2>
+  {#if title}
+    <h2>{title}</h2>
+  {/if}
 
-  <Table columns={isMobile ? 3 : 5}>
+  <Table columns={isMobile ? 3 : 4}>
     <div class="tablegrid-header tablegrid-row">
       {#if !isMobile}
         <div class="tablegrid-cell"></div>
@@ -140,18 +139,25 @@
 
     {#each players as player}
       {@const {
+        contract,
         name,
         team,
         espn_id,
         position,
-        logTeam,
-        salary,
-        years,
         injuryStatus,
         positionRankProj,
         overallRankProj,
-        type
       } = player}
+      {@const {
+        team: logTeam,
+        salary,
+        years,
+        status,
+      } = contract ?? {}}
+      {@const {
+        name: logTeamName,
+        abbreviation: abbr,
+      } = logTeam ?? {}}
       {@const points = player[sortConfig.key]}
       <div class="tablegrid-row" data-player-id="{espn_id}">
         {#if !isMobile}
@@ -171,21 +177,21 @@
           {name}
           <span class="text-minor">
             {team} - {position}
-            {#if isMobile}&nbsp;&nbsp;{salary}, {years}yr{/if}
+            {#if isMobile}&nbsp;&nbsp;{formatMoney(salary)}, {years}yr{/if}
           </span>
         </div>
         {#if !isMobile}
           <div class="tablegrid-cell">
             {#if logTeam}
-              {logTeam.name}
-              <span class="text-minor">{salary}, {years}yr</span>
+              {logTeamName}
+              <span class="text-minor">{formatMoney(salary)}, {years}yr</span>
             {:else}
             <span class="text-minor">-----</span>
             {/if}
           </div>
         {/if}
         <div class="tablegrid-cell">{Math.round(points)}</div>
-        <Actions isOwner={false} player={{ name, position, team, espn_id, type }} />
+        <Actions espn_id={espn_id} logTeam={abbr} status={status} player={player} />
       </div>
     {/each}
   </Table>

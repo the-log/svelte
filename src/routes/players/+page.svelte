@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
 	import type { Player } from "src/types/defs";
 	import formatMoney from "src/utils/formatMoney";
 	import queries from "src/utils/queries";
@@ -6,68 +7,32 @@
   import {positions, leagueTeams} from "src/utils/playerInfo";
 	import PlayerTable from "src/components/tables/PlayerTable.svelte";
 
-  let playerData: any[] = [];
-
-  $: players = playerData;
+  let players: any[] = [];
+  let playerCount: number = 0;
 
   let take = 25;
   let skip = 0;
   let filters = {
     "NOT": {}
   };
-  $: order = { pointsThisYearProj: 'desc' };
+  let order = { pointsThisYearProj: 'desc' };
 
+  $: pagerMessage = playerCount
+    ? `${skip + 1} - ${skip + Math.min(take, playerCount)} of ${playerCount}`
+    : `No results found`;
 
-  $: {
+  $: if (take || skip || filters || order) {
     runQuery(queries["all-players"], {take, skip, filters, order})
     .then((resp) => {
       const {data, errors} = resp;
       if (errors) return errors;
 
-      playerData = (data.players as Player[]).map(player => {
-        const {
-          name,
-          position,
-          team,
-          espn_id,
-          contract,
-          injuryStatus,
-          pointsThisYear,
-          pointsThisYearProj,
-          pointsThisWeekProj,
-          pointsLastYear,
-          positionRank,
-          overallRank,
-          positionRankProj,
-          overallRankProj
-        } = player;
+      playerCount = data.playersCount;
+      players = data.players;
 
-        const {team: logTeam, salary, years, status: type} = contract ?? {};
-        const {abbreviation} = logTeam ?? {};
+      updatePager();
+    });
 
-        return ({
-          name,
-          position,
-          team,
-          espn_id,
-          logTeam,
-          salary: formatMoney(salary),
-          years,
-          type,
-          abbreviation,
-          injuryStatus: injuryStatus.toLowerCase(),
-          pointsThisYear,
-          pointsThisWeekProj,
-          pointsThisYearProj,
-          pointsLastYear,
-          positionRank,
-          overallRank,
-          positionRankProj,
-          overallRankProj
-
-        })
-      });
-    })
   }
 
   function onNameInput(e) {
@@ -80,7 +45,7 @@
     } else {
       delete newFilters.name;
     }
-
+    skip = 0;
     filters = newFilters;
   }
 
@@ -95,7 +60,7 @@
     } else {
       delete newFilters.position;
     }
-
+    skip = 0;
     filters = newFilters;
   }
 
@@ -109,7 +74,7 @@
     } else {
       delete newFilters.team;
     }
-
+    skip = 0;
     filters = newFilters;
   }
 
@@ -139,7 +104,7 @@
       delete newFilters.contract;
       delete newFilters.NOT.contract;
     }
-
+    skip = 0;
     filters = newFilters;
   }
 
@@ -159,7 +124,7 @@
     } else {
       delete newFilters.isRookie
     }
-
+    skip = 0;
     filters = newFilters;
   }
 
@@ -167,6 +132,41 @@
     const {key, dir} = e.detail;
     order = {
       [`${key}`]: dir
+    }
+    skip = 0;
+  }
+
+  function onPagination(e: PointerEvent) {
+    const { target } = e;
+    const { value } = (target as HTMLElement).dataset ?? {};
+
+    switch (value) {
+      case 'first':
+        skip = 0;
+        break;
+      case 'prev':
+        skip = Math.max(skip - take, 0);
+        break;
+      case 'next':
+        skip = Math.min(skip + take, playerCount - take);
+        break;
+      case 'last':
+        skip = playerCount - take;
+        break;
+
+      default:
+        break;
+    }
+
+    updatePager();
+  }
+
+  function updatePager() {
+    if (browser) {
+      const prevButtons = (document?.querySelectorAll('[data-value="first"], [data-value="prev"]') as NodeListOf<HTMLButtonElement>);
+      const nextButtons = (document?.querySelectorAll('[data-value="last"], [data-value="next"]') as NodeListOf<HTMLButtonElement>);
+      prevButtons.forEach(btn => btn.disabled = (skip === 0));
+      nextButtons.forEach(btn => btn.disabled = (playerCount <= (take + skip)))
     }
   }
 
@@ -219,6 +219,23 @@
     margin-bottom: var(--sl-spacing-small);
     font-weight: bold;
   }
+
+  .pagination {
+    margin: 1rem 0 ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    sl-icon-button {
+      color: var(--color-text--main);
+    }
+
+    .results {
+      min-width: 10rem;
+      text-align: center;
+    }
+  }
 </style>
 
 <h1>Players</h1>
@@ -247,5 +264,19 @@
 </form>
 
 <div on:update-sort={onOrderUpdate}>
-  <PlayerTable players={players} title="Active" />
+  <nav class="pagination" on:click={onPagination}>
+    <sl-icon-button data-value="first" name="chevron-double-left" label="Show first set"></sl-icon-button>
+    <sl-icon-button data-value="prev" name="chevron-left" label="Show previous set"></sl-icon-button>
+    <span class="results">{pagerMessage}</span>
+    <sl-icon-button data-value="next" name="chevron-right" label="Show next set"></sl-icon-button>
+    <sl-icon-button data-value="last" name="chevron-double-right" label="Show last set"></sl-icon-button>
+  </nav>
+  <PlayerTable players={players} />
+  <nav class="pagination" on:click={onPagination}>
+    <sl-icon-button data-value="first" name="chevron-double-left" label="Show first set"></sl-icon-button>
+    <sl-icon-button data-value="prev" name="chevron-left" label="Show previous set"></sl-icon-button>
+    <span class="results">{pagerMessage}</span>
+    <sl-icon-button data-value="next" name="chevron-right" label="Show next set"></sl-icon-button>
+    <sl-icon-button data-value="last" name="chevron-double-right" label="Show last set"></sl-icon-button>
+  </nav>
 </div>

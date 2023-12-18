@@ -47,7 +47,9 @@ export default {
       $filters: PlayerWhereInput,
       $order: [PlayerOrderByInput!]!
     ) {
-      playersCount
+      playersCount (
+        where: $filters
+      )
       players (
         take: $take,
         skip: $skip,
