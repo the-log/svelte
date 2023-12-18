@@ -3,6 +3,7 @@
 	import Actions from 'src/components/Actions.svelte';
   import { isMobile as layoutStore } from "src/misc/stores";
   import { userStore } from "src/misc/stores";
+	import { select_value } from 'svelte/internal';
 
   export let title: String;
   export let players: any[];
@@ -11,10 +12,9 @@
   $: isMobile = null;
   layoutStore.subscribe((value) => {isMobile = value});
 
-  $: isOwner = false;
+  let teamAbbr = '';
   userStore.subscribe((value) => {
-    const userTeam = value?.team?.abbreviation || '';
-    isOwner = userTeam?.toLowerCase() === team?.toLowerCase();
+    teamAbbr = value?.team?.abbreviation ?? '';
   });
 </script>
 
@@ -80,10 +80,11 @@
       <div class="tablegrid-cell">Projected Points</div>
     </div>
 
-    {#each players as { name, team, position, salary, years, espn_id, status, type, pointsThisYearProj, positionRankProj }}
+    {#each players as player}
+      {@const { name, team, position, salary, years, espn_id, playerStatus, type, pointsThisYearProj, positionRankProj, contractStatus } = player}
       <div class="tablegrid-row" data-player-id="{espn_id}">
-        {#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell" {status}>{position}</div>{/if}
-        <div class="tablegrid-cell" status="{isMobile ? status : null}">
+        {#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>{/if}
+        <div class="tablegrid-cell" status="{isMobile ? playerStatus : null}">
           {name}
           {#if isMobile}<span class="text-minor">{team} - {position}</span>{/if}
         </div>
@@ -92,7 +93,7 @@
         <div class="tablegrid-cell">{years}</div>
         <div class="tablegrid-cell">{positionRankProj}</div>
         <div class="tablegrid-cell">{Math.round(pointsThisYearProj)}</div>
-        <Actions {isOwner} player={{name, position, team, espn_id, type}} />
+        <Actions espn_id={espn_id} logTeam={teamAbbr} status={contractStatus} player={player} />
         <div class="tray" hidden>
           <sl-tab-group>
             <sl-tab slot="nav" panel="overview">Overview</sl-tab>

@@ -6,6 +6,7 @@
   import type { Contract } from 'src/types/defs';
   import { teamStore } from "src/misc/stores";
 	import TeamTable from 'src/components/tables/TeamTable.svelte';
+	import PlayerTable from 'src/components/tables/PlayerTable.svelte';
 
   $: team = '';
   $: active = [];
@@ -30,7 +31,8 @@
           salary: formatMoney(salary),
           years,
           espn_id,
-          status: injuryStatus.toLowerCase(),
+          playerStatus: injuryStatus.toLowerCase(),
+          contractStatus: contractStatus.toLowerCase(),
           type: contractStatus,
           pointsThisYearProj,
           positionRankProj
