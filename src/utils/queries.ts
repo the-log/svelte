@@ -195,5 +195,12 @@ export default {
         seasonOutlook
       }
     }
-  `
+  `,
+  'new-bid': `
+    mutation Mutation($data: BidCreateInput!) {
+      createBid(data: $data) {
+        created
+      }
+    }
+  `,
 }
