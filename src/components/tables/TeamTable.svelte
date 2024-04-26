@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Table from 'src/components/Table.svelte'
-	import Actions from 'src/components/Actions.svelte';
-  import { isMobile as layoutStore } from "src/misc/stores";
-  import { userStore } from "src/misc/stores";
+  import Table from '../Table.svelte'
+	import Actions from '../Actions.svelte';
+  import { isMobile as layoutStore } from "../../misc/stores";
+  import { userStore } from "../../misc/stores";
 	import { select_value } from 'svelte/internal';
 
   export let title: String;
@@ -11,11 +11,6 @@
 
   $: isMobile = null;
   layoutStore.subscribe((value) => {isMobile = value});
-
-  let teamAbbr = '';
-  userStore.subscribe((value) => {
-    teamAbbr = value?.team?.abbreviation ?? '';
-  });
 </script>
 
 <style lang="scss">
@@ -69,51 +64,34 @@
 {#if players.length}
   <h2>{title}</h2>
 
-  <Table columns={isMobile ? 5 : 7}>
+  <Table columns={isMobile ? 3 : 5}>
     <div class="tablegrid-header tablegrid-row">
       {#if !isMobile}<div class="tablegrid-cell"></div>{/if}
       <div class="tablegrid-cell">Player</div>
       {#if !isMobile}<div class="tablegrid-cell">Team</div>{/if}
       <div class="tablegrid-cell">Salary</div>
       <div class="tablegrid-cell">Years</div>
-      <div class="tablegrid-cell">Projected Rank</div>
-      <div class="tablegrid-cell">Projected Points</div>
     </div>
 
     {#each players as player}
-      {@const { name, team, position, salary, years, espn_id, playerStatus, type, pointsThisYearProj, positionRankProj, contractStatus } = player}
+      {@const { name, team: nflTeam, position, salary, years, espn_id, playerStatus, contractStatus, contract_id } = player}
       <div class="tablegrid-row" data-player-id="{espn_id}">
         {#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>{/if}
         <div class="tablegrid-cell" status="{isMobile ? playerStatus : null}">
           {name}
           {#if isMobile}<span class="text-minor">{team} - {position}</span>{/if}
         </div>
-        {#if !isMobile}<div class="tablegrid-cell">{team}</div>{/if}
+        {#if !isMobile}<div class="tablegrid-cell">{nflTeam}</div>{/if}
         <div class="tablegrid-cell">{salary}</div>
         <div class="tablegrid-cell">{years}</div>
-        <div class="tablegrid-cell">{positionRankProj}</div>
-        <div class="tablegrid-cell">{Math.round(pointsThisYearProj)}</div>
-        <Actions espn_id={espn_id} logTeam={teamAbbr} status={contractStatus} player={player} />
-        <div class="tray" hidden>
-          <sl-tab-group>
-            <sl-tab slot="nav" panel="overview">Overview</sl-tab>
-            <sl-tab slot="nav" panel="outlook">Outlook</sl-tab>
-            <sl-tab slot="nav" panel="stats">Statistics</sl-tab>
-
-            <sl-tab-panel name="overview">
-              <span>HT/WT</span>
-              <span>BIRTH</span>
-              <span>DRAFT</span>
-            </sl-tab-panel>
-
-            <sl-tab-panel name="outlook">
-
-            </sl-tab-panel>
-
-            <sl-tab-panel name="stats">
-              TODO.
-            </sl-tab-panel>
-          </sl-tab-group>
+        <div class="tablegrid-cell tablegrid-actions">
+          <Actions
+            espn_id={espn_id}
+            logTeam={team}
+            status={contractStatus}
+            player={player}
+            contract={contract_id}
+          />
         </div>
       </div>
     {/each}

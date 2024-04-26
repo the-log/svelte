@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { TableData } from '../types/defs';
-  import Actions from "src/components/Actions.svelte";
   export let columns: number;
 </script>
 
@@ -56,6 +54,11 @@
 
   :global(.tray) {
     grid-column: 1 / -1;
+  }
+
+  :global(.text-minor) {
+    font-size: 0.85rem;
+    color: var(--sl-color-neutral-600);
   }
 </style>
 

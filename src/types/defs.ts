@@ -24,10 +24,12 @@ export interface Player {
 
 export type Position = "QB" | "RB" | "WR" | "TE" | "K" | "LB" | "DE" | "DT" | "S" | "CB";
 
+type ID = string | number;
 /**
  * Contract list from keystone
  */
 export interface Contract {
+  id: ID
   node_id: number
   salary: number
   years: number
@@ -42,6 +44,7 @@ export interface Contract {
  * Team list from keystone
  */
 export interface Team {
+  id: ID
   espn_id:number
   name: string
   logo: string
@@ -74,6 +77,7 @@ export interface Team {
  * User list from keystone
  */
 export interface User {
+  id: ID
   name: string
   email: string
   password: string
@@ -85,6 +89,7 @@ export interface User {
  * Bid list from keystone
  */
 export interface Bid {
+  id: ID
   team: Team
   player: Player
   salary:number

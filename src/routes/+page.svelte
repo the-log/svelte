@@ -1,19 +1,17 @@
 <script lang="ts">
-	import formatMoney from 'src/utils/formatMoney';
-	import objByProperty from 'src/utils/objByProperty';
-	import runQuery from 'src/utils/runQuery';
-	import queries from 'src/utils/queries';
-  import type { Contract } from 'src/types/defs';
-  import { teamStore } from "src/misc/stores";
-	import TeamTable from 'src/components/tables/TeamTable.svelte';
-	import PlayerTable from 'src/components/tables/PlayerTable.svelte';
+	import formatMoney from '../utils/formatMoney';
+	import objByProperty from '../utils/objByProperty';
+	import runQuery from '../utils/runQuery';
+	import queries from '../utils/queries';
+  import type { Contract } from '../types/defs';
+  import { userStore } from "../misc/stores";
+	import TeamTable from '../components/tables/TeamTable.svelte';
 
-  $: team = '';
-  $: active = [];
-  $: dts = [];
-  $: ir = [];
-  $: waived = [];
-
+  let team = '';
+  $: active = <any>[];
+  $: dts = <any>[];
+  $: ir = <any>[];
+  $: waived = <any>[];
 
   function processContracts(contracts: any[]) {
 
@@ -21,10 +19,11 @@
       .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
       .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
       .map((contract: Contract) => {
-        const {player, status: contractStatus, years, salary} = contract;
+        const {id, player, status: contractStatus, years, salary} = contract;
         const {name, team, position, espn_id, injuryStatus, pointsThisYearProj, positionRankProj} = player;
 
         return {
+          contract_id: id,
           name,
           team,
           position,
@@ -33,37 +32,34 @@
           espn_id,
           playerStatus: injuryStatus.toLowerCase(),
           contractStatus: contractStatus.toLowerCase(),
-          type: contractStatus,
           pointsThisYearProj,
           positionRankProj
         }
       });
   }
 
-  function getContracts(abbr) {
-    runQuery(queries['contracts-by-team'], {abbr})
-      .then(({data}) => {
-        active = processContracts(data.contracts.filter(c => c.status === 'active'));
-        dts = processContracts(data.contracts.filter(c => c.status === 'dts'));
-        ir = processContracts(data.contracts.filter(c => c.status === 'ir'));
-        waived = processContracts(data.contracts.filter(c => c.status === 'waived'));
-      });
+  function getContracts(teamID: string) {
+    if (teamID) {
+      runQuery(queries['contracts-by-team-id'], {id: teamID})
+        .then(({data}) => {
+          active = processContracts(data.contracts.filter(c => c.status === 'active'));
+          dts = processContracts(data.contracts.filter(c => c.status === 'dts'));
+          ir = processContracts(data.contracts.filter(c => c.status === 'ir'));
+          waived = processContracts(data.contracts.filter(c => c.status === 'waived'));
+        });
+    }
   }
 
-  teamStore.subscribe((value) => {
+  userStore.subscribe((value) => {
     if (!value) return null;
 
-    team = value;
-
-    getContracts(value);
-
-
+    const {teamID} = value;
+    team = teamID;
+    getContracts(teamID);
   })
 </script>
 
-<div on:refresh-contracts>
   <TeamTable team={team} players={active} title="Active" />
   <TeamTable team={team} players={dts} title="Practice Squad" />
   <TeamTable team={team} players={ir} title="Injured Reserve" />
   <TeamTable team={team} players={waived} title="Waived" />
-</div>

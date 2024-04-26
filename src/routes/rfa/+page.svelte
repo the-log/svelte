@@ -5,7 +5,6 @@
 	import runQuery from 'src/utils/runQuery';
 	import queries from 'src/utils/queries';
   import type { Contract } from 'src/types/defs';
-  import { teamStore } from "src/misc/stores";
 	import { each } from 'svelte/internal';
 	import Icon from 'src/components/Icon.svelte';
 	import formatLength from 'src/utils/formatLength';
@@ -17,29 +16,29 @@
   $: players = playerData;
 
 
-  teamStore.subscribe((value) => {
-    if (!value) return null;
+  // teamStore.subscribe((value) => {
+  //   if (!value) return null;
 
-    runQuery(queries['rfas'], {})
-      .then(({data}) => {
-        console.log('DEBUG:', data);
+  //   runQuery(queries['rfas'], {})
+  //     .then(({data}) => {
+  //       console.log('DEBUG:', data);
 
-        playerData = data.contracts
-          .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
-          .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
-          .map((contract: Contract) => ({
-            name: contract.player.name,
-            team: contract.player.team,
-            position: contract.player.position,
-            salary: formatMoney(contract.salary),
-            years: contract.years,
-            espn_id: contract.player.espn_id || 0,
-            status: contract.player.injuryStatus.toLowerCase(),
-            ovr: contract.player.overallRankProj,
-            pos: contract.player.positionRankProj
-          }));
-      })
-  })
+  //       playerData = data.contracts
+  //         .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
+  //         .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
+  //         .map((contract: Contract) => ({
+  //           name: contract.player.name,
+  //           team: contract.player.team,
+  //           position: contract.player.position,
+  //           salary: formatMoney(contract.salary),
+  //           years: contract.years,
+  //           espn_id: contract.player.espn_id || 0,
+  //           status: contract.player.injuryStatus.toLowerCase(),
+  //           ovr: contract.player.overallRankProj,
+  //           pos: contract.player.positionRankProj
+  //         }));
+  //     })
+  // })
 
   function toggleCollapse(e: PointerEvent) {
     const button = (e!.target! as HTMLElement).closest('button')!;

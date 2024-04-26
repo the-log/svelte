@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Table from 'src/components/Table.svelte'
-	import Actions from 'src/components/Actions.svelte';
-  import { isMobile as layoutStore } from "src/misc/stores";
-	import formatMoney from 'src/utils/formatMoney';
+  import Table from '../Table.svelte'
+	import Actions from '../Actions.svelte';
+  import { isMobile as layoutStore } from "../../misc/stores";
+	import formatMoney from '../../utils/formatMoney';
 
   export let title: String | undefined = undefined;
   export let players: any[];
@@ -56,11 +56,6 @@
 
   [status="questionable"] {
     border-color: goldenrod;
-  }
-
-  .text-minor {
-    font-size: 0.85rem;
-    color: var(--sl-color-neutral-600);
   }
 
   h2 {
@@ -191,7 +186,14 @@
           </div>
         {/if}
         <div class="tablegrid-cell">{Math.round(points)}</div>
-        <Actions espn_id={espn_id} logTeam={abbr} status={status} player={player} />
+        <div class="tablegrid-cell tablegrid-actions">
+          <Actions
+            espn_id={espn_id}
+            logTeam={abbr}
+            status={status}
+            player={player}
+          />
+        </div>
       </div>
     {/each}
   </Table>

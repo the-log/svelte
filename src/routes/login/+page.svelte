@@ -1,17 +1,13 @@
 <script lang="ts">
-	import queries from "src/utils/queries";
-	import runQuery from "src/utils/runQuery";
-  import { authStatusStore } from "src/misc/stores";
+	import queries from "../../utils/queries";
+	import runQuery from "../../utils/runQuery";
 	import { goto } from "$app/navigation";
+  import { notify } from "../../utils/notify";
+	import { userStore, authStatusStore } from "../../misc/stores";
 
   let email: string, password: string;
-  let userName = '';
-  let isLoggedIn: boolean;
-
 
   function attemptLogin(e: SubmitEvent) {
-    const messageSpan = (e.target as HTMLFormElement).querySelector('.error')!;
-    messageSpan.textContent = "";
 
     runQuery(queries["begin-session"], {
       identity: email,
@@ -21,15 +17,37 @@
         authenticateUserWithPassword: response
       } = item.data;
 
+      // Authentication Error
       if (response.message) {
-        // messageSpan.textContent = response.message;
-        // console.error(response.message);
-      } else if (response.item) {
+        notify({
+          title: 'Error',
+          message: response.message,
+          variant: 'danger',
+        })
+      }
+
+      // Authentication Successful
+      else if (response.item) {
+        userStore.set({
+          userID: response.item.id,
+          userName: response.item.name,
+          teamID: response.item.team?.id
+        })
         authStatusStore.set(true);
+        const {name} = response.item
         goto('/');
-      } else {
-        // messageSpan.textContent = 'An error has occurred.';
-        // console.error(response);
+        notify({
+          title: 'Login Successful',
+          message: name ? `Welcome, ${name}` : 'Welcome!'
+        })
+      }
+      // Something weird and unexpected
+      else {
+        notify({
+          title: 'Error',
+          message: 'An error has occurred. See the console for more details.'
+        })
+        console.error(item);
       }
     })
   }
@@ -42,23 +60,29 @@
     gap: 1rem;
     align-items: flex-start;
   }
+
+  form sl-alert {
+    /* display: block; */
+    width: 100%;
+    max-width: 20em;
+  }
 </style>
 <h1>Login</h1>
 
 <form on:submit|preventDefault={attemptLogin}>
   <sl-input
+    size="medium"
     type="email"
     placeholder="Email"
     autocomplete="email"
     on:sl-input={(e)=>{email = e.target.value}}
   ></sl-input>
   <sl-input
+    size="medium"
     type="password"
     placeholder="Password"
     autocomplete="password"
     on:sl-input={(e)=>{password = e.target.value}}
   ></sl-input>
-  <span class="error"></span>
   <sl-button type="submit" variant="primary">Submit</sl-button>
-
 </form>

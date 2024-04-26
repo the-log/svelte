@@ -1,11 +1,11 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-	import type { Player } from "src/types/defs";
-	import formatMoney from "src/utils/formatMoney";
-	import queries from "src/utils/queries";
-	import runQuery from "src/utils/runQuery";
-  import {positions, leagueTeams} from "src/utils/playerInfo";
-	import PlayerTable from "src/components/tables/PlayerTable.svelte";
+	import type { Player } from "../../types/defs";
+	import formatMoney from "../../utils/formatMoney";
+	import queries from "../../utils/queries";
+	import runQuery from "../../utils/runQuery";
+  import {positions, leagueTeams} from "../../utils/playerInfo";
+	import PlayerTable from "../../components/tables/PlayerTable.svelte";
 
   let players: any[] = [];
   let playerCount: number = 0;
@@ -238,15 +238,15 @@
   }
 </style>
 
-<h1>Players</h1>
+<h2>Players</h2>
 <form on:submit|preventDefault={()=>{}} class="sl-theme-light">
-  <sl-input on:sl-input={onNameInput} placeholder="Player Name"></sl-input>
-  <sl-select on:sl-input={onPositionInput} placeholder="Position" multiple clearable>
+  <sl-input on:sl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
+  <sl-select on:sl-input={onPositionInput} placeholder="Position" multiple clearable size="medium">
     {#each positions as [abbr, position] }
       <sl-option value="{abbr}">{position}</sl-option>
     {/each}
   </sl-select>
-  <sl-select on:sl-input={onTeamInput} placeholder="Team" multiple clearable>
+  <sl-select on:sl-input={onTeamInput} placeholder="Team" multiple clearable size="medium">
     {#each leagueTeams as [abbr, team] }
       <sl-option value="{abbr}">{team}</sl-option>
     {/each}

@@ -1,14 +1,31 @@
+const contracts_by_team_value = `
+  id
+  player {
+    espn_id
+    name
+    team
+    position
+    positionWeight
+    injuryStatus
+    positionRankProj
+    pointsThisYearProj
+  }
+  status
+  salary
+  years
+`
+
 export default {
   'authenticated-item': `
     query {
       authenticatedItem {
         ... on User {
           id
-          email
           name
           team {
             name
             abbreviation
+            id
           }
         }
       }
@@ -26,7 +43,10 @@ export default {
         ... on UserAuthenticationWithPasswordSuccess {
           item {
             id
-            name,
+            name
+            team {
+              id
+            }
           }
         }
         ... on UserAuthenticationWithPasswordFailure {
@@ -103,7 +123,36 @@ export default {
       }
     }
   `,
-  'contracts-by-team': `
+  'contracts-by-team-id': `
+    query ($id: ID!) {
+      contracts (
+        where: {
+          team: {
+            id: {
+              equals: $id
+            }
+          }
+          status: {
+            in: ["active", "dts", "ir", "waiver"]
+          }
+        }
+        orderBy: {
+          salary: desc
+        }
+      ) {
+        ${contracts_by_team_value}
+      }
+      team (
+        where: {
+          id: $id
+        }
+      ) {
+        name
+        contractTotals
+      }
+    }
+  `,
+  'contracts-by-team-abbr': `
     query ($abbr: String!) {
       contracts (
         where: {
@@ -120,25 +169,14 @@ export default {
           salary: desc
         }
       ) {
-        player {
-          espn_id
-          name
-          team
-          position
-          positionWeight
-          injuryStatus
-          positionRankProj
-          pointsThisYearProj
-        }
-        status
-        salary
-        years
+        ${contracts_by_team_value}
       }
       team (
         where: {
           abbreviation: $abbr
         }
       ) {
+        id
         name
         contractTotals
       }
@@ -193,6 +231,43 @@ export default {
         pointsThisWeekProj
         outlooksByWeek,
         seasonOutlook
+      }
+    }
+  `,
+  'all-bids': `
+    query {
+      pending: bids {
+        team {
+          name
+        }
+        player {
+          name
+          position
+          team
+        }
+        salary
+        years
+      }
+
+      published: bids(where: {
+        locked: {
+          not: {
+            equals: null
+          }
+        }
+      }) {
+        locked
+        team {
+          name
+        }
+        player {
+          espn_id
+          name
+          position
+          team
+        }
+        salary
+        years
       }
     }
   `,

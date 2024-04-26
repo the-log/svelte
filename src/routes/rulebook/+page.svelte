@@ -58,7 +58,7 @@
   }
 </style>
 
-<h1>Rulebook</h1>
+<h2>Rulebook</h2>
 
 <sl-tab-group id="rulebook" placement="{isMobile ? null : 'end'}">
   {#each pages as page, i}

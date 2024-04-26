@@ -1,5 +1,8 @@
-// const backendURL = 'https://api.log.football/api/graphql';
-const backendURL = 'https://api.log.ddev.site/api/graphql';
+const { DEV } = import.meta.env;
+
+const prodURL = 'https://api.log.football/api/graphql';
+const devURL = 'https://api.log.ddev.site/api/graphql';
+const backendURL = DEV ? devURL : prodURL;
 
 export default async function runQuery(query: string, variables = {}) {
   return fetch(backendURL, {

@@ -1,22 +1,28 @@
 <script lang="ts">
   import { beforeNavigate, goto } from '$app/navigation';
   import { browser } from "$app/environment";
-	import runQuery from 'src/utils/runQuery';
-	import queries from 'src/utils/queries';
-  import { userStore, teamStore, authStatusStore, isMobile } from "src/misc/stores";
-  import UserMenu from 'src/components/UserMenu.svelte';
-	import SiteNav from 'src/components/SiteNav.svelte';
+	import runQuery from '../utils/runQuery';
+	import queries from '../utils/queries';
+  import { userStore, authStatusStore, isMobile } from "../misc/stores";
+  import UserMenu from '../components/UserMenu.svelte';
+	import SiteNav from '../components/SiteNav.svelte';
 	import { onMount } from 'svelte';
 
   let isLoggedIn: boolean;
   let userName = '';
 
+
   function authItemUpdated(authItem: any)  {
     const {data} = authItem;
     const {authenticatedItem} = data;
 
-    userStore.set(authenticatedItem);
-    teamStore.set(authenticatedItem?.team?.abbreviation ?? null);
+    userStore.set({
+      userID: authenticatedItem?.id,
+      userName: authenticatedItem?.name,
+      teamID: authenticatedItem?.team?.id,
+    });
+
+    authStatusStore.set(Boolean(authenticatedItem?.id));
 
     userName = authenticatedItem?.name || '';
 
@@ -31,10 +37,6 @@
     isLoggedIn = value;
     runQuery(queries['authenticated-item']).then(authItemUpdated)
   });
-
-  userStore.subscribe((value) => {
-		isLoggedIn = Boolean(value);
-	});
 
   runQuery(queries['authenticated-item']).then(authItemUpdated)
 
@@ -63,6 +65,12 @@
       isMobile.set(mq.matches);
     });
   });
+</script>
+
+<script context="module">
+  if (browser) {
+    import('@shoelace-style/shoelace')
+  }
 </script>
 
 <style lang="scss">
@@ -110,6 +118,10 @@
     }
   }
 
+  #alert-container {
+    position: relative;
+  }
+
   footer {
     grid-area: foot;
     padding-bottom: 2rem;
@@ -119,10 +131,13 @@
   }
 </style>
 
+<svelte:head>
+
+</svelte:head>
 <header>
   <h1>The League <span>of Ordinary Gentlemen</span></h1>
   <UserMenu>
-    <button on:click={logUserOut}>Log Out</button>
+    <sl-button on:click={logUserOut} variant="primary" outline>Log Out</sl-button>
   </UserMenu>
 </header>
 <div id="site-nav">
