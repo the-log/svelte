@@ -84,5 +84,6 @@
     autocomplete="password"
     on:sl-input={(e)=>{password = e.target.value}}
   ></sl-input>
+  <a href="/reset">Forgot Password?</a>
   <sl-button type="submit" variant="primary">Submit</sl-button>
 </form>

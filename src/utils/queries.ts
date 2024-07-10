@@ -278,4 +278,17 @@ export default {
       }
     }
   `,
+  'request-token': `
+    mutation SendUserPasswordResetLink($email: String!) {
+      sendUserPasswordResetLink(email: $email)
+    }
+  `,
+  'reset-pass': `
+    mutation RedeemUserPasswordResetToken($email: String!, $token: String!, $password: String!) {
+      redeemUserPasswordResetToken(email: $email, token: $token, password: $password) {
+        message
+        code
+      }
+    }
+  `
 }

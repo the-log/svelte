@@ -1,4 +1,5 @@
 const { DEV } = import.meta.env;
+import { notify } from "../utils/notify";
 
 const prodURL = 'https://api.log.football/api/graphql';
 const devURL = 'https://api.log.ddev.site/api/graphql';
@@ -21,6 +22,11 @@ export default async function runQuery(query: string, variables = {}) {
   .then(r => r.json())
   .then(json => {
     if (json.errors) {
+      notify({
+        title: 'Error',
+        message: "An error has occurred. See the console for more details.",
+        variant: 'danger',
+      });
       console.error(json.errors);
 
       document.documentElement.dispatchEvent(new CustomEvent('graphqlerror', {

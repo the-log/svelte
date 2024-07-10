@@ -40,9 +40,13 @@
 
   runQuery(queries['authenticated-item']).then(authItemUpdated)
 
+  const unauthPaths = [
+    '/login',
+    '/reset'
+  ]
 
   beforeNavigate((navigation) => {
-    if (!isLoggedIn && navigation.to?.route.id !== '/login') {
+    if (!isLoggedIn && !unauthPaths.includes(navigation.to?.route?.id || '')) {
       navigation.cancel();
     } else {
       console.clear();
