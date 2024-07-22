@@ -81,7 +81,7 @@
       data: {
         team: {
           connect: {
-            abbreviation: teamid
+            id: teamid
           }
         },
         player: {
