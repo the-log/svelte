@@ -113,12 +113,23 @@
 
     switch (action) {
       case 'bid':
-        tryCreateNewBid(data);
+        // tryCreateNewBid(data);
+        break;
+
+      case 'promote':
         break;
 
       default:
+
         break;
     }
+
+    modal.hide();
+    notify({
+      message: "This action isn't enabled yet.",
+      title: "Not Allowed",
+      variant: "warning"
+    })
   }
 </script>
 
