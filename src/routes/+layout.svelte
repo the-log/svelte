@@ -92,6 +92,10 @@
     display: flex;
     justify-content: space-between;
     padding-top: 1rem;
+
+    @media (max-width:45rem) {
+      sl-button { display: none; }
+    }
   }
 
   h1 {
@@ -141,7 +145,7 @@
 <header>
   <h1>The League <span>of Ordinary Gentlemen</span></h1>
   <UserMenu>
-    <sl-button on:click={logUserOut} variant="primary" outline>Log Out</sl-button>
+    <sl-button on:click={logUserOut} size="small" variant="primary" outline>Log Out</sl-button>
   </UserMenu>
 </header>
 <div id="site-nav">
