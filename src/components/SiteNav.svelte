@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from "src/components/Icon.svelte";
   import { afterNavigate } from '$app/navigation';
 
   function setActiveNav(route:string|undefined) {
@@ -82,22 +81,23 @@ nav {
   <ul>
     <li>
       <sl-tooltip content="My Team" placement="right">
-        <sl-icon-button name="house" label="My Team" href="/"></sl-icon-button>
+        <sl-icon-button src="/icons/home-alt.svg" label="My Team" href="/"></sl-icon-button>
       </sl-tooltip>
     </li>
     <li>
       <sl-tooltip content="Teams" placement="right">
-        <sl-icon-button name="trophy" label="Teams" href="/teams"></sl-icon-button>
+        <sl-icon-button src="/icons/pennant.svg" label="Teams" href="/teams"></sl-icon-button>
       </sl-tooltip>
     </li>
     <li>
       <sl-tooltip content="Players" placement="right">
-        <sl-icon-button name="people" label="Players" href="/players"></sl-icon-button>
+        <sl-icon-button src="/icons/football-helmet.svg" label="Players" href="/players">
+        </sl-icon-button>
       </sl-tooltip>
     </li>
     <li>
-      <sl-tooltip content="Free Agency" placement="right">
-        <sl-icon-button name="tag" label="Free Agency" href="/free-agency"></sl-icon-button>
+      <sl-tooltip content="Restricted Free Agency" placement="right">
+        <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button>
       </sl-tooltip>
     </li>
     <li>
