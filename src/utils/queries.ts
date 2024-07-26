@@ -207,6 +207,11 @@ export default {
         status
         salary
         years
+        team {
+          name
+          abbreviation
+        }
+        isFranchiseTagged
       }
     }
   `,

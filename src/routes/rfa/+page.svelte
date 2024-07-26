@@ -1,68 +1,61 @@
 <script lang="ts">
-	import formatMoney from 'src/utils/formatMoney';
-  import Table from 'src/components/Table.svelte'
-	import objByProperty from 'src/utils/objByProperty';
-	import runQuery from 'src/utils/runQuery';
-	import queries from 'src/utils/queries';
-  import type { Contract } from 'src/types/defs';
-	import { each } from 'svelte/internal';
-	import Icon from 'src/components/Icon.svelte';
-	import formatLength from 'src/utils/formatLength';
+	import formatMoney from '../../../src/utils/formatMoney';
+  import Table from '../../../src/components/Table.svelte'
+	import objByProperty from '../../../src/utils/objByProperty';
+	import runQuery from '../../../src/utils/runQuery';
+	import queries from '../../../src/utils/queries';
+  import type { Contract } from '../../../src/types/defs';
+  import { isMobile as layoutStore } from "../../misc/stores";
+	import { onMount } from 'svelte';
 
+  let players: any[];
+  $: players = [];
 
-  let playerData: any[] = [
-  ];
-  $: playerExtra = {};
-  $: players = playerData;
+  const fetchRFAs = () => {
+    runQuery(queries['rfas'], {})
+    .then(({data}) => {
+        console.log('DEBUG:', data);
 
+        const playerData = data.contracts
+          .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
+          .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
+          .filter(contract => !!contract.player)
+          .map((contract: Contract) => ({
+            name: contract.player?.name,
+            nflTeam: contract.player?.team,
+            position: contract.player?.position,
+            salary: formatMoney(contract.salary),
+            years: contract.years,
+            espn_id: contract.player?.espn_id || 0,
+            status: contract.player?.injuryStatus.toLowerCase(),
+            ovr: contract.player?.overallRankProj,
+            pos: contract.player?.positionRankProj,
+            team: contract.team.name,
+            abbr: contract.team.abbreviation
+          }));
 
-  // teamStore.subscribe((value) => {
-  //   if (!value) return null;
-
-  //   runQuery(queries['rfas'], {})
-  //     .then(({data}) => {
-  //       console.log('DEBUG:', data);
-
-  //       playerData = data.contracts
-  //         .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
-  //         .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
-  //         .map((contract: Contract) => ({
-  //           name: contract.player.name,
-  //           team: contract.player.team,
-  //           position: contract.player.position,
-  //           salary: formatMoney(contract.salary),
-  //           years: contract.years,
-  //           espn_id: contract.player.espn_id || 0,
-  //           status: contract.player.injuryStatus.toLowerCase(),
-  //           ovr: contract.player.overallRankProj,
-  //           pos: contract.player.positionRankProj
-  //         }));
-  //     })
-  // })
-
-  function toggleCollapse(e: PointerEvent) {
-    const button = (e!.target! as HTMLElement).closest('button')!;
-    const icon = button.querySelector('svg')!;
-    const row = button.closest('.tablegrid-row')!;
-    const tray = row.querySelector('.tray')! as HTMLElement;
-
-    icon.style.rotate = tray.hidden ? '180deg' : '0deg';
-    tray.hidden = !tray.hidden;
-
-    const isOpen = !tray.hidden;
-    const id = row.dataset.playerId;
-
-    if (isOpen && !playerExtra[id]) {
-      playerExtra[id] = true;
-
-      runQuery(queries['stats-by-player'], {id: parseInt(id)})
-        .then(({data}) => {
-          playerExtra[id] = data.player;
-          console.log(playerExtra);
-
-        })
-    }
+        players = playerData;
+      })
   }
+
+  fetchRFAs();
+
+  let interval;
+  onMount(() => {
+    interval = setInterval(fetchRFAs, 10000);
+
+    return () => clearInterval(interval);
+  })
+
+  let isMobile: null | Boolean;
+  $: isMobile = null;
+  $: isReady = false;
+  layoutStore.subscribe((value) => {
+    setTimeout(() => {
+      isMobile = value;
+      isReady = true;
+    }, 0);
+  });
 </script>
 
 <style lang="scss">
@@ -113,43 +106,40 @@
   }
 </style>
 
-<h1>My Team</h1>
+<h1>Restricted Free Agents</h1>
 
-<Table columns={4}>
+<Table columns={9}>
   <div class="tablegrid-header tablegrid-row">
-    <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
+    {#if !isMobile}
+      <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
+    {/if}
     <div class="tablegrid-cell">Name</div>
-    <div class="tablegrid-cell">Pos Rank</div>
-    <div class="tablegrid-cell">Ovr Rank</div>
+    <div class="tablegrid-cell">Team</div>
+    {#if !isMobile}
+      <div class="tablegrid-cell">Salary</div>
+      <div class="tablegrid-cell">Rank</div>
+    {/if}
   </div>
-
-  {#each players as { name, team, position, salary, years, espn_id, status, pos, ovr }}
+  {#each players as { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, abbr }}
     <div class="tablegrid-row" data-player-id="{espn_id}">
-      <div class="tablegrid-cell tablegrid-thumbcell" status="{status}">{position}</div>
-      <div class="tablegrid-cell">{name} ({position}/{team})</div>
-      <div class="tablegrid-cell">{pos}</div>
-      <div class="tablegrid-cell">{ovr}</div>
-      <div class="tablegrid-cell tablegrid-actions">
-        <button class="plain" on:click={toggleCollapse}>
-          <Icon name="caret_circle" width="1.25em" height="1.25em" />
-        </button>
+
+      {#if !isMobile}
+        <div class="tablegrid-cell tablegrid-thumbcell" status="{status}">{position}</div>
+      {/if}
+      <div class="tablegrid-cell">
+        {name}
+        <span class="text-minor">{nflTeam} {#if isMobile}- {position} (#{pos}){/if}</span>
       </div>
-      <div class="tray" hidden>
-        <img src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{espn_id}.png&w=350&h=254" alt="{name} headshot" />
-
-        <div class="bio-stats">
-          <span>HT/WT</span> <span>{formatLength(playerExtra[espn_id]?.height)}, {playerExtra[espn_id]?.weight}lbs</span>
-          <span>BIRTH</span> <span>2/13/1990 ({playerExtra[espn_id]?.age})</span>
-          <span>DRAFT</span> <span>{playerExtra[espn_id]?.draftYear}: Rd {playerExtra[espn_id]?.draftRound}, Pk {playerExtra[espn_id]?.draftSelection}</span>
-        </div>
-
-        <p>{playerExtra[espn_id]?.seasonOutlook || ''}</p>
-
-        <div class="game-stats">
-          <span>Last Year</span>        <span>{playerExtra[espn_id]?.pointsLastYear || ''}</span>
-          <span>This Year (proj)</span> <span>{playerExtra[espn_id]?.pointsThisYearProj || ''}</span>
-        </div>
+      <div class="tablegrid-cell">
+        {team}
+        {#if isMobile}
+          <span class="text-minor">{salary}</span>
+        {/if}
       </div>
+      {#if !isMobile}
+        <div class="tablegrid-cell">{salary}</div>
+        <div class="tablegrid-cell">#{pos}</div>
+      {/if}
     </div>
   {/each}
 </Table>
