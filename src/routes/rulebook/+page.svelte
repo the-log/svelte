@@ -2,10 +2,18 @@
   import { marked } from 'marked';
   import { isMobile as layoutStore } from "src/misc/stores";
 
+  let isMobile: null | Boolean;
   $: isMobile = null;
-  layoutStore.subscribe((value) => {isMobile = value});
+  $: isReady = false;
+  layoutStore.subscribe((value) => {
+    setTimeout(() => {
+      isMobile = value;
+      isReady = true;
+    }, 0);
+  });
 
-  let pages: string[] = [];
+  let pages: string[];
+  $: pages = [];
 
   async function getRules() {
     const toc = await fetch('https://api.github.com/repos/the-log/rulebook/contents/').then(r => r.json());
@@ -60,13 +68,13 @@
 
 <h2>Rulebook</h2>
 
-<sl-tab-group id="rulebook" placement="{isMobile ? null : 'end'}">
+<sl-tab-group id="rulebook">
   {#each pages as page, i}
-    <sl-tab slot="nav" panel="chapter-{i}">{page.headline}</sl-tab>
+    <sl-tab slot="nav" panel="chapter-{i}" active='{i === 0}'>{page.headline}</sl-tab>
   {/each}
 
   {#each pages as page, i}
-    <sl-tab-panel name="chapter-{i}">
+    <sl-tab-panel name="chapter-{i}" active='{i === 0}'>
       <h2>{page.headline}</h2>
       {@html page.body}
     </sl-tab-panel>
