@@ -19,7 +19,7 @@
       .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
       .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
       .map((contract: Contract) => {
-        const {id, player, status: contractStatus, years, salary} = contract;
+        const {id, player, status: contractStatus, years, salary, needsAttention} = contract;
         const {name, team, position, espn_id, injuryStatus, pointsThisYearProj, positionRankProj} = player;
 
         return {
@@ -33,7 +33,8 @@
           playerStatus: injuryStatus.toLowerCase(),
           contractStatus: contractStatus.toLowerCase(),
           pointsThisYearProj,
-          positionRankProj
+          positionRankProj,
+          needsAttention
         }
       });
   }

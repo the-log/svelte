@@ -13,6 +13,7 @@ const contracts_by_team_value = `
   status
   salary
   years
+  needsAttention
 `
 
 export default {

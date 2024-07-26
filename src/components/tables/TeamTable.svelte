@@ -19,31 +19,6 @@
 </script>
 
 <style lang="scss">
-  .tray {
-    grid-column: 1 / -1;
-    padding: 1rem;
-
-    img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      object-position: center bottom;
-      background-color: var(--color-bg--1);
-    }
-
-    .bio-stats {
-      display: grid;
-      grid-template-columns: auto auto;
-      gap: 0.25rem 1rem;
-    }
-
-    .game-stats {
-      display: grid;
-      grid-template-columns: auto auto;
-      gap: 0.25rem 1rem;
-    }
-  }
-
   [status] {
     border-left: 2px solid transparent;
   }
@@ -64,6 +39,10 @@
   h2 {
     margin-top: 2rem;
   }
+
+  .needs-attention {
+    color: var(--sl-color-danger-700);
+  }
 </style>
 
 {#if players.length && isReady}
@@ -79,8 +58,8 @@
     </div>
 
     {#each players as player}
-      {@const { name, team: nflTeam, position, salary, years, espn_id, playerStatus, contractStatus, contract_id } = player}
-      <div class="tablegrid-row" data-player-id="{espn_id}">
+      {@const { name, team: nflTeam, position, salary, years, espn_id, playerStatus, contractStatus, contract_id, needsAttention } = player}
+      <div class="tablegrid-row {needsAttention ? 'needs-attention' : ''}" data-player-id="{espn_id}">
         {#if !isMobile}
           <div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>
         {/if}
