@@ -14,7 +14,6 @@
   const fetchRFAs = () => {
     runQuery(queries['rfas'], {})
     .then(({data}) => {
-        console.log('DEBUG:', data);
 
         const playerData = data.contracts
           .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
@@ -38,10 +37,9 @@
       })
   }
 
-  fetchRFAs();
-
   let interval;
   onMount(() => {
+    fetchRFAs();
     interval = setInterval(fetchRFAs, 10000);
 
     return () => clearInterval(interval);
