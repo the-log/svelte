@@ -68,7 +68,6 @@
 
 {#if players.length && isReady}
   <h2>{title}</h2>
-  <h3>{isMobile}</h3>
 
   <Table columns={isMobile ? 3 : 5}>
     <div class="tablegrid-header tablegrid-row">
