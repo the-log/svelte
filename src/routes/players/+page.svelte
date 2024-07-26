@@ -87,7 +87,7 @@
         delete newFilters.contract;
         newFilters.NOT.contract = {
           status: {
-            in: ["active", "dts", "ir"]
+            in: ["active", "dts", "ir", "rfa"]
           }
         }
       }
@@ -96,7 +96,7 @@
         delete newFilters.NOT.contract;
         newFilters.contract = {
           status: {
-            in: ["active", "dts", "ir"]
+            in: ["active", "dts", "ir", "rfa"]
           }
         }
       }
