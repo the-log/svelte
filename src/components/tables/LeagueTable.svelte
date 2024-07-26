@@ -5,8 +5,15 @@
 
   export let teams: any[];
 
+  let isMobile: null | Boolean;
   $: isMobile = null;
-  layoutStore.subscribe((value) => {isMobile = value});
+  $: isReady = false;
+  layoutStore.subscribe((value) => {
+    setTimeout(() => {
+      isMobile = value;
+      isReady = true;
+    }, 0);
+  });
 </script>
 
 <style lang="scss">
@@ -41,15 +48,20 @@
     } = team}
 
     <div class="tablegrid-row">
-      <div class="tablegrid-cell tablegrid-thumbcell">#{i + 1}</div>
+      {#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell">#{i + 1}</div>{/if}
       <div class="tablegrid-cell">
         <a href="/teams/{abbreviation}">{name}</a>
         <span class="text-minor">{wins}-{losses}-{ties}</span>
       </div>
       <div class="tablegrid-cell">
         {salary} &nbsp; {years}yrs
+        {#if isMobile}
+          <span class="text-minor">{active} - {dts} - {ir} - {waived}</span>
+        {/if}
       </div>
-      <div class="tablegrid-cell">{active} - {dts} - {ir} - {waived}</div>
+      {#if !isMobile}
+        <div class="tablegrid-cell">{active} - {dts} - {ir} - {waived}</div>
+      {/if}
     </div>
   {/each}
 

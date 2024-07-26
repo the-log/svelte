@@ -19,8 +19,15 @@
     'pointsLastYear': 'Year (Prev)',
   }
 
+  let isMobile: null | Boolean;
   $: isMobile = null;
-  layoutStore.subscribe((value) => {isMobile = value});
+  $: isReady = false;
+  layoutStore.subscribe((value) => {
+    setTimeout(() => {
+      isMobile = value;
+      isReady = true;
+    }, 0);
+  });
 
   function onOrderUpdate(e: CustomEvent) {
     const { target: dropdown, detail } = e;
@@ -172,8 +179,11 @@
           {name}
           <span class="text-minor">
             {team} - {position}
-            {#if isMobile}&nbsp;&nbsp;{formatMoney(salary)}, {years}yr{/if}
           </span>
+          {#if isMobile && (salary || years)}
+          <span class="text-minor">{formatMoney(salary)}, {years}yr</span>
+          {/if}
+
         </div>
         {#if !isMobile}
           <div class="tablegrid-cell">

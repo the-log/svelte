@@ -2,15 +2,20 @@
   import Table from '../Table.svelte'
 	import Actions from '../Actions.svelte';
   import { isMobile as layoutStore } from "../../misc/stores";
-  import { userStore } from "../../misc/stores";
-	import { select_value } from 'svelte/internal';
 
   export let title: String;
   export let players: any[];
   export let team: String | null;
 
+  let isMobile: null | Boolean;
   $: isMobile = null;
-  layoutStore.subscribe((value) => {isMobile = value});
+  $: isReady = false;
+  layoutStore.subscribe((value) => {
+    setTimeout(() => {
+      isMobile = value;
+      isReady = true;
+    }, 0);
+  });
 </script>
 
 <style lang="scss">
@@ -61,8 +66,9 @@
   }
 </style>
 
-{#if players.length}
+{#if players.length && isReady}
   <h2>{title}</h2>
+  <h3>{isMobile}</h3>
 
   <Table columns={isMobile ? 3 : 5}>
     <div class="tablegrid-header tablegrid-row">
@@ -76,10 +82,14 @@
     {#each players as player}
       {@const { name, team: nflTeam, position, salary, years, espn_id, playerStatus, contractStatus, contract_id } = player}
       <div class="tablegrid-row" data-player-id="{espn_id}">
-        {#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>{/if}
+        {#if !isMobile}
+          <div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>
+        {/if}
         <div class="tablegrid-cell" status="{isMobile ? playerStatus : null}">
           {name}
-          {#if isMobile}<span class="text-minor">{team} - {position}</span>{/if}
+          {#if isMobile}
+          <span class="text-minor">{nflTeam} - {position}</span>
+          {/if}
         </div>
         {#if !isMobile}<div class="tablegrid-cell">{nflTeam}</div>{/if}
         <div class="tablegrid-cell">{salary}</div>
@@ -97,4 +107,3 @@
     {/each}
   </Table>
 {/if}
-
