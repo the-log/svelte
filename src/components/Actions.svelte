@@ -216,5 +216,4 @@
     <sl-button slot="footer" variant="primary" type="submit">{buttonLabel}</sl-button>
   </form>
 </sl-dialog>
-
 {/if}

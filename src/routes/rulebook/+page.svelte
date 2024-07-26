@@ -1,6 +1,6 @@
 <script lang="ts">
   import { marked } from 'marked';
-  import { isMobile as layoutStore } from "src/misc/stores";
+  import { isMobile as layoutStore } from "../../../src/misc/stores";
 
   let isMobile: null | Boolean;
   $: isMobile = null;
