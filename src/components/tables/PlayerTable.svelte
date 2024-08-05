@@ -57,7 +57,7 @@
     border-left: 2px solid transparent;
   }
 
-  [status="out"] {
+  [status="out"], [status="suspension"]  {
     border-color: red;
   }
 
@@ -163,7 +163,7 @@
       {@const points = player[sortConfig.key]}
       <div class="tablegrid-row" data-player-id="{espn_id}">
         {#if !isMobile}
-          <div class="tablegrid-cell tablegrid-thumbcell" status={injuryStatus}>
+          <div class="tablegrid-cell tablegrid-thumbcell" status={injuryStatus.toLowerCase()}>
             <sl-tooltip content="#{positionRankProj} {position}, #{overallRankProj} overall (Projected)" placement="top-start">
               <span>
                 {#if positionRankProj < 1000}
@@ -175,7 +175,7 @@
             </sl-tooltip>
           </div>
         {/if}
-        <div class="tablegrid-cell" status="{isMobile ? injuryStatus : null}">
+        <div class="tablegrid-cell" status="{isMobile ? injuryStatus.toLowerCase() : null}">
           {name}
           <span class="text-minor">
             {team} - {position}

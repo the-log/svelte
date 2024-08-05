@@ -23,7 +23,7 @@
     border-left: 2px solid transparent;
   }
 
-  [status="out"] {
+  [status="out"], [status="suspension"]  {
     border-color: red;
   }
 
@@ -61,7 +61,7 @@
       {@const { name, team: nflTeam, position, salary, years, espn_id, playerStatus, contractStatus, contract_id, needsAttention } = player}
       <div class="tablegrid-row {needsAttention ? 'needs-attention' : ''}" data-player-id="{espn_id}">
         {#if !isMobile}
-          <div class="tablegrid-cell tablegrid-thumbcell" {playerStatus}>{position}</div>
+          <div class="tablegrid-cell tablegrid-thumbcell" status="{playerStatus}">{position}</div>
         {/if}
         <div class="tablegrid-cell" status="{isMobile ? playerStatus : null}">
           {name}
