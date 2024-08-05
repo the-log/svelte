@@ -211,6 +211,7 @@ export default {
         team {
           name
           abbreviation
+          espn_id
         }
         isFranchiseTagged
       }

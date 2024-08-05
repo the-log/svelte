@@ -8,6 +8,8 @@
   import { isMobile as layoutStore } from "../../misc/stores";
 	import { onMount } from 'svelte';
 
+  let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank';
+  $: sortMethod = 'position';
   let players: any[];
   $: players = [];
 
@@ -15,10 +17,35 @@
     runQuery(queries['rfas'], {})
     .then(({data}) => {
 
+      switch (sortMethod) {
+        case 'position':
+          data.contracts
+            .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
+            .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}));
+          break;
+
+        case 'team':
+          data.contracts
+            .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
+            .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
+            .sort(objByProperty.bind({path: 'team.name', dir: 'asc'}));
+          break;
+
+        case 'posrank':
+          data.contracts
+            .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
+          break;
+
+        case 'ovrrank':
+          data.contracts
+            .sort(objByProperty.bind({path: 'player.overallRankProj', dir: 'asc'}))
+          break;
+
+        default:
+          break;
+      }
+
         const playerData = data.contracts
-          .sort(objByProperty.bind({path: 'player.positionRankProj', dir: 'asc'}))
-          .sort(objByProperty.bind({path: 'player.positionWeight', dir: 'asc'}))
-          .filter(contract => !!contract.player)
           .map((contract: Contract) => ({
             name: contract.player?.name,
             nflTeam: contract.player?.team,
@@ -30,14 +57,21 @@
             ovr: contract.player?.overallRankProj,
             pos: contract.player?.positionRankProj,
             team: contract.team.name,
-            abbr: contract.team.abbreviation
+            teamID: contract.team.espn_id,
+            abbr: contract.team.abbreviation,
+            ft: contract.isFranchiseTagged
           }));
 
         players = playerData;
       })
   }
 
-  let interval;
+  const onSortChange = ({target}) => {
+    sortMethod = target.value;
+    fetchRFAs();
+  }
+
+  let interval: number;
   onMount(() => {
     fetchRFAs();
     interval = setInterval(fetchRFAs, 10000);
@@ -102,24 +136,81 @@
   [status="questionable"] {
     border-color: goldenrod;
   }
+
+  [data-sort="position"] ~ :where(
+    :nth-last-child(1 of [data-position="QB"]),
+    :nth-last-child(1 of [data-position="RB"]),
+    :nth-last-child(1 of [data-position="WR"]),
+    :nth-last-child(1 of [data-position="TE"]),
+    :nth-last-child(1 of [data-position="K"]),
+    :nth-last-child(1 of [data-position="DT"], [data-position="DE"]),
+    :nth-last-child(1 of [data-position="LB"]),
+    :nth-last-child(1 of [data-position="CB"], [data-position="S"])
+  ) {
+    margin-bottom: 5rem;
+  }
+
+  [data-sort="team"] ~ :nth-last-child(1 of [data-position]) {
+    margin-bottom: 0;
+  }
+
+  [data-sort="team"] ~ :where(
+    :nth-last-child(1 of [data-team="T1"]),
+    :nth-last-child(1 of [data-team="T2"]),
+    :nth-last-child(1 of [data-team="T4"]),
+    :nth-last-child(1 of [data-team="T5"]),
+    :nth-last-child(1 of [data-team="T6"]),
+    :nth-last-child(1 of [data-team="T7"]),
+    :nth-last-child(1 of [data-team="T8"]),
+    :nth-last-child(1 of [data-team="T9"]),
+    :nth-last-child(1 of [data-team="T10"]),
+    :nth-last-child(1 of [data-team="T11"])
+  ) {
+    margin-bottom: 5rem;
+  }
+
+  [data-sort="team"] ~ :nth-last-child(1 of [data-team]) {
+    margin-bottom: 0;
+  }
+
+
+
+  .ft {
+    color: goldenrod;
+  }
+
+  sl-radio-group::part(form-control-input) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
 </style>
 
 <h1>Restricted Free Agents</h1>
 
+<sl-radio-group size="small" label="Sort By:" name="sort" value="position" on:sl-change={onSortChange}>
+  <sl-radio value="position">Position</sl-radio>
+  <sl-radio value="team">Team</sl-radio>
+  <sl-radio value="posrank">Positional Rank</sl-radio>
+  <sl-radio value="ovrrank">Overall Rank</sl-radio>
+</sl-radio-group>
+<br>
+
 <Table columns={9}>
-  <div class="tablegrid-header tablegrid-row">
+  <div class="tablegrid-header tablegrid-row" data-sort="{sortMethod}">
     {#if !isMobile}
       <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
     {/if}
     <div class="tablegrid-cell">Name</div>
-    <div class="tablegrid-cell">Team</div>
+    <div class="tablegrid-cell">Former Team</div>
     {#if !isMobile}
       <div class="tablegrid-cell">Salary</div>
       <div class="tablegrid-cell">Rank</div>
     {/if}
   </div>
-  {#each players as { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, abbr }}
-    <div class="tablegrid-row" data-player-id="{espn_id}">
+  {#each players as { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, teamID, abbr, ft }}
+    <div class="tablegrid-row" data-player-id="{espn_id}" data-position="{position}" data-team="T{teamID}">
 
       {#if !isMobile}
         <div class="tablegrid-cell tablegrid-thumbcell" status="{status}">{position}</div>
@@ -130,9 +221,10 @@
       </div>
       <div class="tablegrid-cell">
         {team}
-        {#if isMobile}
-          <span class="text-minor">{salary}</span>
-        {/if}
+        <span class="text-minor">
+          {#if ft}<span class="ft">FT</span>{/if}
+          {#if isMobile}{salary}{/if}
+        </span>
       </div>
       {#if !isMobile}
         <div class="tablegrid-cell">{salary}</div>
