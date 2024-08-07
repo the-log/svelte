@@ -57,7 +57,9 @@
     border-left: 2px solid transparent;
   }
 
-  [status="out"], [status="suspension"]  {
+  [status="out"],
+  [status="injury_reserve"],
+  [status="suspension"]  {
     border-color: red;
   }
 
