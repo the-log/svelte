@@ -40,7 +40,9 @@
     const newFilters = filters;
 
     if (playerName) {
-      newFilters.name = {};
+      newFilters.name = {
+        mode: "insensitive"
+      };
       newFilters.name.contains = playerName;
     } else {
       delete newFilters.name;
