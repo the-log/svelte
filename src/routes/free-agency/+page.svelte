@@ -13,7 +13,6 @@
   runQuery(queries["all-bids"])
     .then(({data}) => {
       const {pending, published} = data;
-      console.log(published);
 
       published.forEach((bid: Bid) => {
         bid.locked = (new Date(bid.locked)).toLocaleDateString();

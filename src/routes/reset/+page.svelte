@@ -18,15 +18,12 @@
   }
 
   async function sendResetToken(e: SubmitEvent) {
-    console.log(e);
     const form = e.target as HTMLFormElement;
     const emailField = form.querySelector('#email') as HTMLInputElement;
     const submitButton = form.querySelector('#submit') as HTMLButtonElement;
 
     emailField.disabled = true;
     submitButton.disabled = true;
-
-    console.log(email);
 
     await runQuery(queries['request-token'], {email});
 
@@ -44,8 +41,6 @@
       })
       return;
     }
-
-    console.log({email,token,password});
 
     const {data: {redeemUserPasswordResetToken}} = await runQuery(queries['reset-pass'], {
       email,
