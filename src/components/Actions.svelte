@@ -13,6 +13,8 @@
   export let player: Player;
   export let contract: Contract | null = null;
 
+  let irElgibile = !['dts', 'ir', 'waived'].includes(status) && ['out', 'injury_reserve'].includes(player.playerStatus)
+
   let userTeam = '';
   userStore.subscribe((value) => {
     if (!value) return null;
@@ -103,34 +105,91 @@
     });
   }
 
+  async function updateContract(contract, data) {
+    await runQuery(queries["update-contract"], {
+      where: {
+        id: contract
+      },
+      data
+    }).then(({data}) => {
+      const {
+        updateContract: {
+          player: {
+            name,
+            position,
+            team
+          },
+          salary,
+          years,
+          status
+        }
+      } = data;
+      notify({
+        title: `Contract updated for ${name} (${position}, ${team})`,
+        message: `${formatMoney(salary)}, ${years}yrs, ${status}`
+      })
+    });
+  }
+
   function handleFormData(e: FormDataEvent) {
     useFormData(e, doAction)
   }
 
-  function doAction(e: FormDataEvent) {
+  async function doAction(e: FormDataEvent) {
 
-    const data = Object.fromEntries(e.formData)
+    const data = Object.fromEntries(e.formData);
+    const {
+      contract,
+      years
+    } = data;
+
 
     switch (action) {
       case 'bid':
+        notify({
+          title: `Not Allowed`,
+          message: `This action isn't enabled yet.`
+        })
         // tryCreateNewBid(data);
         break;
 
       case 'promote':
+        await updateContract(contract, {
+          status: "active",
+          years: parseInt(years)
+        })
+        break;
+
+      case 'ir':
+        await updateContract(contract, {
+          status: "ir"
+        })
+        break;
+
+      case 'drop':
+        await updateContract(contract, {
+          status: "waived"
+        })
         break;
 
       default:
-
+        notify({
+          message: "Something's gone wrong. See the console for details.",
+          title: "Error",
+          variant: "danger"
+        });
+        console.error(`The action "${action}" is unexpected.`);
         break;
     }
 
     modal.hide();
-    notify({
-      message: "This action isn't enabled yet.",
-      title: "Not Allowed",
-      variant: "warning"
-    })
+
+    window.dispatchEvent(new CustomEvent('action-taken', {
+      bubbles: false,
+      cancelable: false
+    }));
   }
+
 </script>
 
 
@@ -149,7 +208,7 @@
           To Active Roster
         </sl-menu-item>
       {/if}
-      {#if !(['dts', 'ir', 'waived'].includes(status))}
+      {#if irElgibile}
         <sl-menu-item action="ir">
           <sl-icon slot="prefix" name="bandaid"></sl-icon>
           To IR

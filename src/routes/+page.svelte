@@ -6,6 +6,7 @@
   import type { Contract } from '../types/defs';
   import { userStore } from "../misc/stores";
 	import TeamTable from '../components/tables/TeamTable.svelte';
+	import { onMount } from 'svelte';
 
   let team = '';
   $: active = <any>[];
@@ -40,6 +41,7 @@
   }
 
   function getContracts(teamID: string) {
+
     if (teamID) {
       runQuery(queries['contracts-by-team-id'], {id: teamID})
         .then(({data}) => {
@@ -57,6 +59,17 @@
     const {teamID} = value;
     team = teamID;
     getContracts(teamID);
+  })
+
+  onMount(() => {
+    const updater = () => {
+      getContracts(team);
+    };
+    window.addEventListener('action-taken',  updater);
+
+    return () => {
+      window.removeEventListener('action-taken', updater);
+    }
   })
 </script>
 

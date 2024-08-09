@@ -297,5 +297,19 @@ export default {
         code
       }
     }
+  `,
+  'update-contract': `
+    mutation Mutation($where: ContractWhereUniqueInput!, $data: ContractUpdateInput!) {
+      updateContract(where: $where, data: $data) {
+        player {
+          name
+          position
+          team
+        }
+        status
+        salary
+        years
+      }
+    }
   `
 }
