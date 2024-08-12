@@ -29,6 +29,7 @@
       // Authentication Successful
       else if (response.item) {
         userStore.set({
+          isAdmin: response.item.isAdmin,
           userID: response.item.id,
           userName: response.item.name,
           teamID: response.item.team?.id

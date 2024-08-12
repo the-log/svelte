@@ -3,7 +3,7 @@
   import { browser } from "$app/environment";
 	import runQuery from '../utils/runQuery';
 	import queries from '../utils/queries';
-  import { userStore, authStatusStore, isMobile } from "../misc/stores";
+  import { userStore, authStatusStore, isMobile, leagueSettingsStore } from "../misc/stores";
   import UserMenu from '../components/UserMenu.svelte';
 	import SiteNav from '../components/SiteNav.svelte';
 	import { onMount } from 'svelte';
@@ -23,6 +23,11 @@
     });
 
     authStatusStore.set(Boolean(authenticatedItem?.id));
+
+    runQuery(queries['league-settings'])
+      .then(({ data: { leagueSetting } }) => {
+        leagueSettingsStore.set(leagueSetting);
+      })
 
     userName = authenticatedItem?.name || '';
 

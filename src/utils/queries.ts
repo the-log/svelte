@@ -44,6 +44,7 @@ export default {
         ... on UserAuthenticationWithPasswordSuccess {
           item {
             id
+            isAdmin
             name
             team {
               id
@@ -309,6 +310,15 @@ export default {
         status
         salary
         years
+      }
+    }
+  `,
+  'league-settings': `
+    query LeagueSetting {
+      leagueSetting {
+        bid_deadlines
+        phase
+        season
       }
     }
   `

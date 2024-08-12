@@ -7,6 +7,7 @@
   import type { Contract } from '../../../src/types/defs';
   import { isMobile as layoutStore } from "../../misc/stores";
 	import { onMount } from 'svelte';
+	import Actions from '../../components/Actions.svelte';
 
   let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank';
   $: sortMethod = 'position';
@@ -45,25 +46,25 @@
           break;
       }
 
-        const playerData = data.contracts
-          .map((contract: Contract) => ({
-            name: contract.player?.name,
-            nflTeam: contract.player?.team,
-            position: contract.player?.position,
-            salary: formatMoney(contract.salary),
-            years: contract.years,
-            espn_id: contract.player?.espn_id || 0,
-            status: contract.player?.injuryStatus.toLowerCase(),
-            ovr: contract.player?.overallRankProj,
-            pos: contract.player?.positionRankProj,
-            team: contract.team.name,
-            teamID: contract.team.espn_id,
-            abbr: contract.team.abbreviation,
-            ft: contract.isFranchiseTagged
-          }));
+      const playerData = data.contracts
+        .map((contract: Contract) => ({
+          name: contract.player?.name,
+          nflTeam: contract.player?.team,
+          position: contract.player?.position,
+          salary: contract.salary,
+          years: contract.years,
+          espn_id: contract.player?.espn_id || 0,
+          status: contract.player?.injuryStatus.toLowerCase(),
+          ovr: contract.player?.overallRankProj,
+          pos: contract.player?.positionRankProj,
+          team: contract.team.name,
+          teamID: contract.team.espn_id,
+          abbr: contract.team.abbreviation,
+          ft: contract.isFranchiseTagged
+        }));
 
-        players = playerData;
-      })
+      players = playerData;
+    })
   }
 
   const onSortChange = ({target}) => {
@@ -125,6 +126,10 @@
     }
   }
 
+  .tablegrid-cell:last-child {
+    align-items: flex-end;
+  }
+
   [status] {
     border-left: 2px solid transparent;
   }
@@ -175,8 +180,6 @@
     margin-bottom: 0;
   }
 
-
-
   .ft {
     color: goldenrod;
   }
@@ -199,7 +202,7 @@
 </sl-radio-group>
 <br>
 
-<Table columns={9}>
+<Table columns={5}>
   <div class="tablegrid-header tablegrid-row" data-sort="{sortMethod}">
     {#if !isMobile}
       <div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
@@ -211,7 +214,8 @@
       <div class="tablegrid-cell">Rank</div>
     {/if}
   </div>
-  {#each players as { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, teamID, abbr, ft }}
+  {#each players as player}
+    {@const { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, teamID, abbr, ft } = player}
     <div class="tablegrid-row" data-player-id="{espn_id}" data-position="{position}" data-team="T{teamID}">
 
       {#if !isMobile}
@@ -229,8 +233,16 @@
         </span>
       </div>
       {#if !isMobile}
-        <div class="tablegrid-cell">{salary}</div>
+        <div class="tablegrid-cell">{formatMoney(salary)}</div>
         <div class="tablegrid-cell">#{pos}</div>
+        <div class="tablegrid-cell">
+          <Actions
+            espn_id={espn_id}
+            logTeam={abbr}
+            status="rfa"
+            player={player}
+          />
+        </div>
       {/if}
     </div>
   {/each}

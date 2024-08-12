@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Contract, Player } from "../../src/types/defs";
-	import { userStore } from "../misc/stores";
+	import { leagueSettingsStore, userStore } from "../misc/stores";
 	import formatMoney from "../utils/formatMoney";
 	import { serialize, useFormData } from "../utils/forms";
 	import { notify } from "../utils/notify";
@@ -16,9 +16,17 @@
   let irElgibile = !['dts', 'ir', 'waived'].includes(status) && ['out', 'injury_reserve'].includes(player.playerStatus)
 
   let userTeam = '';
+  let isAdmin = false;
   userStore.subscribe((value) => {
     if (!value) return null;
     userTeam = value.teamID;
+    isAdmin = value.isAdmin;
+  })
+
+  let inSeason = false;
+  leagueSettingsStore.subscribe(value => {
+    if (!value) return null;
+    inSeason = value.phase === 'active';
   })
 
   $: isOwner = userTeam === logTeam;
@@ -40,7 +48,7 @@
 
     switch (action) {
       case 'more':
-        row!.querySelector('.tray')?.toggleAttribute('hidden');
+        window.open(`https://www.espn.com/nfl/player/_/id/${player.espn_id}`,'_blank');
         break;
 
       case 'drop':
@@ -197,10 +205,10 @@
 <sl-dropdown>
   <sl-icon-button slot="trigger" name="three-dots-vertical"></sl-icon-button>
   <sl-menu on:sl-select={handlePlayerActions}>
-    <!-- <sl-menu-item action="more">
+    <sl-menu-item action="more">
       <sl-icon slot="prefix" name="person"></sl-icon>
-      More Information ({status})
-    </sl-menu-item> -->
+      More Info
+    </sl-menu-item>
     {#if isOwner}
       {#if status === 'dts'}
         <sl-menu-item action="promote">
@@ -220,7 +228,7 @@
           Drop
         </sl-menu-item>
       {/if}
-    {:else if isAvailable}
+    {:else if isAvailable && inSeason}
       <sl-menu-item action="bid">
         <sl-icon slot="prefix" name="tag"></sl-icon>
         Place Bid
@@ -273,6 +281,60 @@
 
     <!-- Submit Button -->
     <sl-button slot="footer" variant="primary" type="submit">{buttonLabel}</sl-button>
+  </form>
+</sl-dialog>
+{/if}
+
+{#if status === 'rfa'}
+<sl-icon-button name="pencil-square" on:click={modal.show()}></sl-icon-button>
+<sl-dialog label="Creating New Contract" bind:this={modal}>
+  <form
+    data-actions
+    on:submit|preventDefault={serialize}
+    on:formdata={handleFormData}
+  >
+    <!-- References to all involved entities -->
+    <input type="hidden" name="player" value="{espn_id}">
+    <input type="hidden" name="team" value="{userTeam}">
+    <input type="hidden" name="contract" value="{contract}">
+
+    <sl-input label="Player" type="text" readonly value="{player.name} ({player.position}, {player.nflTeam})">
+      <sl-icon name="person-add" slot="prefix"></sl-icon>
+    </sl-input>
+    <br>
+
+    {#if player.ft}
+      <sl-input label="Previous" type="text" readonly value="{player.team}, {formatMoney(player.salary)}, FT">
+        <sl-icon src="/icons/pennant.svg" slot="prefix"></sl-icon>
+      </sl-input>
+    {:else}
+      <sl-input label="Previous" type="text" readonly value="{player.team}, {formatMoney(player.salary)}">
+        <sl-icon src="/icons/pennant.svg" slot="prefix"></sl-icon>
+      </sl-input>
+    {/if}
+    <br>
+    <sl-input name="Salary" label="Salary" type="number" min="1" help-text="50%: {formatMoney(player.salary * 0.5)}; 75%: {formatMoney(player.salary * 0.75)}">
+      <sl-icon name="cash" slot="prefix"></sl-icon>
+    </sl-input>
+    <br>
+
+    <sl-select label="Team">
+      <sl-icon src="/icons/pennant.svg" slot="prefix"></sl-icon>
+      <sl-option value="1">Destructive Drummer</sl-option>
+      <sl-option value="2">Martian Carnage</sl-option>
+      <sl-option value="4">Dumpster Fire</sl-option>
+      <sl-option value="5">Mayfield of Dreams</sl-option>
+      <sl-option value="6">Buckeye Bruiser</sl-option>
+      <sl-option value="7">Murder Salad</sl-option>
+      <sl-option value="8">Globo Gym</sl-option>
+      <sl-option value="9">My Little LeBrony</sl-option>
+      <sl-option value="10">I'm hear to</sl-option>
+      <sl-option value="11">Team Billman</sl-option>
+    </sl-select>
+    <br>
+
+    <!-- Submit Button -->
+    <sl-button slot="footer" variant="primary" type="submit">Create New Contract</sl-button>
   </form>
 </sl-dialog>
 {/if}

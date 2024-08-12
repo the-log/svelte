@@ -40,7 +40,8 @@
           dts,
           ir,
           waived,
-          salary: formatMoney(salary),
+          salary,
+          formattedSalary: formatMoney(salary),
           years
         }
       })
