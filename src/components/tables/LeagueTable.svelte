@@ -91,7 +91,7 @@
         {#if isMobile}
           <span class="text-minor contract-counts">
             <span class="{active > 40 ? 'over' : ''} {active > 36 ? 'warn' : ''}">{active}</span>
-            <span class="{dts > 13 ? 'over' : ''} {active > 11 ? 'warn' : ''}">{dts}</span>
+            <span class="{dts > 13 ? 'over' : ''} {dts > 11 ? 'warn' : ''}">{dts}</span>
             <span>{ir}</span>
             <span>{waived}</span>
           </span>
