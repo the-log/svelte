@@ -104,7 +104,7 @@
               <span class="{active > 40 ? 'over' : ''} {active > 36 ? 'warn' : ''}">{active}</span>
             </sl-tooltip>
             <sl-tooltip content="DTS (max 13)">
-              <span class="{dts > 13 ? 'over' : ''} {active > 11 ? 'warn' : ''}">{dts}</span>
+              <span class="{dts > 13 ? 'over' : ''} {dts > 11 ? 'warn' : ''}">{dts}</span>
             </sl-tooltip>
             <sl-tooltip content="Injured Reserve">
               <span>{ir}</span>
