@@ -2,6 +2,7 @@
   import Table from '../Table.svelte'
 	import Actions from '../Actions.svelte';
   import { isMobile as layoutStore } from "../../misc/stores";
+	import formatMoney from '../../utils/formatMoney';
 
   export let title: String;
   export let players: any[];
@@ -72,7 +73,7 @@
           {/if}
         </div>
         {#if !isMobile}<div class="tablegrid-cell">{nflTeam}</div>{/if}
-        <div class="tablegrid-cell">{salary}</div>
+        <div class="tablegrid-cell">{formatMoney(salary)}</div>
         <div class="tablegrid-cell">{years}</div>
         <div class="tablegrid-cell tablegrid-actions">
           <Actions
