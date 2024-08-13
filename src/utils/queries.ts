@@ -135,7 +135,7 @@ export default {
             }
           }
           status: {
-            in: ["active", "dts", "ir", "waiver"]
+            in: ["active", "dts", "ir", "waived"]
           }
         }
         orderBy: {
@@ -164,7 +164,7 @@ export default {
             }
           }
           status: {
-            in: ["active", "dts", "ir", "waiver"]
+            in: ["active", "dts", "ir", "waived"]
           }
         }
         orderBy: {
