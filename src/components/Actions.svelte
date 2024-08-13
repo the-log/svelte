@@ -151,7 +151,6 @@
       years
     } = data;
 
-
     switch (action) {
       case 'bid':
         notify({
@@ -175,9 +174,34 @@
         break;
 
       case 'drop':
-        await updateContract(contract, {
-          status: "waived"
-        })
+        if (status === 'dts') {
+          await runQuery(queries["delete-contract"], {
+            where: {
+              id: contract
+            }
+          }).then(({data}) => {
+            const {
+              deleteContract: {
+                player: {
+                  name,
+                  position,
+                  team
+                },
+                salary,
+                years,
+                status
+              }
+            } = data;
+            notify({
+              title: `Contract Deleted for ${name} (${position}, ${team})`,
+              message: `${formatMoney(salary)}, ${years}yrs, ${status}`
+            })
+          });
+        } else {
+          await updateContract(contract, {
+            status: "waived"
+          })
+        }
         break;
 
       default:

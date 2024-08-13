@@ -314,6 +314,21 @@ export default {
       }
     }
   `,
+  'delete-contract': `
+    mutation Mutation($where: ContractWhereUniqueInput!) {
+      deleteContract(where: $where) {
+        id
+        player {
+          name
+          position
+          team
+        }
+        salary
+        years
+        status
+      }
+    }
+  `,
   'league-settings': `
     query LeagueSetting {
       leagueSetting {
