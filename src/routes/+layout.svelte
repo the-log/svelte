@@ -17,6 +17,7 @@
     const {authenticatedItem} = data;
 
     userStore.set({
+      isAdmin: authenticatedItem?.isAdmin,
       userID: authenticatedItem?.id,
       userName: authenticatedItem?.name,
       teamID: authenticatedItem?.team?.id,

@@ -23,6 +23,7 @@ export default {
         ... on User {
           id
           name
+          isAdmin
           team {
             name
             abbreviation

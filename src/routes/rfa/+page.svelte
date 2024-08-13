@@ -5,7 +5,7 @@
 	import runQuery from '../../../src/utils/runQuery';
 	import queries from '../../../src/utils/queries';
   import type { Contract } from '../../../src/types/defs';
-  import { isMobile as layoutStore } from "../../misc/stores";
+  import { isMobile as layoutStore, userStore } from "../../misc/stores";
 	import { onMount } from 'svelte';
 	import Actions from '../../components/Actions.svelte';
 
@@ -78,6 +78,11 @@
     interval = setInterval(fetchRFAs, 10000);
 
     return () => clearInterval(interval);
+  })
+
+  let user;
+  userStore.subscribe((value) => {
+    user = value
   })
 
   let isMobile: null | Boolean;
@@ -236,12 +241,14 @@
         <div class="tablegrid-cell">{formatMoney(salary)}</div>
         <div class="tablegrid-cell">#{pos}</div>
         <div class="tablegrid-cell">
-          <Actions
-            espn_id={espn_id}
-            logTeam={abbr}
-            status="rfa"
-            player={player}
-          />
+          {#if user.isAdmin}
+            <Actions
+              espn_id={espn_id}
+              logTeam={abbr}
+              status="rfa"
+              player={player}
+            />
+          {/if}
         </div>
       {/if}
     </div>
