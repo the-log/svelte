@@ -7,7 +7,7 @@
   import type { Contract } from '../../../src/types/defs';
   import { isMobile as layoutStore, userStore } from "../../misc/stores";
 	import { onMount } from 'svelte';
-	import Actions from '../../components/Actions.svelte';
+  import RfaActions from "../../components/RfaActions.svelte";
 
   let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank';
   $: sortMethod = 'position';
@@ -60,7 +60,8 @@
           team: contract.team.name,
           teamID: contract.team.espn_id,
           abbr: contract.team.abbreviation,
-          ft: contract.isFranchiseTagged
+          ft: contract.isFranchiseTagged,
+          contract_id: contract.id
         }));
 
       players = playerData;
@@ -220,7 +221,7 @@
     {/if}
   </div>
   {#each players as player}
-    {@const { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, teamID, abbr, ft } = player}
+    {@const { espn_id, name, nflTeam, ovr, pos, position, salary, status, team, teamID, abbr, ft, contract_id } = player}
     <div class="tablegrid-row" data-player-id="{espn_id}" data-position="{position}" data-team="T{teamID}">
 
       {#if !isMobile}
@@ -242,11 +243,12 @@
         <div class="tablegrid-cell">#{pos}</div>
         <div class="tablegrid-cell">
           {#if user.isAdmin}
-            <Actions
+            <RfaActions
               espn_id={espn_id}
               logTeam={abbr}
               status="rfa"
               player={player}
+              contract={contract_id}
             />
           {/if}
         </div>

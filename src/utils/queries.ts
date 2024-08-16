@@ -207,6 +207,7 @@ export default {
           positionRankProj
           overallRankProj
         }
+        id
         status
         salary
         years
@@ -297,6 +298,21 @@ export default {
       redeemUserPasswordResetToken(email: $email, token: $token, password: $password) {
         message
         code
+      }
+    }
+  `,
+  'create-contract': `
+    mutation Mutation($data: ContractCreateInput!) {
+      createContract(data: $data) {
+        salary
+        team {
+          name
+        }
+        player {
+          name
+          position
+          team
+        }
       }
     }
   `,
