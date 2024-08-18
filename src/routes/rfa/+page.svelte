@@ -76,7 +76,7 @@
   let interval: number;
   onMount(() => {
     fetchRFAs();
-    interval = setInterval(fetchRFAs, 10000);
+    interval = setInterval(fetchRFAs, 5000);
 
     return () => clearInterval(interval);
   })

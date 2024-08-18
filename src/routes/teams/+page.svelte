@@ -6,45 +6,57 @@
   import type { Team, RowAction } from '../../types/defs';
 	import { readable } from 'svelte/store';
 	import LeagueTable from '../../components/tables/LeagueTable.svelte';
+	import { onMount } from 'svelte';
 
   $: teams = [];
 
-  runQuery(queries['all-teams'])
-    .then(({data}) => {
-      teams = data.teams.map((team: Team) => {
-        const {
-          abbreviation,
-          name,
-          wins,
-          losses,
-          ties,
-          contractTotals,
-        } = team;
+  const getTeams = () => {
 
-        const {
-          active,
-          dts,
-          ir,
-          waived,
-          salary,
-          years
-        } = contractTotals;
+    runQuery(queries['all-teams'])
+      .then(({data}) => {
+        teams = data.teams.map((team: Team) => {
+          const {
+            abbreviation,
+            name,
+            wins,
+            losses,
+            ties,
+            contractTotals,
+          } = team;
 
-        return {
-          abbreviation,
-          name,
-          wins,
-          losses,
-          ties,
-          active,
-          dts,
-          ir,
-          waived,
-          salary,
-          formattedSalary: formatMoney(salary),
-          years
-        }
-      })
-    });
+          const {
+            active,
+            dts,
+            ir,
+            waived,
+            salary,
+            years
+          } = contractTotals;
+
+          return {
+            abbreviation,
+            name,
+            wins,
+            losses,
+            ties,
+            active,
+            dts,
+            ir,
+            waived,
+            salary,
+            formattedSalary: formatMoney(salary),
+            years
+          }
+        })
+      });
+  }
+
+  let interval: number;
+  onMount(() => {
+    getTeams();
+    interval = setInterval(getTeams, 5000);
+
+    return () => clearInterval(interval);
+  })
 </script>
 <LeagueTable teams={teams} />
