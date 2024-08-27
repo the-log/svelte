@@ -2,6 +2,7 @@
 	import formatMoney from "../../utils/formatMoney";
   import type { Bid } from "../../types/defs";
   import { isMobile as layoutStore } from "../../misc/stores";
+	import BidActions from "../BidActions.svelte";
 
   export let bid: Bid | null = null;
 
@@ -28,6 +29,11 @@
     <span class="text-minor">
       {formatMoney(salary)} - {years}yrs
     </span>
+  </div>
+  <div class="tablegrid-cell tablegrid-actions">
+    {#if !bid?.locked}
+      <BidActions bid={bid} />
+    {/if}
   </div>
 </div>
 {/if}

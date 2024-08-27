@@ -22,19 +22,31 @@ export default async function runQuery(query: string, variables = {}) {
   .then(r => r.json())
   .then(json => {
     if (json.errors) {
-      notify({
-        title: 'Error',
-        message: "An error has occurred. See the console for more details.",
-        variant: 'danger',
-      });
-      console.error(json.errors);
 
-      document.documentElement.dispatchEvent(new CustomEvent('graphqlerror', {
-        bubbles: false,
-        cancelable: false,
-        composed: true,
-        detail: json
-      }))
+      try {
+        notify({
+          title: 'Error',
+          message: "An error has occurred. See the console for more details.",
+          variant: 'danger',
+        });
+        console.error(json.errors);
+
+        document.documentElement.dispatchEvent(new CustomEvent('graphqlerror', {
+          bubbles: false,
+          cancelable: false,
+          composed: true,
+          detail: json
+        }))
+      } catch (error) {
+        console.log("SVELTE ERROR", error);
+        console.log("KEYSTONE ERROR", json);
+
+
+      }
+
+
+
+
     }
 
     return json;

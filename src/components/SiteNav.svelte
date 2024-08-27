@@ -96,13 +96,14 @@ nav {
       </sl-tooltip>
     </li>
     <li>
-      <sl-tooltip content="Restricted Free Agency" placement="right">
-        <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button>
+      <sl-tooltip content="Free Agency" placement="right">
+        <!-- <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button> -->
+        <sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "></sl-icon-button>
       </sl-tooltip>
     </li>
     <li>
       <sl-tooltip content="Rulebook" placement="right">
-        <sl-icon-button name="book" label="Rulebook" href="/rulebook"></sl-icon-button>
+        <sl-icon-button src="/icons/book.svg" label="Rulebook" href="/rulebook"></sl-icon-button>
       </sl-tooltip>
     </li>
   </ul>

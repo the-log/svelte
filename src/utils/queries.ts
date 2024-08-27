@@ -246,17 +246,22 @@ export default {
   `,
   'all-bids': `
     query {
-      pending: bids {
+      pending: bids(where: {
+        locked: null
+      }) {
         team {
           name
+          id
         }
         player {
           name
           position
           team
+          id
         }
         salary
         years
+        id
       }
 
       published: bids(where: {
@@ -278,6 +283,7 @@ export default {
         }
         salary
         years
+        bid_order
       }
     }
   `,
@@ -285,6 +291,38 @@ export default {
     mutation Mutation($data: BidCreateInput!) {
       createBid(data: $data) {
         created
+      }
+    }
+  `,
+  'update-bid': `
+    mutation UpdateBid($where: BidWhereUniqueInput!, $data: BidUpdateInput!) {
+      updateBid(where: $where, data: $data) {
+        player {
+          name
+          position
+          team
+        }
+        salary
+        team {
+          name
+        }
+        years
+      }
+    }
+  `,
+  'delete-bid': `
+    mutation DeleteBid($where: BidWhereUniqueInput!) {
+      deleteBid(where: $where) {
+        salary
+        years
+        team {
+          name
+        }
+        player {
+          name
+          position
+          team
+        }
       }
     }
   `,

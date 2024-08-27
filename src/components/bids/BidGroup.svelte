@@ -11,7 +11,7 @@
 {#if title}
   <h3>{title}</h3>
 {/if}
-<Table columns={isMobile ? 3 : 4}>
+<Table columns={isMobile ? 2 : 3}>
   <div class="tablegrid-header tablegrid-row">
     {#if !isMobile}
       <div class="tablegrid-cell"></div>

@@ -5,26 +5,38 @@
 	import queries from "../../utils/queries";
 	import runQuery from "../../utils/runQuery";
   import type { Bid } from "../../types/defs";
+	import { onMount } from "svelte";
 
   let team = null;
   let myBids: Bid[] = [];
   let lockedBids: Bid[] = []
 
-  runQuery(queries["all-bids"])
-    .then(({data}) => {
-      const {pending, published} = data;
+  function getBids() {
+    runQuery(queries["all-bids"])
+      .then(({data}) => {
+        const {pending, published} = data;
 
-      published.forEach((bid: Bid) => {
-        bid.locked = (new Date(bid.locked)).toLocaleDateString();
+        published.forEach((bid: Bid) => {
+          bid.locked = (new Date(bid.locked)).toLocaleDateString();
+        });
+
+        lockedBids = published;
+        myBids = pending;
       });
+  }
 
-      lockedBids = published;
-      myBids = pending;
-    });
+  onMount(() => {
+    window.addEventListener('action-taken',  getBids);
+    getBids();
+
+    return () => {
+      window.removeEventListener('action-taken', getBids);
+    }
+  })
 </script>
 
 <h2>Pending Bids</h2>
-<BidGroup title="Pending Bids">
+<BidGroup title="My Bids">
   {#each myBids as bid}
     <Bid bid={bid} />
   {/each}

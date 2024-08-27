@@ -151,11 +151,7 @@
 
     switch (action) {
       case 'bid':
-        notify({
-          title: `Not Allowed`,
-          message: `This action isn't enabled yet.`
-        })
-        // tryCreateNewBid(data);
+        tryCreateNewBid(data);
         break;
 
       case 'promote':
@@ -225,7 +221,7 @@
 
 {#if isOwner || isAvailable}
 <sl-dropdown>
-  <sl-icon-button slot="trigger" name="three-dots-vertical"></sl-icon-button>
+  <sl-icon-button slot="trigger" src="/icons/menu.svg"></sl-icon-button>
   <sl-menu on:sl-select={handlePlayerActions}>
     <sl-menu-item action="more">
       <sl-icon slot="prefix" name="person"></sl-icon>
