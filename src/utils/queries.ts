@@ -284,6 +284,7 @@ export default {
         salary
         years
         bid_order
+        eval_order
       }
     }
   `,
