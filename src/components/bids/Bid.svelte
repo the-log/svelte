@@ -5,6 +5,7 @@
 	import BidActions from "../BidActions.svelte";
 
   export let bid: Bid | null = null;
+  export let index: number | null = null;
 
   $: isMobile = null;
   layoutStore.subscribe((value) => {isMobile = value});
@@ -15,6 +16,7 @@
 <div class="tablegrid-row">
   {#if !isMobile}
     <div class="tablegrid-cell tablegrid-thumbcell">
+      {index}
     </div>
   {/if}
   <div class="tablegrid-cell">
