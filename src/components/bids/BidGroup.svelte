@@ -8,8 +8,14 @@
   layoutStore.subscribe((value) => {isMobile = value});
 </script>
 
+<style>
+  h4:not(:first-of-type) {
+    margin-top: 2rem;
+  }
+</style>
+
 {#if title}
-  <h3>{title}</h3>
+  <h4>{title}</h4>
 {/if}
 <Table columns={isMobile ? 2 : 3}>
   <div class="tablegrid-header tablegrid-row">

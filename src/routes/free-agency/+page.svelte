@@ -110,6 +110,18 @@
   })
 </script>
 
+<style lang="scss">
+  sl-details {
+    & + sl-details {
+      margin-top: 1rem;
+    }
+
+    h3 {
+      margin: 0;
+    }
+  }
+</style>
+
 <h2>Pending Bids {due ? `(${due})` : ''}</h2>
 <BidGroup title="My Bids">
   {#each myBids as bid, i}
@@ -120,15 +132,17 @@
 <hr>
 
 <h2>Auction Results</h2>
-{#each Object.entries(lockedBids) as [date, bidGroups]}
-  <h3>{date}</h3>
-  {#each Object.entries(bidGroups) as [espnid, bids]}
-    <BidGroup title="{bids[0].player.name}">
-      {#each bids.toSorted((a, b) => a.bid_order - b.bid_order) as bid, i}
-        <Bid bid={bid} index={i + 1}/>
-      {/each}
-    </BidGroup>
-  {/each}
+{#each Object.entries(lockedBids).reverse() as [date, bidGroups], i}
+  <sl-details open="{i === 0}">
+    <h3 slot="summary">{date}</h3>
+    {#each Object.entries(bidGroups) as [espnid, bids]}
+      <BidGroup title="{bids[0].player.name}">
+        {#each bids.toSorted((a, b) => a.bid_order - b.bid_order) as bid, j}
+          <Bid bid={bid} index={j + 1}/>
+        {/each}
+      </BidGroup>
+    {/each}
+  </sl-details>
 {/each}
 
 {#if !Object.entries(lockedBids).length}
