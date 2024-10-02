@@ -11,6 +11,11 @@ const config = {
 		adapter: adapter({
 			edge: true,
 		})
+	},
+	vitePlugin: {
+		experimental: {
+			inspector: true
+		}
 	}
 };
 
