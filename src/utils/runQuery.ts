@@ -26,9 +26,13 @@ export default async function runQuery(query: string, variables = {}) {
       try {
         notify({
           title: 'Error',
-          message: "An error has occurred. See the console for more details.",
-          variant: 'danger',
-        });
+          message: `
+          <sl-details summary="An error has occurred">
+            ${json.errors}
+          </sl-details>
+          `,
+          variant: 'danger'
+        })
         console.error(json.errors);
 
         document.documentElement.dispatchEvent(new CustomEvent('graphqlerror', {

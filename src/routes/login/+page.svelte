@@ -46,7 +46,11 @@
       else {
         notify({
           title: 'Error',
-          message: 'An error has occurred. See the console for more details.'
+          message: `
+          <sl-details summary="An error has occurred">
+            ${item}
+          </sl-details>
+          `
         })
         console.error(item);
       }

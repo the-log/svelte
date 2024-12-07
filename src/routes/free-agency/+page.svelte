@@ -26,7 +26,7 @@
           bid.locked = (new Date(bid.locked)).toLocaleDateString();
         });
 
-        const groupedByDate = Object.groupBy(published, (bid) => bid.locked)
+        const groupedByDate = Object.groupBy(published, (bid) => bid.locked);
 
         for (const date in groupedByDate) {
           if (Object.prototype.hasOwnProperty.call(groupedByDate, date)) {
@@ -35,7 +35,6 @@
             groupedByDate[date] = groupedByPlayer;
           }
         }
-
 
         lockedBids = groupedByDate;
         myBids = pending;

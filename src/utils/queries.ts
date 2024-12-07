@@ -264,13 +264,18 @@ export default {
         id
       }
 
-      published: bids(where: {
-        locked: {
-          not: {
-            equals: null
+      published: bids(
+        where: {
+          locked: {
+            not: {
+              equals: null
+            }
           }
         }
-      }) {
+        orderBy: {
+          locked: asc
+        }
+      ) {
         locked
         team {
           name
