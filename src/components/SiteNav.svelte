@@ -97,8 +97,8 @@ nav {
     </li>
     <li>
       <sl-tooltip content="Free Agency" placement="right">
-        <!-- <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button> -->
-        <sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "></sl-icon-button>
+        <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button>
+        <!-- <sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "></sl-icon-button> -->
       </sl-tooltip>
     </li>
     <li>
