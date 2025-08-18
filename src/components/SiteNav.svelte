@@ -1,5 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from '$app/navigation';
+  import { leagueSettingsStore } from "../misc/stores";
 
   function setActiveNav(route:string|undefined) {
     if (typeof route === 'string') {
@@ -13,6 +14,15 @@
   afterNavigate((navigation) => {
     setActiveNav(navigation.to?.route.id ?? undefined);
   })
+
+  const inSeason = "active";
+  const offSeason = ["off", "draft", "rfa"];
+  $: phase = "";
+
+  leagueSettingsStore.subscribe((values) => {
+    phase = values?.phase ?? "";
+  })
+
 </script>
 
 <style lang="scss">
@@ -97,8 +107,12 @@ nav {
     </li>
     <li>
       <sl-tooltip content="Free Agency" placement="right">
-        <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button>
-        <!-- <sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "></sl-icon-button> -->
+        {#if offSeason.includes(phase)}
+          <sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "></sl-icon-button>
+        {/if}
+        {#if inSeason === phase}
+          <sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "></sl-icon-button>
+        {/if}
       </sl-tooltip>
     </li>
     <li>
