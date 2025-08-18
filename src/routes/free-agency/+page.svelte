@@ -41,7 +41,7 @@
       });
   }
 
-  function calculateDiff(now, target = 0) {
+  function calculateDiff(now: number, target = 0) {
     let diff = target - now;
 
     const ms_per = {
@@ -83,6 +83,7 @@
   }
 
   leagueSettingsStore.subscribe((values) => {
+
     if (values) {
       const {bid_deadlines} = values;
 
