@@ -1,6 +1,5 @@
 <script lang="ts">
-  // tbd.
+	// tbd.
 </script>
-
 
 <slot />

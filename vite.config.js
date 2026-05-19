@@ -1,12 +1,12 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import path from "path";
+import path from 'path';
 
 /** @type {import('vite').UserConfig} */
 const config = {
 	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			'src': path.resolve(__dirname, './src')
+			src: path.resolve(__dirname, './src')
 		}
 	}
 };

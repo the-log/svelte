@@ -14,10 +14,10 @@ const contracts_by_team_value = `
   salary
   years
   needsAttention
-`
+`;
 
 export default {
-  'authenticated-item': `
+	'authenticated-item': `
     query {
       authenticatedItem {
         ... on User {
@@ -33,7 +33,7 @@ export default {
       }
     }
   `,
-  'begin-session': `
+	'begin-session': `
     mutation (
       $identity: String!,
       $secret: String!
@@ -58,12 +58,12 @@ export default {
       }
     }
   `,
-  'end-session': `
+	'end-session': `
     mutation {
       endSession
     }
   `,
-  'all-players': `
+	'all-players': `
     query (
       $take: Int,
       $skip: Int,
@@ -105,7 +105,7 @@ export default {
       }
     }
   `,
-  'all-teams': `
+	'all-teams': `
     query  {
       teams (
         orderBy: {
@@ -126,7 +126,7 @@ export default {
       }
     }
   `,
-  'contracts-by-team-id': `
+	'contracts-by-team-id': `
     query ($id: ID!) {
       contracts (
         where: {
@@ -155,7 +155,7 @@ export default {
       }
     }
   `,
-  'contracts-by-team-abbr': `
+	'contracts-by-team-abbr': `
     query ($abbr: String!) {
       contracts (
         where: {
@@ -185,7 +185,7 @@ export default {
       }
     }
   `,
-  'rfas': `
+	rfas: `
     query {
       contracts (
         where: {
@@ -220,7 +220,7 @@ export default {
       }
     }
   `,
-  'stats-by-player': `
+	'stats-by-player': `
     query ($id: Int) {
       player (
         where: {
@@ -244,7 +244,7 @@ export default {
       }
     }
   `,
-  'all-bids': `
+	'all-bids': `
     query {
       pending: bids(where: {
         locked: null
@@ -293,14 +293,14 @@ export default {
       }
     }
   `,
-  'new-bid': `
+	'new-bid': `
     mutation Mutation($data: BidCreateInput!) {
       createBid(data: $data) {
         created
       }
     }
   `,
-  'update-bid': `
+	'update-bid': `
     mutation UpdateBid($where: BidWhereUniqueInput!, $data: BidUpdateInput!) {
       updateBid(where: $where, data: $data) {
         player {
@@ -316,7 +316,7 @@ export default {
       }
     }
   `,
-  'delete-bid': `
+	'delete-bid': `
     mutation DeleteBid($where: BidWhereUniqueInput!) {
       deleteBid(where: $where) {
         salary
@@ -332,12 +332,12 @@ export default {
       }
     }
   `,
-  'request-token': `
+	'request-token': `
     mutation SendUserPasswordResetLink($email: String!) {
       sendUserPasswordResetLink(email: $email)
     }
   `,
-  'reset-pass': `
+	'reset-pass': `
     mutation RedeemUserPasswordResetToken($email: String!, $token: String!, $password: String!) {
       redeemUserPasswordResetToken(email: $email, token: $token, password: $password) {
         message
@@ -345,7 +345,7 @@ export default {
       }
     }
   `,
-  'create-contract': `
+	'create-contract': `
     mutation Mutation($data: ContractCreateInput!) {
       createContract(data: $data) {
         salary
@@ -360,7 +360,7 @@ export default {
       }
     }
   `,
-  'update-contract': `
+	'update-contract': `
     mutation Mutation($where: ContractWhereUniqueInput!, $data: ContractUpdateInput!) {
       updateContract(where: $where, data: $data) {
         player {
@@ -374,7 +374,7 @@ export default {
       }
     }
   `,
-  'delete-contract': `
+	'delete-contract': `
     mutation Mutation($where: ContractWhereUniqueInput!) {
       deleteContract(where: $where) {
         id
@@ -389,7 +389,7 @@ export default {
       }
     }
   `,
-  'league-settings': `
+	'league-settings': `
     query LeagueSetting {
       leagueSetting {
         bid_deadlines
@@ -398,4 +398,4 @@ export default {
       }
     }
   `
-}
+};
