@@ -1,38 +1,61 @@
-# create-svelte
+# the-log/svelte
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+SvelteKit frontend for the fantasy football league management app. Reads from the Keystone GraphQL backend (`api.log.football` in prod, `api.log.ddev.site` locally) and is deployed to Netlify.
 
-## Creating a project
+## Quick start
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+The recommended local workflow uses [DDEV](https://ddev.com/), which orchestrates this app alongside its backend and scraper siblings:
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# from the parent project directory (where .ddev/ lives)
+ddev start
+ddev svelte         # runs `npm run dev` inside the container
 ```
 
-## Building
+The dev server listens on `:3001` and is reachable at <https://app.log.ddev.site>.
 
-To create a production version of your app:
+To run outside DDEV (frontend-only, pointed at the prod backend):
 
 ```bash
-npm run build
+cd svelte
+npm install
+npm run dev         # http://localhost:3001
 ```
 
-You can preview the production build with `npm run preview`.
+## Scripts
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Start the dev server on port 3001. |
+| `npm run build` | Build for production (used by Netlify). |
+| `npm run preview` | Preview the production build locally. |
+| `npm run check` | Run `svelte-check` for type errors. |
+| `npm run lint` | Prettier + ESLint check. |
+| `npm run format` | Apply Prettier formatting. |
+
+## Stack
+
+- **Framework**: SvelteKit (adapter-netlify, edge functions)
+- **UI**: Shoelace web components, loaded via CDN autoloader in `src/app.html`
+- **Data**: GraphQL via a thin `fetch` wrapper in `src/utils/runQuery.ts`
+- **Markdown**: `marked` (used by the rulebook route)
+
+## Project layout
+
+```
+src/
+  app.html              Shell — Shoelace bootstrap, design tokens
+  routes/               SvelteKit pages
+  components/           Reusable Svelte components
+  utils/                Pure helpers, GraphQL client, query strings
+  types/                TypeScript types and GraphQL schema types
+  misc/stores.ts        Svelte stores (auth, etc.)
+```
+
+## Environment
+
+See `.env.example`. The app currently reads only Vite's built-in `import.meta.env.DEV` to switch backend URLs; user-settable env vars are tracked in [issue #17](https://github.com/the-log/svelte/issues/17).
+
+## Deployment
+
+Netlify auto-deploys from `main`. Build config lives in `netlify.toml`.
