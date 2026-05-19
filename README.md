@@ -24,14 +24,14 @@ npm run dev         # http://localhost:3001
 
 ## Scripts
 
-| Script | Purpose |
-|---|---|
-| `npm run dev` | Start the dev server on port 3001. |
-| `npm run build` | Build for production (used by Netlify). |
-| `npm run preview` | Preview the production build locally. |
-| `npm run check` | Run `svelte-check` for type errors. |
-| `npm run lint` | Prettier + ESLint check. |
-| `npm run format` | Apply Prettier formatting. |
+| Script            | Purpose                                 |
+| ----------------- | --------------------------------------- |
+| `npm run dev`     | Start the dev server on port 3001.      |
+| `npm run build`   | Build for production (used by Netlify). |
+| `npm run preview` | Preview the production build locally.   |
+| `npm run check`   | Run `svelte-check` for type errors.     |
+| `npm run lint`    | Prettier + ESLint check.                |
+| `npm run format`  | Apply Prettier formatting.              |
 
 ## Stack
 
