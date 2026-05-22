@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { goto } from '$app/navigation';
 	import { notify } from '../../utils/notify';
 	import { userStore, authStatusStore } from '../../misc/stores';
 
-	let email: string, password: string;
+	let email: string = $state(),
+		password: string = $state();
 
 	function attemptLogin(e: SubmitEvent) {
 		runQuery(queries['begin-session'], {
@@ -57,13 +60,13 @@
 
 <h1>Login</h1>
 
-<form on:submit|preventDefault={attemptLogin}>
+<form onsubmit={preventDefault(attemptLogin)}>
 	<sl-input
 		size="medium"
 		type="email"
 		placeholder="Email"
 		autocomplete="email"
-		on:sl-input={(e) => {
+		onsl-input={(e) => {
 			email = e.target.value;
 		}}
 	></sl-input>
@@ -72,7 +75,7 @@
 		type="password"
 		placeholder="Password"
 		autocomplete="password"
-		on:sl-input={(e) => {
+		onsl-input={(e) => {
 			password = e.target.value;
 		}}
 	></sl-input>

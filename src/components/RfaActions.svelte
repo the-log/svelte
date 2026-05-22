@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import type { Contract, Player } from '../../src/types/defs';
 	import { userStore } from '../misc/stores';
 	import formatMoney from '../utils/formatMoney';
@@ -7,11 +9,15 @@
 	import queries from '../utils/queries';
 	import runQuery from '../utils/runQuery';
 
-	export let espn_id: number;
-	export let logTeam: string;
-	export let status: string;
-	export let player: Player;
-	export let contract: Contract | null = null;
+	interface Props {
+		espn_id: number;
+		logTeam: string;
+		status: string;
+		player: Player;
+		contract?: Contract | null;
+	}
+
+	let { espn_id, logTeam, status, player, contract = null }: Props = $props();
 
 	let isAdmin = false;
 	userStore.subscribe((value) => {
@@ -19,7 +25,7 @@
 		isAdmin = value.isAdmin;
 	});
 
-	let modal: HTMLDialogElement;
+	let modal: HTMLDialogElement = $state();
 
 	function handleFormData(e: FormDataEvent) {
 		useFormData(e, doAction);
@@ -83,9 +89,9 @@
 	}
 </script>
 
-<sl-icon-button name="pencil-square" on:click={modal.show()}></sl-icon-button>
+<sl-icon-button name="pencil-square" onclick={modal.show()}></sl-icon-button>
 <sl-dialog label="Creating New Contract" bind:this={modal}>
-	<form data-actions on:submit|preventDefault={serialize} on:formdata={handleFormData}>
+	<form data-actions onsubmit={preventDefault(serialize)} onformdata={handleFormData}>
 		<!-- References to all involved entities -->
 		<input type="hidden" name="player" value={espn_id} />
 		<input type="hidden" name="contract" value={contract} />

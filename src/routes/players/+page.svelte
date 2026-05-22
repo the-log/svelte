@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import { browser } from '$app/environment';
 	import type { Player } from '../../types/defs';
 	import formatMoney from '../../utils/formatMoney';
@@ -7,31 +9,15 @@
 	import { positions, leagueTeams } from '../../utils/playerInfo';
 	import PlayerTable from '../../components/tables/PlayerTable.svelte';
 
-	let players: any[] = [];
-	let playerCount: number = 0;
+	let players: any[] = $state([]);
+	let playerCount: number = $state(0);
 
 	let take = 25;
-	let skip = 0;
-	let filters = {
+	let skip = $state(0);
+	let filters = $state({
 		NOT: {}
-	};
-	let order = { pointsThisYearProj: 'desc' };
-
-	$: pagerMessage = playerCount
-		? `${skip + 1} - ${skip + Math.min(take, playerCount)} of ${playerCount}`
-		: `No results found`;
-
-	$: if (take || skip || filters || order) {
-		runQuery(queries['all-players'], { take, skip, filters, order }).then((resp) => {
-			const { data, errors } = resp;
-			if (errors) return errors;
-
-			playerCount = data.playersCount;
-			players = data.players;
-
-			updatePager();
-		});
-	}
+	});
+	let order = $state({ pointsThisYearProj: 'desc' });
 
 	function onNameInput(e) {
 		const playerName = e.target.value;
@@ -173,23 +159,41 @@
 			nextButtons.forEach((btn) => (btn.disabled = playerCount <= take + skip));
 		}
 	}
+	run(() => {
+		if (take || skip || filters || order) {
+			runQuery(queries['all-players'], { take, skip, filters, order }).then((resp) => {
+				const { data, errors } = resp;
+				if (errors) return errors;
+
+				playerCount = data.playersCount;
+				players = data.players;
+
+				updatePager();
+			});
+		}
+	});
+	let pagerMessage = $derived(
+		playerCount
+			? `${skip + 1} - ${skip + Math.min(take, playerCount)} of ${playerCount}`
+			: `No results found`
+	);
 </script>
 
 <h2>Players</h2>
-<form on:submit|preventDefault={() => {}} class="sl-theme-light">
-	<sl-input on:sl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
-	<sl-select on:sl-input={onPositionInput} placeholder="Position" multiple clearable size="medium">
+<form onsubmit={preventDefault(() => {})} class="sl-theme-light">
+	<sl-input onsl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
+	<sl-select onsl-input={onPositionInput} placeholder="Position" multiple clearable size="medium">
 		{#each positions as [abbr, position]}
 			<sl-option value={abbr}>{position}</sl-option>
 		{/each}
 	</sl-select>
-	<sl-select on:sl-input={onTeamInput} placeholder="Team" multiple clearable size="medium">
+	<sl-select onsl-input={onTeamInput} placeholder="Team" multiple clearable size="medium">
 		{#each leagueTeams as [abbr, team]}
 			<sl-option value={abbr}>{team}</sl-option>
 		{/each}
 	</sl-select>
 	<sl-radio-group
-		on:sl-input={onAvailabilityInput}
+		onsl-input={onAvailabilityInput}
 		size="small"
 		label="Available"
 		name="isAvailable"
@@ -199,21 +203,15 @@
 		<sl-radio size="small" value="no">No</sl-radio>
 		<sl-radio size="small" value="">Either</sl-radio>
 	</sl-radio-group>
-	<sl-radio-group
-		on:sl-input={onIsRookieInput}
-		size="small"
-		label="Rookie"
-		name="isRookie"
-		value=""
-	>
+	<sl-radio-group onsl-input={onIsRookieInput} size="small" label="Rookie" name="isRookie" value="">
 		<sl-radio size="small" value="yes">Yes</sl-radio>
 		<sl-radio size="small" value="no">No</sl-radio>
 		<sl-radio size="small" value="">Either</sl-radio>
 	</sl-radio-group>
 </form>
 
-<div on:update-sort={onOrderUpdate}>
-	<nav class="pagination" on:click={onPagination}>
+<div onupdate-sort={onOrderUpdate}>
+	<nav class="pagination" onclick={onPagination}>
 		<sl-icon-button data-value="first" name="chevron-double-left" label="Show first set"
 		></sl-icon-button>
 		<sl-icon-button data-value="prev" name="chevron-left" label="Show previous set"
@@ -224,7 +222,7 @@
 		></sl-icon-button>
 	</nav>
 	<PlayerTable {players} />
-	<nav class="pagination" on:click={onPagination}>
+	<nav class="pagination" onclick={onPagination}>
 		<sl-icon-button data-value="first" name="chevron-double-left" label="Show first set"
 		></sl-icon-button>
 		<sl-icon-button data-value="prev" name="chevron-left" label="Show previous set"

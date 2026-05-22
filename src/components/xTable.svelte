@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { TableData } from '../types/defs';
 	import Actions from 'src/components/Actions.svelte';
-	export let data: TableData;
+	interface Props {
+		data: TableData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <table>

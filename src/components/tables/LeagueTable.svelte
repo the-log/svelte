@@ -3,11 +3,16 @@
 	import Actions from '../Actions.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 
-	export let teams: any[];
+	interface Props {
+		teams: any[];
+	}
 
-	let isMobile: null | Boolean;
-	$: isMobile = null;
-	$: isReady = false;
+	let { teams }: Props = $props();
+
+	let isMobile: null | boolean = $state(null);
+
+	let isReady = $state(false);
+
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
@@ -99,7 +104,7 @@
 		display: flex;
 		gap: 0.25rem;
 
-		:is(sl-tooltip, span):not(:last-of-type):after {
+		:is(:global(sl-tooltip, span)):not(:last-of-type):after {
 			content: '-';
 			margin-left: 0.25rem;
 			color: var(--sl-color-neutral-600);

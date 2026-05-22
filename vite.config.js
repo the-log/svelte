@@ -8,6 +8,9 @@ const config = {
 		alias: {
 			src: path.resolve(__dirname, './src')
 		}
+	},
+	server: {
+		allowedHosts: ['app.log.ddev.site']
 	}
 };
 

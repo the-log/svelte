@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
 	import Table from '../Table.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 
-	export let title = '';
+	interface Props {
+		title?: string;
+		children?: import('svelte').Snippet;
+	}
 
-	$: isMobile = null;
+	let { title = '', children }: Props = $props();
+
+	let isMobile = $state(null);
+
 	layoutStore.subscribe((value) => {
 		isMobile = value;
 	});
@@ -29,7 +35,7 @@
 			</div>
 		{/if}
 	</div>
-	<slot />
+	{@render children?.()}
 </Table>
 
 <style>

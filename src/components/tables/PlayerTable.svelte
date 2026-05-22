@@ -4,13 +4,17 @@
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
 
-	export let title: String | undefined = undefined;
-	export let players: any[];
+	interface Props {
+		title?: string | undefined;
+		players: any[];
+	}
 
-	$: sortConfig = {
+	let { title = undefined, players }: Props = $props();
+
+	let sortConfig = $derived({
 		key: 'pointsThisYearProj',
 		dir: 'desc'
-	};
+	});
 
 	let sortLabel = {
 		pointsThisWeekProj: 'Week (Proj)',
@@ -19,9 +23,10 @@
 		pointsLastYear: 'Year (Prev)'
 	};
 
-	let isMobile: null | Boolean;
-	$: isMobile = null;
-	$: isReady = false;
+	let isMobile: null | boolean = $state(null);
+
+	let isReady = $state(false);
+
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
@@ -75,7 +80,7 @@
 			<div class="tablegrid-cell subtitle">
 				Points
 				<span class="text-minor">{sortLabel[sortConfig.key]}</span>
-				<sl-dropdown placement="bottom-end" on:sl-select={onOrderUpdate}>
+				<sl-dropdown placement="bottom-end" onsl-select={onOrderUpdate}>
 					<sl-icon-button slot="trigger" name="arrow-down-up"></sl-icon-button>
 
 					<sl-menu>
