@@ -17,7 +17,6 @@
 	const inSeason = 'active';
 	const offSeason = ['off', 'draft', 'rfa'];
 	let phase = $state('');
-	
 
 	leagueSettingsStore.subscribe((values) => {
 		phase = values?.phase ?? '';

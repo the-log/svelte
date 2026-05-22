@@ -10,9 +10,9 @@
 	let teamAbbr = $page.params.name;
 
 	let teamName = $state('');
-	
+
 	let teamID = $state(null);
-	
+
 	let active = $derived([]);
 	let dts = $derived([]);
 	let ir = $derived([]);

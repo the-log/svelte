@@ -10,9 +10,8 @@
 	import RfaActions from '../../components/RfaActions.svelte';
 
 	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank' = $state('position');
-	
+
 	let players: any[] = $state([]);
-	
 
 	const fetchRFAs = () => {
 		runQuery(queries['rfas'], {}).then(({ data }) => {
@@ -81,10 +80,10 @@
 		user = value;
 	});
 
-	let isMobile: null | Boolean = $state(null);
-	
+	let isMobile: null | boolean = $state(null);
+
 	let isReady = $state(false);
-	
+
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
@@ -227,16 +226,18 @@
 	}
 
 	[data-sort='position']
-		~ :where(:global(
-			:nth-last-child(1 of [data-position='QB']),
-			:nth-last-child(1 of [data-position='RB']),
-			:nth-last-child(1 of [data-position='WR']),
-			:nth-last-child(1 of [data-position='TE']),
-			:nth-last-child(1 of [data-position='K']),
-			:nth-last-child(1 of [data-position='DT'], [data-position='DE']),
-			:nth-last-child(1 of [data-position='LB']),
-			:nth-last-child(1 of [data-position='CB'], [data-position='S'])
-		)) {
+		~ :where(
+			:global(
+				:nth-last-child(1 of [data-position='QB']),
+				:nth-last-child(1 of [data-position='RB']),
+				:nth-last-child(1 of [data-position='WR']),
+				:nth-last-child(1 of [data-position='TE']),
+				:nth-last-child(1 of [data-position='K']),
+				:nth-last-child(1 of [data-position='DT'], [data-position='DE']),
+				:nth-last-child(1 of [data-position='LB']),
+				:nth-last-child(1 of [data-position='CB'], [data-position='S'])
+			)
+		) {
 		margin-bottom: 5rem;
 	}
 
@@ -245,18 +246,20 @@
 	}
 
 	[data-sort='team']
-		~ :where(:global(
-			:nth-last-child(1 of [data-team='T1']),
-			:nth-last-child(1 of [data-team='T2']),
-			:nth-last-child(1 of [data-team='T4']),
-			:nth-last-child(1 of [data-team='T5']),
-			:nth-last-child(1 of [data-team='T6']),
-			:nth-last-child(1 of [data-team='T7']),
-			:nth-last-child(1 of [data-team='T8']),
-			:nth-last-child(1 of [data-team='T9']),
-			:nth-last-child(1 of [data-team='T10']),
-			:nth-last-child(1 of [data-team='T11'])
-		)) {
+		~ :where(
+			:global(
+				:nth-last-child(1 of [data-team='T1']),
+				:nth-last-child(1 of [data-team='T2']),
+				:nth-last-child(1 of [data-team='T4']),
+				:nth-last-child(1 of [data-team='T5']),
+				:nth-last-child(1 of [data-team='T6']),
+				:nth-last-child(1 of [data-team='T7']),
+				:nth-last-child(1 of [data-team='T8']),
+				:nth-last-child(1 of [data-team='T9']),
+				:nth-last-child(1 of [data-team='T10']),
+				:nth-last-child(1 of [data-team='T11'])
+			)
+		) {
 		margin-bottom: 5rem;
 	}
 

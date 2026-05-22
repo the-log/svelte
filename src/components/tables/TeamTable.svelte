@@ -5,17 +5,17 @@
 	import formatMoney from '../../utils/formatMoney';
 
 	interface Props {
-		title: String;
+		title: string;
 		players: any[];
-		team: String | null;
+		team: string | null;
 	}
 
 	let { title, players, team }: Props = $props();
 
-	let isMobile: null | Boolean = $state(null);
-	
+	let isMobile: null | boolean = $state(null);
+
 	let isReady = $state(false);
-	
+
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;

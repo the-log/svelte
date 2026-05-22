@@ -7,7 +7,10 @@
 	import { notify } from '../../utils/notify';
 	import { userStore, authStatusStore } from '../../misc/stores';
 
-	let email: string = $state(), token: string = $state(), password: string = $state(), passwordConf: string = $state();
+	let email: string = $state(),
+		token: string = $state(),
+		password: string = $state(),
+		passwordConf: string = $state();
 	let tokenRequested = $state(false);
 	let passwordsMatch = false;
 
@@ -118,7 +121,7 @@
 			size="medium"
 			type="password"
 			placeholder="new password"
-			pattern="[^\s]{'{'}8,{'}'}"
+			pattern="[^\s]{'{'}8,}"
 			onsl-input={(e) => {
 				password = e.target.value;
 				confirmPass();

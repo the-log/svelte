@@ -17,13 +17,7 @@
 		contract?: Contract | null;
 	}
 
-	let {
-		espn_id,
-		logTeam,
-		status,
-		player,
-		contract = null
-	}: Props = $props();
+	let { espn_id, logTeam, status, player, contract = null }: Props = $props();
 
 	let isAdmin = false;
 	userStore.subscribe((value) => {

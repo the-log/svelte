@@ -7,7 +7,8 @@
 	import { notify } from '../../utils/notify';
 	import { userStore, authStatusStore } from '../../misc/stores';
 
-	let email: string = $state(), password: string = $state();
+	let email: string = $state(),
+		password: string = $state();
 
 	function attemptLogin(e: SubmitEvent) {
 		runQuery(queries['begin-session'], {

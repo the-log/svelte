@@ -10,7 +10,7 @@
 	let { title = '', children }: Props = $props();
 
 	let isMobile = $state(null);
-	
+
 	layoutStore.subscribe((value) => {
 		isMobile = value;
 	});

@@ -2,10 +2,10 @@
 	import { marked } from 'marked';
 	import { isMobile as layoutStore } from '../../../src/misc/stores';
 
-	let isMobile: null | Boolean = $state(null);
-	
+	let isMobile: null | boolean = $state(null);
+
 	let isReady = $state(false);
-	
+
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
@@ -14,7 +14,6 @@
 	});
 
 	let pages: string[] = $state([]);
-	
 
 	async function getRules() {
 		const toc = await fetch('https://api.github.com/repos/the-log/rulebook/contents/').then((r) =>

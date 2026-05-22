@@ -12,7 +12,7 @@
 	let { bid = null, index = null }: Props = $props();
 
 	let isMobile = $state(null);
-	
+
 	layoutStore.subscribe((value) => {
 		isMobile = value;
 	});

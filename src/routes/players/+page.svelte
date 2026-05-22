@@ -19,8 +19,6 @@
 	});
 	let order = $state({ pointsThisYearProj: 'desc' });
 
-
-
 	function onNameInput(e) {
 		const playerName = e.target.value;
 		const newFilters = filters;
@@ -174,9 +172,11 @@
 			});
 		}
 	});
-	let pagerMessage = $derived(playerCount
-		? `${skip + 1} - ${skip + Math.min(take, playerCount)} of ${playerCount}`
-		: `No results found`);
+	let pagerMessage = $derived(
+		playerCount
+			? `${skip + 1} - ${skip + Math.min(take, playerCount)} of ${playerCount}`
+			: `No results found`
+	);
 </script>
 
 <h2>Players</h2>
@@ -203,13 +203,7 @@
 		<sl-radio size="small" value="no">No</sl-radio>
 		<sl-radio size="small" value="">Either</sl-radio>
 	</sl-radio-group>
-	<sl-radio-group
-		onsl-input={onIsRookieInput}
-		size="small"
-		label="Rookie"
-		name="isRookie"
-		value=""
-	>
+	<sl-radio-group onsl-input={onIsRookieInput} size="small" label="Rookie" name="isRookie" value="">
 		<sl-radio size="small" value="yes">Yes</sl-radio>
 		<sl-radio size="small" value="no">No</sl-radio>
 		<sl-radio size="small" value="">Either</sl-radio>
