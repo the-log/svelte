@@ -15,7 +15,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.5.27",
+		"@sveltejs/kit": "^2.60.1",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
@@ -35,7 +35,7 @@
 	"type": "module",
 	"dependencies": {
 		"@shoelace-style/shoelace": "^2.16.0",
-		"@sveltejs/adapter-netlify": "^3.0.0",
+		"@sveltejs/adapter-netlify": "^6.0.4",
 		"marked": "^18.0.4"
 	}
 }
