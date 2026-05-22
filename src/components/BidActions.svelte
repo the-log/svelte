@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { serialize, useFormData } from '../utils/forms';
 	import formatMoney from '../utils/formatMoney';
 	import runQuery from '../utils/runQuery';
 	import queries from '../utils/queries';
 	import { notify } from '../utils/notify';
 
-	export let bid;
+	let { bid } = $props();
 	let { player, team } = bid;
 
-	let modal: HTMLElement,
-		modalTitle = '',
-		modalBody = '',
-		modalSubmit = '';
+	let modal: HTMLElement = $state(),
+		modalTitle = $state(''),
+		modalBody = $state(''),
+		modalSubmit = $state('');
 
 	function onMenuSelect(e: CustomEvent) {
 		const {
@@ -109,7 +111,7 @@
 
 <sl-dropdown>
 	<sl-icon-button slot="trigger" src="/icons/menu.svg"></sl-icon-button>
-	<sl-menu on:sl-select={onMenuSelect}>
+	<sl-menu onsl-select={onMenuSelect}>
 		<sl-menu-item value="edit">
 			<sl-icon slot="prefix" name="pencil-square"></sl-icon>
 			Edit
@@ -125,14 +127,14 @@
 	{#if modalBody}
 		<p>Are you sure you want to delete this bid?</p>
 		<p>{modalBody}</p>
-		<sl-button slot="footer" variant="secondary" type="button" size="medium" on:click={onDelete}
+		<sl-button slot="footer" variant="secondary" type="button" size="medium" onclick={onDelete}
 			>{modalSubmit}</sl-button
 		>
 	{:else}
 		<form
 			data-actions
-			on:submit|preventDefault={serialize}
-			on:formdata={(e) => {
+			onsubmit={preventDefault(serialize)}
+			onformdata={(e) => {
 				useFormData(e, onEdit);
 			}}
 		>

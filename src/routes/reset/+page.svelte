@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { goto } from '$app/navigation';
 	import { notify } from '../../utils/notify';
 	import { userStore, authStatusStore } from '../../misc/stores';
 
-	let email: string, token: string, password: string, passwordConf: string;
-	let tokenRequested = false;
+	let email: string = $state(), token: string = $state(), password: string = $state(), passwordConf: string = $state();
+	let tokenRequested = $state(false);
 	let passwordsMatch = false;
 
 	async function formSubmit(e: SubmitEvent) {
@@ -83,7 +85,7 @@
 
 <h1>Reset Password</h1>
 
-<form on:submit|preventDefault={formSubmit}>
+<form onsubmit={preventDefault(formSubmit)}>
 	<a href="/login">← Log In</a>
 	{#if !tokenRequested}
 		<span>Enter the email for the account you'd like to reset below.</span>
@@ -94,7 +96,7 @@
 		type="email"
 		placeholder="Email"
 		autocomplete="email"
-		on:sl-input={(e) => {
+		onsl-input={(e) => {
 			email = e.target.value;
 		}}
 	></sl-input>
@@ -106,7 +108,7 @@
 			size="medium"
 			type="text"
 			placeholder="one-time code"
-			on:sl-input={(e) => {
+			onsl-input={(e) => {
 				token = e.target.value;
 			}}
 		></sl-input>
@@ -117,7 +119,7 @@
 			type="password"
 			placeholder="new password"
 			pattern="[^\s]{'{'}8,{'}'}"
-			on:sl-input={(e) => {
+			onsl-input={(e) => {
 				password = e.target.value;
 				confirmPass();
 			}}
@@ -130,7 +132,7 @@
 			size="medium"
 			type="password"
 			placeholder="confirm new password"
-			on:sl-input={(e) => {
+			onsl-input={(e) => {
 				passwordConf = e.target.value;
 				confirmPass();
 			}}

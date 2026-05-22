@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 	if (browser) {
 		import('@shoelace-style/shoelace');
 	}
@@ -13,6 +13,11 @@
 	import UserMenu from '../components/UserMenu.svelte';
 	import SiteNav from '../components/SiteNav.svelte';
 	import { onMount } from 'svelte';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	let isLoggedIn: boolean;
 	let userName = '';
@@ -82,14 +87,14 @@
 <header>
 	<h1>The League <span>of Ordinary Gentlemen</span></h1>
 	<UserMenu>
-		<sl-button on:click={logUserOut} size="small" variant="primary" outline>Log Out</sl-button>
+		<sl-button onclick={logUserOut} size="small" variant="primary" outline>Log Out</sl-button>
 	</UserMenu>
 </header>
 <div id="site-nav">
 	<SiteNav />
 </div>
 <main>
-	<slot />
+	{@render children?.()}
 </main>
 <footer>
 	<p>

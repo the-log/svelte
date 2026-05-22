@@ -4,13 +4,18 @@
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
 
-	export let title: String;
-	export let players: any[];
-	export let team: String | null;
+	interface Props {
+		title: String;
+		players: any[];
+		team: String | null;
+	}
 
-	let isMobile: null | Boolean;
-	$: isMobile = null;
-	$: isReady = false;
+	let { title, players, team }: Props = $props();
+
+	let isMobile: null | Boolean = $state(null);
+	
+	let isReady = $state(false);
+	
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;

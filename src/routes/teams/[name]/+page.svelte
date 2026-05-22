@@ -9,12 +9,14 @@
 
 	let teamAbbr = $page.params.name;
 
-	$: teamName = '';
-	$: teamID = null;
-	$: active = [];
-	$: dts = [];
-	$: ir = [];
-	$: waived = [];
+	let teamName = $state('');
+	
+	let teamID = $state(null);
+	
+	let active = $derived([]);
+	let dts = $derived([]);
+	let ir = $derived([]);
+	let waived = $derived([]);
 
 	function processContracts(contracts: any[]) {
 		return contracts

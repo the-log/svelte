@@ -8,11 +8,11 @@
 	import TeamTable from '../components/tables/TeamTable.svelte';
 	import { onMount } from 'svelte';
 
-	let team = '';
-	$: active = <any>[];
-	$: dts = <any>[];
-	$: ir = <any>[];
-	$: waived = <any>[];
+	let team = $state('');
+	let active = $derived(<any>[]);
+	let dts = $derived(<any>[]);
+	let ir = $derived(<any>[]);
+	let waived = $derived(<any>[]);
 
 	function processContracts(contracts: any[]) {
 		return contracts

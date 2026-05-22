@@ -4,10 +4,15 @@
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import BidActions from '../BidActions.svelte';
 
-	export let bid: Bid | null = null;
-	export let index: number | null = null;
+	interface Props {
+		bid?: Bid | null;
+		index?: number | null;
+	}
 
-	$: isMobile = null;
+	let { bid = null, index = null }: Props = $props();
+
+	let isMobile = $state(null);
+	
 	layoutStore.subscribe((value) => {
 		isMobile = value;
 	});

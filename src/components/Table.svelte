@@ -1,9 +1,14 @@
 <script lang="ts">
-	export let columns: number;
+	interface Props {
+		columns: number;
+		children?: import('svelte').Snippet;
+	}
+
+	let { columns, children }: Props = $props();
 </script>
 
 <div class="tablegrid" style="--columns:{columns};">
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

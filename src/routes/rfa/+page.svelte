@@ -9,10 +9,10 @@
 	import { onMount } from 'svelte';
 	import RfaActions from '../../components/RfaActions.svelte';
 
-	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank';
-	$: sortMethod = 'position';
-	let players: any[];
-	$: players = [];
+	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank' = $state('position');
+	
+	let players: any[] = $state([]);
+	
 
 	const fetchRFAs = () => {
 		runQuery(queries['rfas'], {}).then(({ data }) => {
@@ -76,14 +76,15 @@
 		return () => clearInterval(interval);
 	});
 
-	let user;
+	let user = $state();
 	userStore.subscribe((value) => {
 		user = value;
 	});
 
-	let isMobile: null | Boolean;
-	$: isMobile = null;
-	$: isReady = false;
+	let isMobile: null | Boolean = $state(null);
+	
+	let isReady = $state(false);
+	
 	layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
@@ -99,7 +100,7 @@
 	label="Sort By:"
 	name="sort"
 	value="position"
-	on:sl-change={onSortChange}
+	onsl-change={onSortChange}
 >
 	<sl-radio value="position">Position</sl-radio>
 	<sl-radio value="team">Team</sl-radio>
@@ -226,7 +227,7 @@
 	}
 
 	[data-sort='position']
-		~ :where(
+		~ :where(:global(
 			:nth-last-child(1 of [data-position='QB']),
 			:nth-last-child(1 of [data-position='RB']),
 			:nth-last-child(1 of [data-position='WR']),
@@ -235,7 +236,7 @@
 			:nth-last-child(1 of [data-position='DT'], [data-position='DE']),
 			:nth-last-child(1 of [data-position='LB']),
 			:nth-last-child(1 of [data-position='CB'], [data-position='S'])
-		) {
+		)) {
 		margin-bottom: 5rem;
 	}
 
@@ -244,7 +245,7 @@
 	}
 
 	[data-sort='team']
-		~ :where(
+		~ :where(:global(
 			:nth-last-child(1 of [data-team='T1']),
 			:nth-last-child(1 of [data-team='T2']),
 			:nth-last-child(1 of [data-team='T4']),
@@ -255,7 +256,7 @@
 			:nth-last-child(1 of [data-team='T9']),
 			:nth-last-child(1 of [data-team='T10']),
 			:nth-last-child(1 of [data-team='T11'])
-		) {
+		)) {
 		margin-bottom: 5rem;
 	}
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import type { Contract, Player } from '../../src/types/defs';
 	import { leagueSettingsStore, userStore } from '../misc/stores';
 	import formatMoney from '../utils/formatMoney';
@@ -7,36 +9,46 @@
 	import queries from '../utils/queries';
 	import runQuery from '../utils/runQuery';
 
-	export let espn_id: number;
-	export let logTeam: string;
-	export let status: string;
-	export let player: Player;
-	export let contract: Contract | null = null;
+	interface Props {
+		espn_id: number;
+		logTeam: string;
+		status: string;
+		player: Player;
+		contract?: Contract | null;
+	}
+
+	let {
+		espn_id,
+		logTeam,
+		status,
+		player,
+		contract = null
+	}: Props = $props();
 
 	let irElgibile =
 		!['dts', 'ir', 'waived'].includes(status) &&
 		['out', 'injury_reserve'].includes(player.playerStatus);
 
-	let userTeam = '';
+	let userTeam = $state('');
 	userStore.subscribe((value) => {
 		if (!value) return null;
 		userTeam = value.teamID;
 	});
 
-	let inSeason = false;
+	let inSeason = $state(false);
 	leagueSettingsStore.subscribe((value) => {
 		if (!value) return null;
 		inSeason = value.phase === 'active';
 	});
 
-	$: isOwner = userTeam === logTeam;
-	$: isAvailable = !status || status === 'waived';
+	let isOwner = $derived(userTeam === logTeam);
+	let isAvailable = $derived(!status || status === 'waived');
 
-	let modal: HTMLDialogElement;
-	let modalTitle = '';
-	let modalBody = '';
-	let buttonLabel = '&nbsp;';
-	let action = '';
+	let modal: HTMLDialogElement = $state();
+	let modalTitle = $state('');
+	let modalBody = $state('');
+	let buttonLabel = $state('&nbsp;');
+	let action = $state('');
 
 	function handlePlayerActions(e: CustomEvent) {
 		const menu = e.target as HTMLElement;
@@ -211,7 +223,7 @@
 {#if isOwner || isAvailable}
 	<sl-dropdown>
 		<sl-icon-button slot="trigger" src="/icons/menu.svg"></sl-icon-button>
-		<sl-menu on:sl-select={handlePlayerActions}>
+		<sl-menu onsl-select={handlePlayerActions}>
 			<sl-menu-item action="more">
 				<sl-icon slot="prefix" name="person"></sl-icon>
 				More Info
@@ -244,7 +256,7 @@
 		</sl-menu>
 	</sl-dropdown>
 	<sl-dialog label={modalTitle} bind:this={modal}>
-		<form data-actions on:submit|preventDefault={serialize} on:formdata={handleFormData}>
+		<form data-actions onsubmit={preventDefault(serialize)} onformdata={handleFormData}>
 			<!-- Actions with no form elements -->
 			{#if !['bid', 'promote'].includes(action)}
 				<p>{modalBody}</p>
