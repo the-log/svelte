@@ -1,18 +1,16 @@
-<!-- @migration-task Error while migrating Svelte code: Identifier 'Bid' has already been declared
-https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	import Bid from '../../components/bids/Bid.svelte';
 	import BidGroup from '../../components/bids/BidGroup.svelte';
 	import formatMoney from '../../utils/formatMoney';
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
-	import type { Bid } from '../../types/defs';
+	import type { Bid as BidRecord } from '../../types/defs';
 	import { onMount } from 'svelte';
 	import { leagueSettingsStore } from '../../misc/stores';
 
 	let team = null;
-	let myBids: Bid[] = [];
-	let lockedBids: Bid[] = [];
+	let myBids: BidRecord[] = [];
+	let lockedBids: BidRecord[] = [];
 
 	let due: string | null;
 	let dueInterval: number | undefined;
@@ -22,7 +20,7 @@ https://svelte.dev/e/js_parse_error -->
 		runQuery(queries['all-bids']).then(({ data }) => {
 			const { pending, published } = data;
 
-			published.forEach((bid: Bid) => {
+			published.forEach((bid: BidRecord) => {
 				bid.locked = new Date(bid.locked).toLocaleDateString();
 			});
 
