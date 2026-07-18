@@ -89,7 +89,7 @@
 	}
 </script>
 
-<sl-icon-button name="pencil-square" onclick={modal.show()}></sl-icon-button>
+<sl-icon-button name="pencil-square" onclick={() => modal.show()}></sl-icon-button>
 <sl-dialog label="Creating New Contract" bind:this={modal}>
 	<form data-actions onsubmit={preventDefault(serialize)} onformdata={handleFormData}>
 		<!-- References to all involved entities -->
