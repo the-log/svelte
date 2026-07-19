@@ -57,6 +57,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Rulebook — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h2>Rulebook</h2>
 
 {#if loadFailed}
