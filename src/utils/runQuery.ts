@@ -1,9 +1,10 @@
 const { DEV } = import.meta.env;
+import { env } from '$env/dynamic/public';
 import { notify } from '../utils/notify';
 
 const prodURL = 'https://api.log.football/api/graphql';
 const devURL = 'https://api.log.ddev.site/api/graphql';
-const backendURL = DEV ? devURL : prodURL;
+const backendURL = env.PUBLIC_API_URL || (DEV ? devURL : prodURL);
 
 export default async function runQuery(query: string, variables = {}) {
 	return fetch(backendURL, {

@@ -54,7 +54,11 @@ src/
 
 ## Environment
 
-See `.env.example`. The app currently reads only Vite's built-in `import.meta.env.DEV` to switch backend URLs; user-settable env vars are tracked in [issue #17](https://github.com/the-log/svelte/issues/17).
+See `.env.example`. Supported variables:
+
+| Variable         | Purpose                                                                                                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PUBLIC_API_URL` | GraphQL endpoint of the backend. Optional — defaults to `https://api.log.ddev.site/api/graphql` in dev and `https://api.log.football/api/graphql` in production builds. Set it to point a preview deploy or local override at a different backend. |
 
 ## Deployment
 
