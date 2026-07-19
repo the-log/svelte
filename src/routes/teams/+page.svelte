@@ -35,7 +35,7 @@
 		});
 	};
 
-	let interval: number;
+	let interval: ReturnType<typeof setInterval>;
 	onMount(() => {
 		getTeams();
 		interval = setInterval(getTeams, 5000);
