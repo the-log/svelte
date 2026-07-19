@@ -132,6 +132,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Free Agency — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h2>Pending Bids {due ? `(${due})` : ''}</h2>
 <BidGroup title="My Bids">
 	{#each myBids as bid, i}
