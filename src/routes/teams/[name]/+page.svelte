@@ -81,6 +81,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{teamName || 'Team'} — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h1>{teamName}</h1>
 
 <TeamTable team={teamID} players={active} title="Active" />
