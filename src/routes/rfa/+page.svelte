@@ -120,7 +120,7 @@
 			<div class="tablegrid-cell">Rank</div>
 		{/if}
 	</div>
-	{#each players as player}
+	{#each players as player (player.espn_id)}
 		{@const {
 			espn_id,
 			name,
@@ -163,7 +163,7 @@
 				<div class="tablegrid-cell">{formatMoney(salary)}</div>
 				<div class="tablegrid-cell">#{pos}</div>
 				<div class="tablegrid-cell">
-					{#if user.isAdmin}
+					{#if user?.isAdmin}
 						<RfaActions {espn_id} logTeam={abbr} status="rfa" {player} contract={contract_id} />
 					{/if}
 				</div>
