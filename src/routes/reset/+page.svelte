@@ -92,6 +92,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Reset Password — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h1>Reset Password</h1>
 
 <form onsubmit={preventDefault(formSubmit)}>
