@@ -235,7 +235,7 @@
 						To IR
 					</sl-menu-item>
 				{/if}
-				{#if status !== 'wavied'}
+				{#if status !== 'waived'}
 					<sl-menu-item action="drop">
 						<sl-icon slot="prefix" name="arrow-down"></sl-icon>
 						Drop

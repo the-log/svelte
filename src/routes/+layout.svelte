@@ -22,6 +22,8 @@
 	let isLoggedIn: boolean;
 	let userName = '';
 
+	const unauthPaths = ['/login', '/reset'];
+
 	function authItemUpdated(authItem: any) {
 		const { data } = authItem;
 		const { authenticatedItem } = data;
@@ -42,7 +44,8 @@
 		userName = authenticatedItem?.name || '';
 
 		if (browser) {
-			if (!isLoggedIn) {
+			const currentPath = window.location.pathname;
+			if (!isLoggedIn && !unauthPaths.includes(currentPath)) {
 				goto('/login');
 			}
 		}
@@ -54,8 +57,6 @@
 	});
 
 	runQuery(queries['authenticated-item']).then(authItemUpdated);
-
-	const unauthPaths = ['/login', '/reset'];
 
 	beforeNavigate((navigation) => {
 		if (!isLoggedIn && !unauthPaths.includes(navigation.to?.route?.id || '')) {
