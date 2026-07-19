@@ -1,18 +1,15 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { leagueSettingsStore } from '../misc/stores';
 
-	function setActiveNav(route: string | undefined) {
-		if (typeof route === 'string') {
-			document.querySelectorAll('nav sl-icon-button').forEach((item) => {
-				item.classList.toggle('is-active', item.matches(`sl-icon-button[href="${route}"]`));
-			});
-		}
-	}
+	let routeId = $derived($page.route?.id ?? '');
 
-	afterNavigate((navigation) => {
-		setActiveNav(navigation.to?.route.id ?? undefined);
-	});
+	// Svelte sets attributes on upgraded custom elements as DOM properties, so
+	// client-rendered buttons may carry no href attribute at all; the active
+	// state must be computed from route state, not read back out of the DOM.
+	function isActive(href: string) {
+		return href === '/' ? routeId === '/' : routeId === href || routeId.startsWith(`${href}/`);
+	}
 
 	const inSeason = 'active';
 	const offSeason = ['off', 'draft', 'rfa'];
@@ -27,35 +24,62 @@
 	<ul>
 		<li>
 			<sl-tooltip content="My Team" placement="right">
-				<sl-icon-button src="/icons/home-alt.svg" label="My Team" href="/"></sl-icon-button>
+				<sl-icon-button
+					src="/icons/home-alt.svg"
+					label="My Team"
+					href="/"
+					class:is-active={isActive('/')}
+				></sl-icon-button>
 			</sl-tooltip>
 		</li>
 		<li>
 			<sl-tooltip content="Teams" placement="right">
-				<sl-icon-button src="/icons/pennant.svg" label="Teams" href="/teams"></sl-icon-button>
+				<sl-icon-button
+					src="/icons/pennant.svg"
+					label="Teams"
+					href="/teams"
+					class:is-active={isActive('/teams')}
+				></sl-icon-button>
 			</sl-tooltip>
 		</li>
 		<li>
 			<sl-tooltip content="Players" placement="right">
-				<sl-icon-button src="/icons/football-helmet.svg" label="Players" href="/players">
-				</sl-icon-button>
+				<sl-icon-button
+					src="/icons/football-helmet.svg"
+					label="Players"
+					href="/players"
+					class:is-active={isActive('/players')}
+				></sl-icon-button>
 			</sl-tooltip>
 		</li>
 		<li>
 			<sl-tooltip content="Free Agency" placement="right">
 				{#if offSeason.includes(phase)}
-					<sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "
+					<sl-icon-button
+						src="/icons/tags.svg"
+						label="Restricted Free Agency"
+						href="/rfa"
+						class:is-active={isActive('/rfa')}
 					></sl-icon-button>
 				{/if}
 				{#if inSeason === phase}
-					<sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "
+					<sl-icon-button
+						src="/icons/tags.svg"
+						label="Free Agency"
+						href="/free-agency"
+						class:is-active={isActive('/free-agency')}
 					></sl-icon-button>
 				{/if}
 			</sl-tooltip>
 		</li>
 		<li>
 			<sl-tooltip content="Rulebook" placement="right">
-				<sl-icon-button src="/icons/book.svg" label="Rulebook" href="/rulebook"></sl-icon-button>
+				<sl-icon-button
+					src="/icons/book.svg"
+					label="Rulebook"
+					href="/rulebook"
+					class:is-active={isActive('/rulebook')}
+				></sl-icon-button>
 			</sl-tooltip>
 		</li>
 	</ul>
