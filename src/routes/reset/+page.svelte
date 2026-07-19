@@ -30,9 +30,18 @@
 		emailField.disabled = true;
 		submitButton.disabled = true;
 
-		await runQuery(queries['request-token'], { email });
+		const response = await runQuery(queries['request-token'], { email });
 
-		tokenRequested = true;
+		if (response?.errors?.length) {
+			emailField.disabled = false;
+			notify({
+				title: 'Error',
+				message: 'The reset email could not be sent. Please try again later.',
+				variant: 'danger'
+			});
+		} else {
+			tokenRequested = true;
+		}
 		submitButton.disabled = false;
 	}
 
