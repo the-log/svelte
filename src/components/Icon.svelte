@@ -42,6 +42,7 @@
 		fill="currentColor"
 		viewBox="0 0 256 256"
 	>
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -- static SVG paths defined in this file -->
 		{@html icon}
 	</svg>
 {/if}
