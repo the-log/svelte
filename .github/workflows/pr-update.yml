@@ -6,7 +6,7 @@ jobs:
     autoupdate:
         runs-on: ubuntu-latest
         permissions:
-            contents: read
+            contents: write
             pull-requests: write
         steps:
             - uses: allonsy-studio/actions-pr-auto-update@v3
