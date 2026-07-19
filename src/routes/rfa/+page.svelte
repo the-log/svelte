@@ -97,6 +97,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Restricted Free Agents — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h1>Restricted Free Agents</h1>
 
 <sl-radio-group
