@@ -79,7 +79,13 @@
 					variant: 'danger'
 				});
 			} else {
-				goto('/reset');
+				tokenRequested = false;
+				token = '';
+				password = '';
+				passwordConf = '';
+				passwordsMatch = false;
+				const emailField = document.querySelector('#email') as HTMLInputElement | null;
+				if (emailField) emailField.disabled = false;
 				notify({
 					title: 'Error',
 					message: `${message} You will need to create a new one-time code.`,

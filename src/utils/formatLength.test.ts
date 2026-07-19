@@ -15,8 +15,11 @@ describe('formatLength', () => {
 		expect(formatLength(11)).toBe(`0' 11"`);
 	});
 
-	it('returns undefined for falsy inputs', () => {
-		expect(formatLength(0)).toBeUndefined();
+	it('formats zero inches', () => {
+		expect(formatLength(0)).toBe(`0' 0"`);
+	});
+
+	it('returns undefined for null and undefined', () => {
 		expect(formatLength(null)).toBeUndefined();
 		expect(formatLength(undefined)).toBeUndefined();
 	});
