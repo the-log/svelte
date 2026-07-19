@@ -86,6 +86,7 @@
 		});
 
 		modal.hide();
+		(e.target as HTMLFormElement).reset();
 	}
 </script>
 

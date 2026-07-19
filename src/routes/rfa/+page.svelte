@@ -120,7 +120,7 @@
 			<div class="tablegrid-cell">Rank</div>
 		{/if}
 	</div>
-	{#each players as player}
+	{#each players as player (player.espn_id)}
 		{@const {
 			espn_id,
 			name,
