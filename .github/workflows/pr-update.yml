@@ -9,4 +9,11 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # Merge commits made with the default GITHUB_TOKEN never trigger other
+      # workflows, so updated PRs would keep stale CI results. Provide a PAT
+      # via the PR_AUTOUPDATE_TOKEN secret to have CI re-run on each update;
+      # until that secret exists, this falls back to the default token
+      # (updates still happen, CI just isn't re-triggered).
       - uses: allonsy-studio/actions-pr-auto-update@v3
+        with:
+          token: ${{ secrets.PR_AUTOUPDATE_TOKEN || github.token }}
