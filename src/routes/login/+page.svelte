@@ -74,7 +74,7 @@
 		size="medium"
 		type="password"
 		placeholder="Password"
-		autocomplete="password"
+		autocomplete="current-password"
 		onsl-input={(e) => {
 			password = e.target.value;
 		}}
