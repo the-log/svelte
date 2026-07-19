@@ -6,7 +6,7 @@
 	import type { Contract } from '../types/defs';
 	import { userStore } from '../misc/stores';
 	import TeamTable from '../components/tables/TeamTable.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let team = $state('');
 	let active = $derived(<any>[]);
@@ -59,13 +59,14 @@
 		}
 	}
 
-	userStore.subscribe((value) => {
+	const unsubscribeUser = userStore.subscribe((value) => {
 		if (!value) return null;
 
 		const { teamID } = value;
 		team = teamID;
 		getContracts(teamID);
 	});
+	onDestroy(unsubscribeUser);
 
 	onMount(() => {
 		const updater = () => {

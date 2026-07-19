@@ -23,17 +23,8 @@
 		!['dts', 'ir', 'waived'].includes(status) &&
 		['out', 'injury_reserve'].includes(player.playerStatus);
 
-	let userTeam = $state('');
-	userStore.subscribe((value) => {
-		if (!value) return null;
-		userTeam = value.teamID;
-	});
-
-	let inSeason = $state(false);
-	leagueSettingsStore.subscribe((value) => {
-		if (!value) return null;
-		inSeason = value.phase === 'active';
-	});
+	let userTeam = $derived($userStore?.teamID ?? '');
+	let inSeason = $derived($leagueSettingsStore?.phase === 'active');
 
 	let isOwner = $derived(userTeam === logTeam);
 	let isAvailable = $derived(!status || status === 'waived');

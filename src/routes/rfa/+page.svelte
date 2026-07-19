@@ -6,7 +6,7 @@
 	import queries from '../../../src/utils/queries';
 	import type { Contract } from '../../../src/types/defs';
 	import { isMobile as layoutStore, userStore } from '../../misc/stores';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import RfaActions from '../../components/RfaActions.svelte';
 
 	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank' = $state('position');
@@ -76,7 +76,7 @@
 	});
 
 	let user = $state();
-	userStore.subscribe((value) => {
+	const unsubscribeUser = userStore.subscribe((value) => {
 		user = value;
 	});
 
@@ -84,11 +84,16 @@
 
 	let isReady = $state(false);
 
-	layoutStore.subscribe((value) => {
+	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
 			isReady = true;
 		}, 0);
+	});
+
+	onDestroy(() => {
+		unsubscribeUser();
+		unsubscribeLayout();
 	});
 </script>
 
