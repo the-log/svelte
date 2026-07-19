@@ -18,8 +18,11 @@ describe('formatMoney', () => {
 		expect(formatMoney(-500)).toBe('-$5.00');
 	});
 
-	it('returns undefined for falsy inputs', () => {
-		expect(formatMoney(0)).toBeUndefined();
+	it('formats zero as $0.00', () => {
+		expect(formatMoney(0)).toBe('$0.00');
+	});
+
+	it('returns undefined for null and undefined', () => {
 		expect(formatMoney(null)).toBeUndefined();
 		expect(formatMoney(undefined)).toBeUndefined();
 	});
