@@ -79,6 +79,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>My Team — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <TeamTable {team} players={active} title="Active" />
 <TeamTable {team} players={dts} title="Practice Squad" />
 <TeamTable {team} players={ir} title="Injured Reserve" />

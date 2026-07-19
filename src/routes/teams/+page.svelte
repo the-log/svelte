@@ -44,4 +44,8 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Teams — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <LeagueTable {teams} />
