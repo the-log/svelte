@@ -5,7 +5,10 @@
 	function setActiveNav(route: string | undefined) {
 		if (typeof route === 'string') {
 			document.querySelectorAll('nav sl-icon-button').forEach((item) => {
-				item.classList.toggle('is-active', item.matches(`sl-icon-button[href="${route}"]`));
+				const href = item.getAttribute('href')?.trim();
+				const isActive =
+					!!href && (href === '/' ? route === '/' : route === href || route.startsWith(`${href}/`));
+				item.classList.toggle('is-active', isActive);
 			});
 		}
 	}
@@ -44,11 +47,11 @@
 		<li>
 			<sl-tooltip content="Free Agency" placement="right">
 				{#if offSeason.includes(phase)}
-					<sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa "
+					<sl-icon-button src="/icons/tags.svg" label="Restricted Free Agency" href="/rfa"
 					></sl-icon-button>
 				{/if}
 				{#if inSeason === phase}
-					<sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency "
+					<sl-icon-button src="/icons/tags.svg" label="Free Agency" href="/free-agency"
 					></sl-icon-button>
 				{/if}
 			</sl-tooltip>
