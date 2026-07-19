@@ -57,6 +57,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Login — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h1>Login</h1>
 
 <form onsubmit={preventDefault(attemptLogin)}>
