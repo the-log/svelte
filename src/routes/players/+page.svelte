@@ -182,7 +182,7 @@
 </svelte:head>
 
 <h2>Players</h2>
-<form onsubmit={preventDefault(() => {})} class="sl-theme-light">
+<form onsubmit={preventDefault(() => {})}>
 	<sl-input onsl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
 	<sl-select onsl-input={onPositionInput} placeholder="Position" multiple clearable size="medium">
 		{#each positions as [abbr, position] (abbr)}
