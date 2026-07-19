@@ -15,10 +15,12 @@
 			identity: email,
 			secret: password
 		}).then((item) => {
-			const { authenticateUserWithPassword: response } = item.data;
+			if (item.errors) return; // runQuery already notified the user
+
+			const response = item.data?.authenticateUserWithPassword;
 
 			// Authentication Error
-			if (response.message) {
+			if (response?.message) {
 				notify({
 					title: 'Error',
 					message: response.message,
@@ -27,7 +29,7 @@
 			}
 
 			// Authentication Successful
-			else if (response.item) {
+			else if (response?.item) {
 				userStore.set({
 					isAdmin: response.item.isAdmin,
 					userID: response.item.id,
@@ -46,11 +48,8 @@
 			else {
 				notify({
 					title: 'Error',
-					message: `
-          <sl-details summary="An error has occurred">
-            ${item}
-          </sl-details>
-          `
+					message: 'An unexpected response was received from the server. Please try again.',
+					variant: 'danger'
 				});
 				console.error(item);
 			}
