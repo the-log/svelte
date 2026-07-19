@@ -179,6 +179,10 @@
 	);
 </script>
 
+<svelte:head>
+	<title>Players — The League of Ordinary Gentlemen</title>
+</svelte:head>
+
 <h2>Players</h2>
 <form onsubmit={preventDefault(() => {})} class="sl-theme-light">
 	<sl-input onsl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
