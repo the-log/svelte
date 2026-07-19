@@ -23,6 +23,7 @@
 		switch (value) {
 			case 'edit':
 				modalTitle = 'Editing Bid';
+				modalBody = '';
 				modalSubmit = 'Save';
 				break;
 
