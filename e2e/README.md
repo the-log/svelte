@@ -3,7 +3,26 @@
 End-to-end tests for the SvelteKit UI that never touch a real backend. Run them
 with `npm run test:e2e` (or `npm run test:e2e:ui` for the inspector). The
 Playwright config builds the app and serves the production bundle via
-`vite preview`, so the suite also verifies the build.
+`vite preview`, so the suite also verifies the build. Every run writes an HTML
+report to `playwright-report/` (open it with `npx playwright show-report`).
+
+## Visual regression
+
+`visual.spec.ts` captures full-page screenshots of the stable, data-driven
+pages and diffs them against committed baselines in
+`visual.spec.ts-snapshots/`. Screenshots are pixel-sensitive to the OS and font
+stack, so **baselines are generated and checked in one pinned Linux image** —
+the same `mcr.microsoft.com/playwright` tag CI runs. Never regenerate them on
+the host (macOS antialiasing won't match CI).
+
+- Run/update through the container: `npm run test:e2e:docker` (append
+  `-- --update-snapshots` to refresh baselines, e.g. after an intentional UI
+  change). `ddev playwright [...]` is a thin wrapper around the same script.
+- The image tag is pinned in `package.json` (`test:e2e:docker`), the CI
+  `e2e` job (`.github/workflows/ci.yml`), and `visual.spec.ts`. Keep all three
+  in lockstep with the installed `@playwright/test` version.
+- Dynamic chrome is masked/avoided so baselines don't rot: the footer's live
+  copyright year is masked, and the free-agency countdown page is excluded.
 
 ## Architecture
 

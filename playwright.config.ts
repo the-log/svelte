@@ -8,7 +8,18 @@ export default defineConfig({
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+	// Always emit the HTML report to playwright-report/ (never auto-open it); the
+	// list reporter keeps the console readable while a run is in progress.
+	reporter: [['list'], ['html', { open: 'never' }]],
+	// Visual-regression tolerances. Text renders in fallback fonts (the webfont is
+	// stubbed in e2e), so allow a small ratio of antialiasing differences before
+	// a snapshot is considered a regression.
+	expect: {
+		toHaveScreenshot: {
+			maxDiffPixelRatio: 0.02,
+			animations: 'disabled'
+		}
+	},
 	use: {
 		baseURL: 'http://localhost:4173',
 		trace: 'on-first-retry',

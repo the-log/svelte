@@ -146,7 +146,11 @@
 
 <h2>Auction Results</h2>
 {#each Object.entries(lockedBids).reverse() as [date, bidGroups], i}
-	<sl-details open={i === 0}>
+	<!-- Shoelace registers asynchronously (see +layout.svelte); before sl-details
+	     is defined, Svelte writes booleans as string attributes and Lit reads any
+	     present `open` attribute as truthy. Emit the attribute only when open so a
+	     closed panel never renders `open="false"` (which reflects back to open). -->
+	<sl-details open={i === 0 || undefined}>
 		<h3 slot="summary">{date}</h3>
 		{#each Object.entries(bidGroups) as [espnid, bids]}
 			<BidGroup title={bids[0].player.name}>
