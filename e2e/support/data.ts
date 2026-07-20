@@ -405,14 +405,14 @@ export const pendingBids = [
 		salary: 500,
 		years: 2,
 		team: { name: teams.scranton.name, id: teams.scranton.id },
-		player: { name: 'Quincy Quill', position: 'WR', team: 'ARI', id: 'p-401' }
+		player: { espn_id: 401, name: 'Quincy Quill', position: 'WR', team: 'ARI', id: 'p-401' }
 	},
 	{
 		id: 'bid-2',
 		salary: 300,
 		years: 1,
 		team: { name: teams.scranton.name, id: teams.scranton.id },
-		player: { name: 'Ruben Royce', position: 'RB', team: 'CLE', id: 'p-402' }
+		player: { espn_id: 402, name: 'Ruben Royce', position: 'RB', team: 'CLE', id: 'p-402' }
 	}
 ];
 
@@ -454,6 +454,81 @@ export const publishedBids = [
 		player: { espn_id: 312, name: 'Titus Turner', position: 'K', team: 'WAS' }
 	}
 ];
+
+// stats-by-player responses for the stats drawer, keyed by espn_id. Stat IDs
+// are ESPN fantasy stat keys (see src/utils/statMap.ts); players without an
+// entry answer `player: null`, which the drawer renders as its error state.
+export const playerStatsById: Record<number, object> = {
+	// Aaron Ashford (QB) — on the players page and the Scranton roster.
+	101: {
+		height: 75,
+		weight: 220,
+		age: 27,
+		debutYear: 2021,
+		draftYear: 2021,
+		draftRound: 1,
+		draftSelection: 5,
+		pointsThisYear: 254.3,
+		pointsLastYear: 301.2,
+		pointsThisYearProj: 320,
+		pointsThisWeekProj: 24,
+		outlooksByWeek: {},
+		seasonOutlook: 'Ashford enters the season as the unquestioned starter in Philadelphia.',
+		fullStats: {
+			lastYearActual: {},
+			thisWeekProjected: {},
+			thisYearActual: {
+				id: '002026',
+				title: 'This Year',
+				seasonId: 2026,
+				appliedTotal: 254.3,
+				appliedAverage: 25.43,
+				stats: {
+					'0': 300,
+					'1': 210,
+					'2': 90,
+					'3': 2450,
+					'4': 18,
+					'20': 7,
+					'21': 0.7,
+					'22': 245,
+					'23': 45,
+					'24': 260,
+					'25': 3,
+					'39': 5.78,
+					'40': 26,
+					'64': 21,
+					'68': 4,
+					'72': 2,
+					'73': 9,
+					'155': 7,
+					'156': 3,
+					'210': 10,
+					'211': 120,
+					'212': 15
+				}
+			},
+			thisYearProjected: {
+				id: '102026',
+				title: 'This Year (Proj)',
+				seasonId: 2026,
+				appliedTotal: 320.4,
+				appliedAverage: 18.85,
+				stats: {
+					'0': 512.6,
+					'1': 348.2,
+					'3': 4012.4,
+					'4': 30.2,
+					'20': 11.8,
+					'23': 71.5,
+					'24': 402.3,
+					'25': 4.6,
+					'210': 17
+				}
+			}
+		}
+	}
+};
 
 // Rulebook chapters served from the mocked GitHub API.
 export const rulebookToc = [

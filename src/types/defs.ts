@@ -136,6 +136,18 @@ export interface RosterRow {
 	needsAttention?: boolean;
 }
 
+/**
+ * Minimal player identity needed to open the stats drawer. Richer shapes
+ * (Player, RosterRow, bid players) are structurally assignable, so callers can
+ * usually pass their row object straight through.
+ */
+export interface StatsPlayerRef {
+	espn_id?: number;
+	name?: string;
+	team?: string;
+	position?: string;
+}
+
 export interface RowAction {
 	name: string;
 	fn: () => void;

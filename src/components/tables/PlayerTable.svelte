@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import Table from '../Table.svelte';
 	import Actions from '../Actions.svelte';
+	import StatsTrigger from '../StatsTrigger.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
 	import type { Contract, Player } from '../../types/defs';
@@ -113,7 +114,6 @@
 		{#each players as player (player.espn_id)}
 			{@const {
 				contract,
-				name,
 				team,
 				espn_id,
 				position,
@@ -142,7 +142,7 @@
 					</div>
 				{/if}
 				<div class="tablegrid-cell" status={isMobile ? injuryStatus.toLowerCase() : null}>
-					{name}
+					<StatsTrigger {player} />
 					<span class="text-minor">
 						{team} - {position}
 					</span>

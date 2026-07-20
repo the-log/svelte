@@ -13,6 +13,7 @@
 	import { userStore, authStatusStore, isMobile, leagueSettingsStore } from '../misc/stores';
 	import UserMenu from '../components/UserMenu.svelte';
 	import SiteNav from '../components/SiteNav.svelte';
+	import PlayerStatsDrawer from '../components/PlayerStatsDrawer.svelte';
 	import { onMount } from 'svelte';
 	interface Props {
 		children?: import('svelte').Snippet;
@@ -124,6 +125,7 @@
 		&copy; 2010-{new Date().getFullYear()} The League of Ordinary Gentlemen. All Rights Reserved.
 	</p>
 </footer>
+<PlayerStatsDrawer />
 
 <style lang="scss">
 	header,

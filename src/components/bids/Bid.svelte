@@ -3,6 +3,7 @@
 	import type { Bid } from '../../types/defs';
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import BidActions from '../BidActions.svelte';
+	import StatsTrigger from '../StatsTrigger.svelte';
 
 	interface Props {
 		bid?: Bid | null;
@@ -16,7 +17,8 @@
 
 {#if bid}
 	{@const {
-		player: { name, position, team },
+		player,
+		player: { position, team },
 		salary,
 		years,
 		team: { name: logTeam }
@@ -28,7 +30,7 @@
 			</div>
 		{/if}
 		<div class="tablegrid-cell">
-			{name}
+			<StatsTrigger {player} />
 			<span class="text-minor">
 				{team} - {position}
 				{#if isMobile}&nbsp;&nbsp;{formatMoney(salary)}, {years}yrs{/if}
