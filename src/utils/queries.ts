@@ -130,7 +130,7 @@ export default {
     query {
       teams (
         orderBy: {
-          name: asc
+          espn_id: asc
         }
       ) {
         name
