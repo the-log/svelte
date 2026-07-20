@@ -19,11 +19,7 @@
 
 	let { espn_id, logTeam, status, player, contract = null }: Props = $props();
 
-	let isAdmin = false;
-	userStore.subscribe((value) => {
-		if (!value) return null;
-		isAdmin = value.isAdmin;
-	});
+	let isAdmin = $derived($userStore?.isAdmin ?? false);
 
 	let modal: HTMLDialogElement = $state();
 

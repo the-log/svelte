@@ -11,11 +11,7 @@
 
 	let { bid = null, index = null }: Props = $props();
 
-	let isMobile = $state(null);
-
-	layoutStore.subscribe((value) => {
-		isMobile = value;
-	});
+	let isMobile = $derived($layoutStore);
 </script>
 
 {#if bid}

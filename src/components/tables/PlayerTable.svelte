@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import Table from '../Table.svelte';
 	import Actions from '../Actions.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
@@ -27,12 +28,13 @@
 
 	let isReady = $state(false);
 
-	layoutStore.subscribe((value) => {
+	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
 			isReady = true;
 		}, 0);
 	});
+	onDestroy(unsubscribeLayout);
 
 	function onOrderUpdate(e: CustomEvent) {
 		const { target: dropdown, detail } = e;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { marked } from 'marked';
+	import { onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { isMobile as layoutStore } from '../../../src/misc/stores';
 
@@ -7,12 +8,13 @@
 
 	let isReady = $state(false);
 
-	layoutStore.subscribe((value) => {
+	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
 			isReady = true;
 		}, 0);
 	});
+	onDestroy(unsubscribeLayout);
 
 	let pages: { headline: string; body: string }[] = $state([]);
 	let loadFailed = $state(false);
