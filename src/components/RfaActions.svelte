@@ -27,6 +27,14 @@
 
 	let modal: HTMLDialogElement = $state();
 
+	let teamOptions: { name: string; espn_id: number }[] = $state([]);
+
+	async function loadTeamOptions() {
+		if (teamOptions.length) return;
+		const response = await runQuery(queries['team-options']);
+		teamOptions = response?.data?.teams ?? [];
+	}
+
 	function handleFormData(e: FormDataEvent) {
 		useFormData(e, doAction);
 	}
@@ -90,7 +98,13 @@
 	}
 </script>
 
-<sl-icon-button name="pencil-square" onclick={() => modal.show()}></sl-icon-button>
+<sl-icon-button
+	name="pencil-square"
+	onclick={() => {
+		loadTeamOptions();
+		modal.show();
+	}}
+></sl-icon-button>
 <sl-dialog label="Creating New Contract" bind:this={modal}>
 	<form data-actions onsubmit={preventDefault(serialize)} onformdata={handleFormData}>
 		<!-- References to all involved entities -->
@@ -140,16 +154,9 @@
 
 		<sl-select name="team" label="Team">
 			<sl-icon src="/icons/pennant.svg" slot="prefix"></sl-icon>
-			<sl-option value="1">Destructive Drummer</sl-option>
-			<sl-option value="2">Martian Carnage</sl-option>
-			<sl-option value="4">Dumpster Fire</sl-option>
-			<sl-option value="5">Mayfield of Dreams</sl-option>
-			<sl-option value="6">Buckeye Bruiser</sl-option>
-			<sl-option value="7">Murder Salad</sl-option>
-			<sl-option value="8">Globo Gym</sl-option>
-			<sl-option value="9">My Little LeBrony</sl-option>
-			<sl-option value="10">I'm hear to</sl-option>
-			<sl-option value="11">Team Billman</sl-option>
+			{#each teamOptions as team (team.espn_id)}
+				<sl-option value={String(team.espn_id)}>{team.name}</sl-option>
+			{/each}
 		</sl-select>
 		<br />
 
