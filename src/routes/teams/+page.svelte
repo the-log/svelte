@@ -8,7 +8,7 @@
 	import LeagueTable from '../../components/tables/LeagueTable.svelte';
 	import { onMount } from 'svelte';
 
-	let teams = $derived([]);
+	let teams = $state([]);
 
 	const getTeams = () => {
 		runQuery(queries['all-teams']).then(({ data }) => {
