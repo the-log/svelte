@@ -52,12 +52,19 @@
 		}
 	}
 
+	// Session checks are browser-only: during SSR the layout renders the same
+	// shell either way, and a server-side fetch here would hit the real API on
+	// every render (see also teams/[name], which skips its query during SSR).
 	authStatusStore.subscribe((value) => {
 		isLoggedIn = value;
-		runQuery(queries['authenticated-item']).then(authItemUpdated);
+		if (browser) {
+			runQuery(queries['authenticated-item']).then(authItemUpdated);
+		}
 	});
 
-	runQuery(queries['authenticated-item']).then(authItemUpdated);
+	if (browser) {
+		runQuery(queries['authenticated-item']).then(authItemUpdated);
+	}
 
 	beforeNavigate((navigation) => {
 		if (!isLoggedIn && !unauthPaths.includes(navigation.to?.route?.id || '')) {
