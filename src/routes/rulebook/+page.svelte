@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { marked } from 'marked';
+	import { browser } from '$app/environment';
 	import { isMobile as layoutStore } from '../../../src/misc/stores';
 
 	let isMobile: null | boolean = $state(null);
@@ -13,36 +14,47 @@
 		}, 0);
 	});
 
-	let pages: string[] = $state([]);
+	let pages: { headline: string; body: string }[] = $state([]);
+	let loadFailed = $state(false);
 
 	async function getRules() {
-		const toc = await fetch('https://api.github.com/repos/the-log/rulebook/contents/').then((r) =>
-			r.json()
-		);
-		Promise.allSettled(
-			toc.map((pageInfo) => fetch(pageInfo.download_url).then((r) => r.text()))
-		).then((fetchedPages) => {
-			pages = fetchedPages.map((fetchedPage) => {
-				if (fetchedPage.status === 'fulfilled') {
-					let chapter = fetchedPage.value.split('\n');
-					let headline = chapter.filter((s) => s.startsWith('##'))[0];
-					let body = chapter.filter((s) => !s.startsWith('##'));
+		try {
+			const response = await fetch('https://api.github.com/repos/the-log/rulebook/contents/');
+			const toc = await response.json();
 
-					if (headline) {
-						headline = headline.substring(3);
-					}
+			// When rate-limited or unavailable, the GitHub API returns an object
+			// with a message instead of the directory array.
+			if (!response.ok || !Array.isArray(toc)) {
+				console.error('Unable to load the rulebook listing', toc);
+				loadFailed = true;
+				return;
+			}
 
-					if (body.length) {
-						body = marked.parse(body.join('\n'));
-					}
+			const fetchedPages = await Promise.allSettled(
+				toc.map((pageInfo) => fetch(pageInfo.download_url).then((r) => r.text()))
+			);
 
-					return { headline, body };
-				}
-			});
-		});
+			pages = fetchedPages
+				.filter((result): result is PromiseFulfilledResult<string> => result.status === 'fulfilled')
+				.map((result) => {
+					const chapter = result.value.split('\n');
+					const headline = chapter.find((s) => s.startsWith('##'))?.substring(3) ?? '';
+					const body = chapter.filter((s) => !s.startsWith('##')).join('\n');
+
+					return { headline, body: body ? (marked.parse(body) as string) : '' };
+				})
+				.filter((page) => page.headline && page.body);
+
+			loadFailed = pages.length === 0;
+		} catch (error) {
+			console.error(error);
+			loadFailed = true;
+		}
 	}
 
-	getRules();
+	if (browser) {
+		getRules();
+	}
 </script>
 
 <svelte:head>
@@ -50,6 +62,14 @@
 </svelte:head>
 
 <h2>Rulebook</h2>
+
+{#if loadFailed}
+	<p>
+		The rulebook couldn't be loaded right now (it lives on GitHub, which may be rate-limiting
+		requests). Please try again in a few minutes, or read it directly at
+		<a href="https://github.com/the-log/rulebook">github.com/the-log/rulebook</a>.
+	</p>
+{/if}
 
 <sl-tab-group id="rulebook">
 	{#each pages as page, i}
