@@ -80,7 +80,11 @@
 		}
 	}
 
-	let deadlines: number[] = [];
+	// bid_deadlines[0] is the server's authoritative next deadline: a cron job
+	// evaluates bids once it passes and then removes it from the list. The
+	// client only ever counts down to the head — a passed deadline reads
+	// 00:00:00:00 until fresh settings arrive with the next head.
+	let target: number | null = null;
 
 	// bid_deadlines is a Keystone json() field; entries may be epoch numbers
 	// or ISO strings.
@@ -91,32 +95,27 @@
 	}
 
 	function updateDue() {
-		const now = Date.now();
-		const target = deadlines.find((deadline) => deadline > now);
-
-		if (!target) {
+		if (target === null) {
 			due = null;
 			return;
 		}
 
-		const { days, hours, minutes, seconds } = calculateDiff(now, target);
+		const { days, hours, minutes, seconds } = calculateDiff(Date.now(), target);
 		due = `${padInt(days)}:${padInt(hours)}:${padInt(minutes)}:${padInt(seconds)}`;
 	}
 
 	const unsubscribeSettings = leagueSettingsStore.subscribe((values) => {
-		deadlines = (values?.bid_deadlines ?? [])
-			.map(toTimestamp)
-			.filter((timestamp: number) => !Number.isNaN(timestamp))
-			.sort((a: number, b: number) => a - b);
+		const timestamp = toTimestamp(values?.bid_deadlines?.[0]);
+		target = Number.isNaN(timestamp) ? null : timestamp;
 
 		clearInterval(dueInterval);
 		dueInterval = undefined;
 
-		if (deadlines.length) {
+		if (target === null) {
+			due = null;
+		} else {
 			updateDue();
 			dueInterval = setInterval(updateDue, 1000);
-		} else {
-			due = null;
 		}
 	});
 
