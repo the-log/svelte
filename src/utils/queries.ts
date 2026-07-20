@@ -128,6 +128,18 @@ export default {
       }
     }
   `,
+	'team-options': `
+    query {
+      teams (
+        orderBy: {
+          espn_id: asc
+        }
+      ) {
+        name
+        espn_id
+      }
+    }
+  `,
 	'contracts-by-team-id': `
     query ($id: ID!) {
       contracts (
