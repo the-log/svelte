@@ -4,10 +4,11 @@
 	import Actions from '../Actions.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
+	import type { Contract, Player } from '../../types/defs';
 
 	interface Props {
 		title?: string | undefined;
-		players: any[];
+		players: Player[];
 	}
 
 	let { title = undefined, players }: Props = $props();
@@ -26,12 +27,9 @@
 
 	let isMobile: null | boolean = $state(null);
 
-	let isReady = $state(false);
-
 	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
-			isReady = true;
 		}, 0);
 	});
 	onDestroy(unsubscribeLayout);
@@ -86,7 +84,7 @@
 					<sl-icon-button slot="trigger" name="arrow-down-up"></sl-icon-button>
 
 					<sl-menu>
-						{#each Object.entries(sortLabel) as [key, label]}
+						{#each Object.entries(sortLabel) as [key, label] (key)}
 							<sl-menu-item sort-key={key}>
 								{label}
 								{#if sortConfig.key === key}
@@ -112,7 +110,7 @@
 			</div>
 		</div>
 
-		{#each players as player}
+		{#each players as player (player.espn_id)}
 			{@const {
 				contract,
 				name,
@@ -123,9 +121,9 @@
 				positionRankProj,
 				overallRankProj
 			} = player}
-			{@const { team: logTeam, salary, years, status } = contract ?? {}}
-			{@const { name: logTeamName } = logTeam ?? {}}
-			{@const points = player[sortConfig.key]}
+			{@const { team: logTeam, salary, years, status } = contract ?? ({} as Partial<Contract>)}
+			{@const logTeamName = logTeam?.name}
+			{@const points = Number(player[sortConfig.key as keyof Player])}
 			<div class="tablegrid-row" data-player-id={espn_id}>
 				{#if !isMobile}
 					<div class="tablegrid-cell tablegrid-thumbcell" status={injuryStatus.toLowerCase()}>

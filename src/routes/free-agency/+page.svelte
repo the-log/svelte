@@ -1,20 +1,17 @@
 <script lang="ts">
 	import Bid from '../../components/bids/Bid.svelte';
 	import BidGroup from '../../components/bids/BidGroup.svelte';
-	import formatMoney from '../../utils/formatMoney';
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import type { Bid as BidRecord } from '../../types/defs';
 	import { onMount } from 'svelte';
 	import { leagueSettingsStore } from '../../misc/stores';
 
-	let team = null;
 	let myBids: BidRecord[] = [];
 	let lockedBids: BidRecord[] = [];
 
-	let due: string | null;
+	let due: string | null = null;
 	let dueInterval: ReturnType<typeof setInterval> | undefined;
-	$: due = null;
 
 	function getBids() {
 		runQuery(queries['all-bids']).then(({ data }) => {
@@ -137,7 +134,7 @@
 
 <h2>Pending Bids {due ? `(${due})` : ''}</h2>
 <BidGroup title="My Bids">
-	{#each myBids as bid, i}
+	{#each myBids as bid, i (bid.id)}
 		<Bid {bid} index={i + 1} />
 	{/each}
 </BidGroup>
@@ -145,16 +142,16 @@
 <hr />
 
 <h2>Auction Results</h2>
-{#each Object.entries(lockedBids).reverse() as [date, bidGroups], i}
+{#each Object.entries(lockedBids).reverse() as [date, bidGroups], i (date)}
 	<!-- Shoelace registers asynchronously (see +layout.svelte); before sl-details
 	     is defined, Svelte writes booleans as string attributes and Lit reads any
 	     present `open` attribute as truthy. Emit the attribute only when open so a
 	     closed panel never renders `open="false"` (which reflects back to open). -->
 	<sl-details open={i === 0 || undefined}>
 		<h3 slot="summary">{date}</h3>
-		{#each Object.entries(bidGroups) as [espnid, bids]}
+		{#each Object.entries(bidGroups) as [espnid, bids] (espnid)}
 			<BidGroup title={bids[0].player.name}>
-				{#each bids.toSorted((a, b) => a.bid_order - b.bid_order) as bid, j}
+				{#each bids.toSorted((a, b) => a.bid_order - b.bid_order) as bid, j (bid.bid_order)}
 					<Bid {bid} index={j + 1} />
 				{/each}
 			</BidGroup>

@@ -4,10 +4,11 @@
 	import Actions from '../Actions.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
+	import type { RosterRow } from '../../types/defs';
 
 	interface Props {
 		title: string;
-		players: any[];
+		players: RosterRow[];
 		team: string | null;
 	}
 
@@ -38,7 +39,7 @@
 			<div class="tablegrid-cell">Years</div>
 		</div>
 
-		{#each players as player}
+		{#each players as player (player.espn_id)}
 			{@const {
 				name,
 				team: nflTeam,

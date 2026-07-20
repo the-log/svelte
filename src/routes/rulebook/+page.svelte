@@ -1,20 +1,6 @@
 <script lang="ts">
 	import { marked } from 'marked';
-	import { onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { isMobile as layoutStore } from '../../../src/misc/stores';
-
-	let isMobile: null | boolean = $state(null);
-
-	let isReady = $state(false);
-
-	const unsubscribeLayout = layoutStore.subscribe((value) => {
-		setTimeout(() => {
-			isMobile = value;
-			isReady = true;
-		}, 0);
-	});
-	onDestroy(unsubscribeLayout);
 
 	let pages: { headline: string; body: string }[] = $state([]);
 	let loadFailed = $state(false);
@@ -74,13 +60,14 @@
 {/if}
 
 <sl-tab-group id="rulebook">
-	{#each pages as page, i}
+	{#each pages as page, i (i)}
 		<sl-tab slot="nav" panel="chapter-{i}" active={i === 0}>{page.headline}</sl-tab>
 	{/each}
 
-	{#each pages as page, i}
+	{#each pages as page, i (i)}
 		<sl-tab-panel name="chapter-{i}" active={i === 0}>
 			<h2>{page.headline}</h2>
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -- marked output of the league's own rulebook repo -->
 			{@html page.body}
 		</sl-tab-panel>
 	{/each}

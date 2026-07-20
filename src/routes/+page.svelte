@@ -3,18 +3,18 @@
 	import objByProperty from '../utils/objByProperty';
 	import runQuery from '../utils/runQuery';
 	import queries from '../utils/queries';
-	import type { Contract } from '../types/defs';
+	import type { Contract, RosterRow } from '../types/defs';
 	import { userStore } from '../misc/stores';
 	import TeamTable from '../components/tables/TeamTable.svelte';
 	import { onDestroy, onMount } from 'svelte';
 
 	let team = $state('');
-	let active = $state(<any>[]);
-	let dts = $state(<any>[]);
-	let ir = $state(<any>[]);
-	let waived = $state(<any>[]);
+	let active: RosterRow[] = $state([]);
+	let dts: RosterRow[] = $state([]);
+	let ir: RosterRow[] = $state([]);
+	let waived: RosterRow[] = $state([]);
 
-	function processContracts(contracts: any[]) {
+	function processContracts(contracts: Contract[]): RosterRow[] {
 		return contracts
 			.sort(objByProperty.bind({ path: 'player.positionRankProj', dir: 'asc' }))
 			.sort(objByProperty.bind({ path: 'player.positionWeight', dir: 'asc' }))

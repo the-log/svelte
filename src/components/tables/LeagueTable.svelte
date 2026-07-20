@@ -1,23 +1,35 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import Table from '../Table.svelte';
-	import Actions from '../Actions.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 
+	interface LeagueRow {
+		abbreviation: string;
+		name: string;
+		wins: number;
+		losses: number;
+		ties: number;
+		active: number;
+		dts: number;
+		ir: number;
+		waived: number;
+		salary: number;
+		formattedSalary?: string;
+		years: number;
+	}
+
 	interface Props {
-		teams: any[];
+		teams: LeagueRow[];
 	}
 
 	let { teams }: Props = $props();
 
 	let isMobile: null | boolean = $state(null);
 
-	let isReady = $state(false);
-
 	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
-			isReady = true;
 		}, 0);
 	});
 	onDestroy(unsubscribeLayout);
@@ -32,7 +44,7 @@
 		{#if !isMobile}<div class="tablegrid-cell">Contracts</div>{/if}
 	</div>
 
-	{#each teams as team, i}
+	{#each teams as team, i (team.abbreviation)}
 		{@const {
 			abbreviation,
 			name,
@@ -51,7 +63,7 @@
 		<div class="tablegrid-row">
 			{#if !isMobile}<div class="tablegrid-cell tablegrid-thumbcell">#{i + 1}</div>{/if}
 			<div class="tablegrid-cell">
-				<a href="/teams/{abbreviation}">{name}</a>
+				<a href={resolve('/teams/[name]', { name: abbreviation })}>{name}</a>
 				<span class="text-minor">{wins}-{losses}-{ties}</span>
 			</div>
 			<div class="tablegrid-cell">

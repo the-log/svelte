@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
-	import type { Player } from '../../src/types/defs';
 	import { leagueSettingsStore, userStore } from '../misc/stores';
 	import formatMoney from '../utils/formatMoney';
 	import { serialize, useFormData } from '../utils/forms';
@@ -10,21 +9,29 @@
 	import runQuery from '../utils/runQuery';
 
 	interface Props {
-		espn_id: number;
+		espn_id?: number;
 		/** ID (not abbreviation) of the LOG team owning the player's contract. */
-		logTeam?: string | null;
-		status: string;
-		/** Accepts mapped rows (playerStatus) and raw players (injuryStatus). */
-		player: Player;
+		logTeam?: string | number | null;
+		status?: string;
+		/** Accepts mapped roster rows (playerStatus) and raw players (injuryStatus). */
+		player: {
+			espn_id?: number;
+			name?: string;
+			position?: string;
+			team?: string;
+			playerStatus?: string;
+			injuryStatus?: string;
+		};
 		/** ID of the player's contract; required for drop/IR/promote. */
-		contract?: string | null;
+		contract?: string | number | null;
 	}
 
 	let { espn_id, logTeam = null, status, player, contract = null }: Props = $props();
 
 	let playerStatus = $derived((player.playerStatus ?? player.injuryStatus ?? '').toLowerCase());
 	let irEligible = $derived(
-		!['dts', 'ir', 'waived'].includes(status) && ['out', 'injury_reserve'].includes(playerStatus)
+		!['dts', 'ir', 'waived'].includes(status ?? '') &&
+			['out', 'injury_reserve'].includes(playerStatus)
 	);
 
 	let userTeam = $derived($userStore?.teamID ?? '');
@@ -40,11 +47,7 @@
 	let action = $state('');
 
 	function handlePlayerActions(e: CustomEvent) {
-		const menu = e.target as HTMLElement;
 		const { item } = e.detail;
-		const row = menu!.closest('.tablegrid-row');
-
-		const player_id = menu.getAttribute('player-id');
 		action = item.getAttribute('action');
 
 		switch (action) {

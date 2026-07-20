@@ -11,6 +11,8 @@ export interface Player {
 	injuryStatus: string;
 	positionRank: number;
 	overallRank: number;
+	positionRankProj: number;
+	overallRankProj: number;
 	seasonOutlook: string;
 	outlooksByWeek: JSON;
 	isRookie: boolean;
@@ -19,7 +21,7 @@ export interface Player {
 	pointsThisYear: number;
 	pointsThisYearProj: number;
 	pointsThisWeekProj: number;
-	contract: Contract;
+	contract?: Contract | null;
 }
 
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'LB' | 'DE' | 'DT' | 'S' | 'CB';
@@ -101,6 +103,38 @@ export interface Bid {
  * AuthenticatedUser schema from keystone
  */
 export type AuthenticatedUser = User;
+
+/**
+ * Shape the layout/login flows put into userStore (a session summary, not the
+ * Keystone User list item).
+ */
+export interface SessionUser {
+	isAdmin?: boolean;
+	userID?: ID;
+	userName?: string | null;
+	teamID?: ID | null;
+}
+
+/**
+ * Roster row shape produced by the contract-mapping on the home and team
+ * detail pages, consumed by TeamTable/Actions.
+ */
+export interface RosterRow {
+	contract_id?: ID;
+	name?: string;
+	team?: string;
+	position?: Position;
+	salary?: number;
+	salaryFormatted?: string;
+	years?: number;
+	espn_id?: number;
+	playerStatus?: string;
+	status?: string;
+	contractStatus?: string;
+	pointsThisYearProj?: number;
+	positionRankProj?: number;
+	needsAttention?: boolean;
+}
 
 export interface RowAction {
 	name: string;

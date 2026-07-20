@@ -3,13 +3,12 @@
 
 	import { browser } from '$app/environment';
 	import type { Player } from '../../types/defs';
-	import formatMoney from '../../utils/formatMoney';
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { positions, leagueTeams } from '../../utils/playerInfo';
 	import PlayerTable from '../../components/tables/PlayerTable.svelte';
 
-	let players: any[] = $state([]);
+	let players: Player[] = $state([]);
 	let playerCount: number = $state(0);
 
 	let take = 25;
@@ -189,12 +188,12 @@
 <form onsubmit={preventDefault(() => {})}>
 	<sl-input onsl-input={onNameInput} placeholder="Player Name" size="medium"></sl-input>
 	<sl-select onsl-input={onPositionInput} placeholder="Position" multiple clearable size="medium">
-		{#each positions as [abbr, position]}
+		{#each positions as [abbr, position] (abbr)}
 			<sl-option value={abbr}>{position}</sl-option>
 		{/each}
 	</sl-select>
 	<sl-select onsl-input={onTeamInput} placeholder="Team" multiple clearable size="medium">
-		{#each leagueTeams as [abbr, team]}
+		{#each leagueTeams as [abbr, team] (abbr)}
 			<sl-option value={abbr}>{team}</sl-option>
 		{/each}
 	</sl-select>

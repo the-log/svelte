@@ -8,7 +8,7 @@
 	import { notify } from '../utils/notify';
 
 	let { bid } = $props();
-	let { player, team } = bid;
+	let { player } = bid;
 
 	let modal: HTMLElement = $state(),
 		modalTitle = $state(''),
@@ -40,7 +40,7 @@
 		modal.show();
 	}
 
-	async function onDelete(e: CustomEvent) {
+	async function onDelete() {
 		const resp = await runQuery(queries['delete-bid'], {
 			where: {
 				id: bid.id

@@ -4,8 +4,8 @@
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { notify } from '../../utils/notify';
-	import { userStore, authStatusStore } from '../../misc/stores';
 
 	let email: string = $state(),
 		token: string = $state(),
@@ -18,7 +18,7 @@
 		if (!tokenRequested) {
 			await sendResetToken(e);
 		} else {
-			await useResetToken(e);
+			await useResetToken();
 		}
 	}
 
@@ -45,7 +45,7 @@
 		submitButton.disabled = false;
 	}
 
-	async function useResetToken(e: SubmitEvent) {
+	async function useResetToken() {
 		if (!passwordsMatch) {
 			notify({
 				title: 'Error',
@@ -64,7 +64,7 @@
 		});
 
 		if (!redeemUserPasswordResetToken) {
-			goto('/login');
+			goto(resolve('/login'));
 			notify({
 				title: 'Password Reset',
 				message: 'Your password has been updated. Please log in.'
@@ -108,7 +108,7 @@
 <h1>Reset Password</h1>
 
 <form onsubmit={preventDefault(formSubmit)}>
-	<a href="/login">← Log In</a>
+	<a href={resolve('/login')}>← Log In</a>
 	{#if !tokenRequested}
 		<span>Enter the email for the account you'd like to reset below.</span>
 	{/if}

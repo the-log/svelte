@@ -1,10 +1,8 @@
 <script lang="ts">
 	import formatMoney from '../../utils/formatMoney';
-	import Table from '../../components/Table.svelte';
 	import runQuery from '../../utils/runQuery';
 	import queries from '../../utils/queries';
-	import type { Team, RowAction } from '../../types/defs';
-	import { readable } from 'svelte/store';
+	import type { Team } from '../../types/defs';
 	import LeagueTable from '../../components/tables/LeagueTable.svelte';
 	import { onMount } from 'svelte';
 
