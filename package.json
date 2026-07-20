@@ -11,10 +11,14 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test": "svelte-kit sync && vitest run",
-		"test:watch": "svelte-kit sync && vitest"
+		"test:watch": "svelte-kit sync && vitest",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:docker": "docker run --rm --ipc=host -v \"$PWD\":/work -v the-log-svelte-e2e-nm:/work/node_modules -w /work mcr.microsoft.com/playwright:v1.61.1-noble bash -lc 'npm install --no-audit --no-fund --prefer-offline --silent && npx playwright test \"$@\"' --"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.4",
+		"@playwright/test": "^1.61.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.60.1",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",

@@ -159,7 +159,9 @@
 		}
 	}
 	run(() => {
-		if (take || skip || filters || order) {
+		// browser check: run() executes during SSR too, and the results of a
+		// server-side query could never reach the client anyway.
+		if (browser && (take || skip || filters || order)) {
 			runQuery(queries['all-players'], { take, skip, filters, order }).then((resp) => {
 				const { data, errors } = resp;
 				if (errors) return errors;
