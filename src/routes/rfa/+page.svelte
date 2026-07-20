@@ -67,7 +67,7 @@
 		fetchRFAs();
 	};
 
-	let interval: number;
+	let interval: ReturnType<typeof setInterval>;
 	onMount(() => {
 		fetchRFAs();
 		interval = setInterval(fetchRFAs, 5000);
