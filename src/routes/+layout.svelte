@@ -1,6 +1,6 @@
 <script module>
 	if (browser) {
-		import('@shoelace-style/shoelace');
+		import('../misc/shoelace');
 	}
 </script>
 
