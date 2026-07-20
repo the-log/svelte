@@ -13,7 +13,7 @@
 	let lockedBids: BidRecord[] = [];
 
 	let due: string | null;
-	let dueInterval: number | undefined;
+	let dueInterval: ReturnType<typeof setInterval> | undefined;
 	$: due = null;
 
 	function getBids() {
