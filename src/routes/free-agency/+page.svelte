@@ -80,18 +80,42 @@
 		}
 	}
 
-	leagueSettingsStore.subscribe((values) => {
-		if (values) {
-			const { bid_deadlines } = values;
+	// bid_deadlines[0] is the server's authoritative next deadline: a cron job
+	// evaluates bids once it passes and then removes it from the list. The
+	// client only ever counts down to the head — a passed deadline reads
+	// 00:00:00:00 until fresh settings arrive with the next head.
+	let target: number | null = null;
 
-			if (bid_deadlines.length) {
-				const target = bid_deadlines[0];
-				dueInterval = setInterval(() => {
-					const now = Date.now();
-					const { days, hours, minutes, seconds } = calculateDiff(now, target);
-					due = `${padInt(days)}:${padInt(hours)}:${padInt(minutes)}:${padInt(seconds)}`;
-				}, 1000);
-			}
+	// bid_deadlines is a Keystone json() field; entries may be epoch numbers
+	// or ISO strings.
+	function toTimestamp(value: unknown): number {
+		if (typeof value === 'number') return value;
+		if (typeof value === 'string') return new Date(value).getTime();
+		return NaN;
+	}
+
+	function updateDue() {
+		if (target === null) {
+			due = null;
+			return;
+		}
+
+		const { days, hours, minutes, seconds } = calculateDiff(Date.now(), target);
+		due = `${padInt(days)}:${padInt(hours)}:${padInt(minutes)}:${padInt(seconds)}`;
+	}
+
+	const unsubscribeSettings = leagueSettingsStore.subscribe((values) => {
+		const timestamp = toTimestamp(values?.bid_deadlines?.[0]);
+		target = Number.isNaN(timestamp) ? null : timestamp;
+
+		clearInterval(dueInterval);
+		dueInterval = undefined;
+
+		if (target === null) {
+			due = null;
+		} else {
+			updateDue();
+			dueInterval = setInterval(updateDue, 1000);
 		}
 	});
 
@@ -101,6 +125,7 @@
 
 		return () => {
 			clearInterval(dueInterval);
+			unsubscribeSettings();
 			window.removeEventListener('action-taken', getBids);
 		};
 	});
