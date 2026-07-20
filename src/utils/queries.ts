@@ -94,7 +94,9 @@ export default {
         espn_id
         injuryStatus
         contract {
+          id
           team {
+            id
             name
             abbreviation
           }
