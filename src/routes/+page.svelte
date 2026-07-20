@@ -9,10 +9,10 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	let team = $state('');
-	let active = $derived(<any>[]);
-	let dts = $derived(<any>[]);
-	let ir = $derived(<any>[]);
-	let waived = $derived(<any>[]);
+	let active = $state(<any>[]);
+	let dts = $state(<any>[]);
+	let ir = $state(<any>[]);
+	let waived = $state(<any>[]);
 
 	function processContracts(contracts: any[]) {
 		return contracts

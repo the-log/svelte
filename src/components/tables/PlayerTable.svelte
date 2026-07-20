@@ -12,7 +12,7 @@
 
 	let { title = undefined, players }: Props = $props();
 
-	let sortConfig = $derived({
+	let sortConfig = $state({
 		key: 'pointsThisYearProj',
 		dir: 'desc'
 	});
