@@ -94,7 +94,9 @@ export default {
         espn_id
         injuryStatus
         contract {
+          id
           team {
+            id
             name
             abbreviation
           }
@@ -123,6 +125,18 @@ export default {
         owner {
           name
         }
+      }
+    }
+  `,
+	'team-options': `
+    query {
+      teams (
+        orderBy: {
+          espn_id: asc
+        }
+      ) {
+        name
+        espn_id
       }
     }
   `,

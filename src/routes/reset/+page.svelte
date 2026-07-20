@@ -30,9 +30,18 @@
 		emailField.disabled = true;
 		submitButton.disabled = true;
 
-		await runQuery(queries['request-token'], { email });
+		const response = await runQuery(queries['request-token'], { email });
 
-		tokenRequested = true;
+		if (response?.errors?.length) {
+			emailField.disabled = false;
+			notify({
+				title: 'Error',
+				message: 'The reset email could not be sent. Please try again later.',
+				variant: 'danger'
+			});
+		} else {
+			tokenRequested = true;
+		}
 		submitButton.disabled = false;
 	}
 
@@ -70,7 +79,13 @@
 					variant: 'danger'
 				});
 			} else {
-				goto('/reset');
+				tokenRequested = false;
+				token = '';
+				password = '';
+				passwordConf = '';
+				passwordsMatch = false;
+				const emailField = document.querySelector('#email') as HTMLInputElement | null;
+				if (emailField) emailField.disabled = false;
 				notify({
 					title: 'Error',
 					message: `${message} You will need to create a new one-time code.`,
@@ -85,6 +100,10 @@
 		passwordsMatch = !!password && isValid && password === passwordConf;
 	}
 </script>
+
+<svelte:head>
+	<title>Reset Password — The League of Ordinary Gentlemen</title>
+</svelte:head>
 
 <h1>Reset Password</h1>
 

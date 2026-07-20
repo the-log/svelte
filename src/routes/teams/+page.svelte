@@ -8,7 +8,7 @@
 	import LeagueTable from '../../components/tables/LeagueTable.svelte';
 	import { onMount } from 'svelte';
 
-	let teams = $derived([]);
+	let teams = $state([]);
 
 	const getTeams = () => {
 		runQuery(queries['all-teams']).then(({ data }) => {
@@ -35,7 +35,7 @@
 		});
 	};
 
-	let interval: number;
+	let interval: ReturnType<typeof setInterval>;
 	onMount(() => {
 		getTeams();
 		interval = setInterval(getTeams, 5000);
@@ -43,5 +43,9 @@
 		return () => clearInterval(interval);
 	});
 </script>
+
+<svelte:head>
+	<title>Teams — The League of Ordinary Gentlemen</title>
+</svelte:head>
 
 <LeagueTable {teams} />

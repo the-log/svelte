@@ -7,16 +7,16 @@
 	import formatMoney from '../../../utils/formatMoney';
 	import TeamTable from '../../../components/tables/TeamTable.svelte';
 
-	let teamAbbr = $page.params.name;
+	let teamAbbr = $derived($page.params.name);
 
 	let teamName = $state('');
 
 	let teamID = $state(null);
 
-	let active = $derived([]);
-	let dts = $derived([]);
-	let ir = $derived([]);
-	let waived = $derived([]);
+	let active = $state([]);
+	let dts = $state([]);
+	let ir = $state([]);
+	let waived = $state([]);
 
 	function processContracts(contracts: any[]) {
 		return contracts
@@ -51,20 +51,39 @@
 			});
 	}
 
-	if (teamAbbr) {
-		runQuery(queries['contracts-by-team-abbr'], { abbr: teamAbbr.toUpperCase() }).then(
-			({ data }) => {
-				teamName = data?.team?.name || '';
-				teamID = data?.team?.id || null;
+	function getTeam(abbr: string) {
+		runQuery(queries['contracts-by-team-abbr'], { abbr: abbr.toUpperCase() }).then(({ data }) => {
+			if (abbr !== $page.params.name) return; // superseded by a later navigation
 
-				active = processContracts(data.contracts.filter((c) => c.status === 'active'));
-				dts = processContracts(data.contracts.filter((c) => c.status === 'dts'));
-				ir = processContracts(data.contracts.filter((c) => c.status === 'ir'));
-				waived = processContracts(data.contracts.filter((c) => c.status === 'waived'));
-			}
-		);
+			teamName = data?.team?.name || '';
+			teamID = data?.team?.id || null;
+
+			active = processContracts(data.contracts.filter((c) => c.status === 'active'));
+			dts = processContracts(data.contracts.filter((c) => c.status === 'dts'));
+			ir = processContracts(data.contracts.filter((c) => c.status === 'ir'));
+			waived = processContracts(data.contracts.filter((c) => c.status === 'waived'));
+		});
 	}
+
+	// $effect never runs during SSR, so this also keeps the query out of
+	// server renders.
+	$effect(() => {
+		teamName = '';
+		teamID = null;
+		active = [];
+		dts = [];
+		ir = [];
+		waived = [];
+
+		if (teamAbbr) {
+			getTeam(teamAbbr);
+		}
+	});
 </script>
+
+<svelte:head>
+	<title>{teamName || 'Team'} — The League of Ordinary Gentlemen</title>
+</svelte:head>
 
 <h1>{teamName}</h1>
 

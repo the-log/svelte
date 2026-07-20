@@ -67,7 +67,7 @@
 		fetchRFAs();
 	};
 
-	let interval: number;
+	let interval: ReturnType<typeof setInterval>;
 	onMount(() => {
 		fetchRFAs();
 		interval = setInterval(fetchRFAs, 5000);
@@ -96,6 +96,10 @@
 		unsubscribeLayout();
 	});
 </script>
+
+<svelte:head>
+	<title>Restricted Free Agents — The League of Ordinary Gentlemen</title>
+</svelte:head>
 
 <h1>Restricted Free Agents</h1>
 

@@ -1,11 +1,12 @@
 <script module>
 	if (browser) {
-		import('@shoelace-style/shoelace');
+		import('../misc/shoelace');
 	}
 </script>
 
 <script lang="ts">
 	import { beforeNavigate, goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
 	import runQuery from '../utils/runQuery';
 	import queries from '../utils/queries';
@@ -46,7 +47,7 @@
 		if (browser) {
 			const currentPath = window.location.pathname;
 			if (!isLoggedIn && !unauthPaths.includes(currentPath)) {
-				goto('/login');
+				goto(resolve('/login'));
 			}
 		}
 	}
@@ -61,6 +62,7 @@
 	beforeNavigate((navigation) => {
 		if (!isLoggedIn && !unauthPaths.includes(navigation.to?.route?.id || '')) {
 			navigation.cancel();
+			goto(resolve('/login'));
 		} else {
 			console.clear();
 		}
@@ -70,7 +72,7 @@
 		runQuery(queries['end-session']).then(({ data }) => {
 			if (data.endSession) {
 				authStatusStore.set(false);
-				goto('/login');
+				goto(resolve('/login'));
 			}
 		});
 	}
@@ -88,11 +90,17 @@
 <header>
 	<h1>The League <span>of Ordinary Gentlemen</span></h1>
 	<UserMenu>
-		<sl-button onclick={logUserOut} size="small" variant="primary" outline>Log Out</sl-button>
+		{#if $authStatusStore}
+			<sl-button onclick={logUserOut} size="small" variant="primary" outline>Log Out</sl-button>
+		{:else}
+			<sl-button href="/login" size="small" variant="primary" outline>Log In</sl-button>
+		{/if}
 	</UserMenu>
 </header>
 <div id="site-nav">
-	<SiteNav />
+	{#if $authStatusStore}
+		<SiteNav />
+	{/if}
 </div>
 <main>
 	{@render children?.()}

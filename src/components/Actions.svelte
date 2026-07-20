@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
-	import type { Contract, Player } from '../../src/types/defs';
+	import type { Player } from '../../src/types/defs';
 	import { leagueSettingsStore, userStore } from '../misc/stores';
 	import formatMoney from '../utils/formatMoney';
 	import { serialize, useFormData } from '../utils/forms';
@@ -11,17 +11,21 @@
 
 	interface Props {
 		espn_id: number;
-		logTeam: string;
+		/** ID (not abbreviation) of the LOG team owning the player's contract. */
+		logTeam?: string | null;
 		status: string;
+		/** Accepts mapped rows (playerStatus) and raw players (injuryStatus). */
 		player: Player;
-		contract?: Contract | null;
+		/** ID of the player's contract; required for drop/IR/promote. */
+		contract?: string | null;
 	}
 
-	let { espn_id, logTeam, status, player, contract = null }: Props = $props();
+	let { espn_id, logTeam = null, status, player, contract = null }: Props = $props();
 
-	let irElgibile =
-		!['dts', 'ir', 'waived'].includes(status) &&
-		['out', 'injury_reserve'].includes(player.playerStatus);
+	let playerStatus = $derived((player.playerStatus ?? player.injuryStatus ?? '').toLowerCase());
+	let irEligible = $derived(
+		!['dts', 'ir', 'waived'].includes(status) && ['out', 'injury_reserve'].includes(playerStatus)
+	);
 
 	let userTeam = $derived($userStore?.teamID ?? '');
 	let inSeason = $derived($leagueSettingsStore?.phase === 'active');
@@ -220,7 +224,7 @@
 						To Active Roster
 					</sl-menu-item>
 				{/if}
-				{#if irElgibile}
+				{#if irEligible}
 					<sl-menu-item action="ir">
 						<sl-icon slot="prefix" name="bandaid"></sl-icon>
 						To IR
@@ -232,7 +236,9 @@
 						Drop
 					</sl-menu-item>
 				{/if}
-			{:else if isAvailable && inSeason}
+			{/if}
+			<!-- Not exclusive with ownership: bidding on your own waived player is legal. -->
+			{#if isAvailable && inSeason}
 				<sl-menu-item action="bid">
 					<sl-icon slot="prefix" name="tag"></sl-icon>
 					Place Bid
