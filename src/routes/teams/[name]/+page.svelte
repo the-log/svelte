@@ -13,10 +13,10 @@
 
 	let teamID = $state(null);
 
-	let active = $derived([]);
-	let dts = $derived([]);
-	let ir = $derived([]);
-	let waived = $derived([]);
+	let active = $state([]);
+	let dts = $state([]);
+	let ir = $state([]);
+	let waived = $state([]);
 
 	function processContracts(contracts: any[]) {
 		return contracts
