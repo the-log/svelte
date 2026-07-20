@@ -122,7 +122,7 @@
 				overallRankProj
 			} = player}
 			{@const { team: logTeam, salary, years, status } = contract ?? {}}
-			{@const { name: logTeamName, abbreviation: abbr } = logTeam ?? {}}
+			{@const { name: logTeamName } = logTeam ?? {}}
 			{@const points = player[sortConfig.key]}
 			<div class="tablegrid-row" data-player-id={espn_id}>
 				{#if !isMobile}
@@ -162,7 +162,13 @@
 				{/if}
 				<div class="tablegrid-cell">{Math.round(points)}</div>
 				<div class="tablegrid-cell tablegrid-actions">
-					<Actions {espn_id} logTeam={abbr} {status} {player} />
+					<Actions
+						{espn_id}
+						logTeam={logTeam?.id ?? null}
+						{status}
+						{player}
+						contract={contract?.id ?? null}
+					/>
 				</div>
 			</div>
 		{/each}
