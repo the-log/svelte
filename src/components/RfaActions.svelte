@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
-	import type { Contract, Player } from '../../src/types/defs';
-	import { userStore } from '../misc/stores';
 	import formatMoney from '../utils/formatMoney';
 	import { serialize, useFormData } from '../utils/forms';
 	import { notify } from '../utils/notify';
@@ -11,15 +9,22 @@
 
 	interface Props {
 		espn_id: number;
-		logTeam: string;
-		status: string;
-		player: Player;
-		contract?: Contract | null;
+		logTeam?: string | null;
+		status?: string;
+		/** RFA row shape from the /rfa page. */
+		player: {
+			name: string;
+			position: string;
+			team: string;
+			nflTeam?: string;
+			salary: number;
+			ft?: boolean;
+		};
+		/** ID of the RFA contract being replaced. */
+		contract?: string | number | null;
 	}
 
-	let { espn_id, logTeam, status, player, contract = null }: Props = $props();
-
-	let isAdmin = $derived($userStore?.isAdmin ?? false);
+	let { espn_id, player, contract = null }: Props = $props();
 
 	let modal: HTMLDialogElement = $state();
 
@@ -37,7 +42,7 @@
 
 	async function doAction(e: FormDataEvent) {
 		const data = Object.fromEntries(e.formData);
-		const { contract, years, player, salary, team } = data;
+		const { contract, player, salary, team } = data;
 
 		await runQuery(queries['delete-contract'], {
 			where: {

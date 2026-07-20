@@ -3,7 +3,7 @@
 	import objByProperty from '../../../utils/objByProperty';
 	import queries from '../../../utils/queries';
 	import runQuery from '../../../utils/runQuery';
-	import type { Contract } from '../../../types/defs';
+	import type { Contract, Player, RosterRow } from '../../../types/defs';
 	import formatMoney from '../../../utils/formatMoney';
 	import TeamTable from '../../../components/tables/TeamTable.svelte';
 
@@ -13,12 +13,12 @@
 
 	let teamID = $state(null);
 
-	let active = $state([]);
-	let dts = $state([]);
-	let ir = $state([]);
-	let waived = $state([]);
+	let active: RosterRow[] = $state([]);
+	let dts: RosterRow[] = $state([]);
+	let ir: RosterRow[] = $state([]);
+	let waived: RosterRow[] = $state([]);
 
-	function processContracts(contracts: any[]) {
+	function processContracts(contracts: Contract[]): RosterRow[] {
 		return contracts
 			.sort(objByProperty.bind({ path: 'salary', dir: 'desc' }))
 			.sort(objByProperty.bind({ path: 'player.positionWeight', dir: 'asc' }))
@@ -32,7 +32,7 @@
 					injuryStatus,
 					pointsThisYearProj,
 					positionRankProj
-				} = player || {};
+				} = (player ?? {}) as Partial<Player>;
 
 				return {
 					name,

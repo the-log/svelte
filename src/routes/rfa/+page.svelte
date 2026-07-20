@@ -11,7 +11,24 @@
 
 	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank' = $state('position');
 
-	let players: any[] = $state([]);
+	interface RfaRow {
+		name: string;
+		nflTeam: string;
+		position: string;
+		salary: number;
+		years: number;
+		espn_id: number;
+		status: string;
+		ovr: number;
+		pos: number;
+		team: string;
+		teamID: number;
+		abbr: string;
+		ft: boolean;
+		contract_id: string | number;
+	}
+
+	let players: RfaRow[] = $state([]);
 
 	const fetchRFAs = () => {
 		runQuery(queries['rfas'], {}).then(({ data }) => {
@@ -82,12 +99,9 @@
 
 	let isMobile: null | boolean = $state(null);
 
-	let isReady = $state(false);
-
 	const unsubscribeLayout = layoutStore.subscribe((value) => {
 		setTimeout(() => {
 			isMobile = value;
-			isReady = true;
 		}, 0);
 	});
 
@@ -134,7 +148,6 @@
 			espn_id,
 			name,
 			nflTeam,
-			ovr,
 			pos,
 			position,
 			salary,

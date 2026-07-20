@@ -2,12 +2,13 @@
 	import { run, preventDefault } from 'svelte/legacy';
 
 	import { browser } from '$app/environment';
+	import type { Player } from '../../types/defs';
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { positions, leagueTeams } from '../../utils/playerInfo';
 	import PlayerTable from '../../components/tables/PlayerTable.svelte';
 
-	let players: unknown[] = $state([]);
+	let players: Player[] = $state([]);
 	let playerCount: number = $state(0);
 
 	let take = 25;

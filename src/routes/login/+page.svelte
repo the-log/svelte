@@ -4,13 +4,14 @@
 	import queries from '../../utils/queries';
 	import runQuery from '../../utils/runQuery';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { notify } from '../../utils/notify';
 	import { userStore, authStatusStore } from '../../misc/stores';
 
 	let email: string = $state(),
 		password: string = $state();
 
-	function attemptLogin(e: SubmitEvent) {
+	function attemptLogin() {
 		runQuery(queries['begin-session'], {
 			identity: email,
 			secret: password
@@ -38,7 +39,7 @@
 				});
 				authStatusStore.set(true);
 				const { name } = response.item;
-				goto('/');
+				goto(resolve('/'));
 				notify({
 					title: 'Login Successful',
 					message: name ? `Welcome, ${name}` : 'Welcome!'
@@ -82,7 +83,7 @@
 			password = e.target.value;
 		}}
 	></sl-input>
-	<a href="/reset">Forgot Password?</a>
+	<a href={resolve('/reset')}>Forgot Password?</a>
 	<sl-button type="submit" variant="primary">Submit</sl-button>
 </form>
 

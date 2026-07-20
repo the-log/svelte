@@ -21,13 +21,22 @@
 	let { children }: Props = $props();
 
 	let isLoggedIn: boolean;
-	let userName = '';
 
 	const unauthPaths = ['/login', '/reset'];
 
-	function authItemUpdated(authItem: any) {
-		const { data } = authItem;
-		const { authenticatedItem } = data;
+	interface AuthItemResponse {
+		data?: {
+			authenticatedItem?: {
+				id: string;
+				name: string | null;
+				isAdmin: boolean;
+				team?: { id: string; name: string; abbreviation: string } | null;
+			} | null;
+		} | null;
+	}
+
+	function authItemUpdated(authItem: AuthItemResponse) {
+		const authenticatedItem = authItem?.data?.authenticatedItem;
 
 		userStore.set({
 			isAdmin: authenticatedItem?.isAdmin,
@@ -38,11 +47,9 @@
 
 		authStatusStore.set(Boolean(authenticatedItem?.id));
 
-		runQuery(queries['league-settings']).then(({ data: { leagueSetting } }) => {
-			leagueSettingsStore.set(leagueSetting);
+		runQuery(queries['league-settings']).then(({ data }) => {
+			leagueSettingsStore.set(data?.leagueSetting ?? null);
 		});
-
-		userName = authenticatedItem?.name || '';
 
 		if (browser) {
 			const currentPath = window.location.pathname;
