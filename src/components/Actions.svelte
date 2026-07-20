@@ -245,7 +245,9 @@
 						Drop
 					</sl-menu-item>
 				{/if}
-			{:else if isAvailable && inSeason}
+			{/if}
+			<!-- Not exclusive with ownership: bidding on your own waived player is legal. -->
+			{#if isAvailable && inSeason}
 				<sl-menu-item action="bid">
 					<sl-icon slot="prefix" name="tag"></sl-icon>
 					Place Bid
