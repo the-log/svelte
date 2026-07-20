@@ -10,9 +10,7 @@ test.describe('player stats drawer', () => {
 	// Scope to the active tab panel — the inactive stat-set panels stay in the
 	// DOM (hidden), so an unscoped dt lookup can match the wrong set.
 	const statValue = (page: import('@playwright/test').Page, label: string) =>
-		drawer(page)
-			.locator(`sl-tab-panel[active] dt:has-text("${label}") + dd`)
-			.first();
+		drawer(page).locator(`sl-tab-panel[active] dt:has-text("${label}") + dd`).first();
 
 	test('opens from the players table with mapped stats', async ({ page, api }) => {
 		await page.goto('/players');
