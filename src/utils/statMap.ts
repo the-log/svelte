@@ -92,7 +92,9 @@ const rushing: StatGroup = {
 const receiving: StatGroup = {
 	title: 'Receiving',
 	rows: [
-		{ label: 'Rec / Targets', ids: [41, 58], format: 'fraction' },
+		// 41 (receptions) is absent from projected sets; 53 (ESPN's per-reception
+		// scoring counter) duplicates it in actuals and is present everywhere.
+		{ label: 'Rec / Targets', ids: [53, 58], format: 'fraction' },
 		{ label: 'Yards', ids: [42] },
 		{ label: 'Touchdowns', ids: [43] },
 		{ label: 'Yards / reception', ids: [60], format: 'dec1' },

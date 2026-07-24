@@ -33,6 +33,48 @@ const allen: StatSet = {
 	}
 };
 
+const chase: StatSet = {
+	appliedTotal: 313.6,
+	appliedAverage: 19.6,
+	stats: {
+		'23': 3,
+		'24': 14,
+		'39': 4.66666667,
+		'40': 0.875,
+		'41': 125,
+		'42': 1412,
+		'43': 8,
+		'53': 125,
+		'58': 185,
+		'59': 640,
+		'60': 11.296,
+		'61': 88.25,
+		'68': 1,
+		'72': 1,
+		'73': 1,
+		'155': 6,
+		'156': 10,
+		'210': 16,
+		'213': 77
+	}
+};
+
+// Projected sets omit 41 (receptions) and carry only the 53 scoring counter —
+// the reason the Rec / Targets row reads id 53.
+const chaseProjected: StatSet = {
+	stats: {
+		'23': 3.554324183,
+		'24': 19.5647913,
+		'42': 1536.38307,
+		'43': 11.2996368,
+		'53': 116.6923989,
+		'58': 165.3012469,
+		'61': 90.37547473,
+		'210': 17,
+		'213': 72.43635253
+	}
+};
+
 const aubrey: StatSet = {
 	stats: {
 		'74': 11,
@@ -155,6 +197,22 @@ describe('getStatGroups', () => {
 		expect(findRow('QB', allen, 'Interceptions')).toBe('10');
 		expect(findRow('QB', allen, 'Times sacked')).toBe('40');
 		expect(findRow('QB', allen, 'Team record')).toBe('12-5');
+	});
+
+	it('maps WR receiving keys to their verified meanings', () => {
+		expect(findRow('WR', chase, 'Rec / Targets')).toBe('125 / 185');
+		expect(findRow('WR', chase, 'Yards')).toBe('1412');
+		expect(findRow('WR', chase, 'Touchdowns')).toBe('8');
+		expect(findRow('WR', chase, 'Yards after catch')).toBe('640');
+		expect(findRow('WR', chase, 'Yards / reception')).toBe('11.3');
+		expect(findRow('WR', chase, 'Yards / game')).toBe('88.3');
+		expect(findRow('WR', chase, 'First downs')).toBe('77');
+		expect(findRow('WR', chase, 'Team record')).toBe('6-10');
+	});
+
+	it('resolves projected receptions from the 53 counter (41 is absent)', () => {
+		expect(findRow('WR', chaseProjected, 'Rec / Targets')).toBe('117 / 165');
+		expect(findRow('WR', chaseProjected, 'Touchdowns')).toBe('11');
 	});
 
 	it('maps kicking distance splits', () => {

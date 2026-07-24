@@ -14,9 +14,16 @@
 	$effect(() => {
 		if ($statsPlayerStore) drawer?.show();
 	});
+
+	// sl-after-hide bubbles from any Shoelace descendant, and a stale one can
+	// arrive after show() interrupts a closing animation (open a new player
+	// mid-close), so only clear the store for the drawer's own completed hide.
+	function onAfterHide(event: Event) {
+		if (event.target === drawer && !drawer?.open) statsPlayerStore.set(null);
+	}
 </script>
 
-<sl-drawer bind:this={drawer} {label} onsl-after-hide={() => statsPlayerStore.set(null)}>
+<sl-drawer bind:this={drawer} {label} onsl-after-hide={onAfterHide}>
 	{#if $statsPlayerStore?.espn_id}
 		{#key $statsPlayerStore.espn_id}
 			<PlayerStats
