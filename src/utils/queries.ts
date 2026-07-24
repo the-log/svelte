@@ -268,6 +268,7 @@ export default {
           id
         }
         player {
+          espn_id
           name
           position
           team

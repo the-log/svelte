@@ -8,6 +8,7 @@
 	import { isMobile as layoutStore, userStore } from '../../misc/stores';
 	import { onDestroy, onMount } from 'svelte';
 	import RfaActions from '../../components/RfaActions.svelte';
+	import StatsTrigger from '../../components/StatsTrigger.svelte';
 
 	let sortMethod: 'position' | 'team' | 'posrank' | 'ovrrank' = $state('position');
 
@@ -168,7 +169,7 @@
 				<div class="tablegrid-cell tablegrid-thumbcell" {status}>{position}</div>
 			{/if}
 			<div class="tablegrid-cell">
-				{name}
+				<StatsTrigger player={{ espn_id, name, team: nflTeam, position }} />
 				<span class="text-minor"
 					>{nflTeam}
 					{#if isMobile}- {position} (#{pos}){/if}</span

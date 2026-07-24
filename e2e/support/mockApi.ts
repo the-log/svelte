@@ -248,7 +248,7 @@ export class MockApi {
 				return { data: { contracts: data.rfaContracts } };
 
 			case 'stats-by-player':
-				return { data: { player: null } };
+				return { data: { player: data.playerStatsById[variables.id as number] ?? null } };
 
 			case 'all-bids':
 				return { data: { pending: data.pendingBids, published: data.publishedBids } };

@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import Table from '../Table.svelte';
 	import Actions from '../Actions.svelte';
+	import StatsTrigger from '../StatsTrigger.svelte';
 	import { isMobile as layoutStore } from '../../misc/stores';
 	import formatMoney from '../../utils/formatMoney';
 	import type { RosterRow } from '../../types/defs';
@@ -41,7 +42,6 @@
 
 		{#each players as player (player.espn_id)}
 			{@const {
-				name,
 				team: nflTeam,
 				position,
 				salary,
@@ -57,7 +57,7 @@
 					<div class="tablegrid-cell tablegrid-thumbcell" status={playerStatus}>{position}</div>
 				{/if}
 				<div class="tablegrid-cell" status={isMobile ? playerStatus : null}>
-					{name}
+					<StatsTrigger {player} />
 					{#if isMobile}
 						<span class="text-minor">{nflTeam} - {position}</span>
 					{/if}
