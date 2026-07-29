@@ -5,6 +5,7 @@ import {
 	buildLiveWhere,
 	classifyPlayer,
 	GAMES_PER_SEASON,
+	PROJECTION_FLOOR,
 	type DraftPlayer
 } from './draftBoard';
 import type { Position } from '../types/defs';
@@ -54,19 +55,14 @@ function contract(overrides: Partial<NonNullable<DraftPlayer['contract']>> = {})
 }
 
 describe('buildAvailableWhere', () => {
-	it('floors available players to those with a projection by default', () => {
+	it('floors uncontracted players to meaningful projections by default', () => {
 		expect(buildAvailableWhere(false).OR).toEqual([
-			{
-				NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } },
-				pointsThisYearProj: { gt: 0 }
-			}
+			{ contract: null, pointsThisYearProj: { gt: PROJECTION_FLOOR } }
 		]);
 	});
 
-	it('drops the projection floor when unprojected players are requested', () => {
-		expect(buildAvailableWhere(true).OR).toEqual([
-			{ NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } } }
-		]);
+	it('drops the floor when the deep pool is requested', () => {
+		expect(buildAvailableWhere(true).OR).toEqual([{ contract: null }]);
 	});
 });
 
@@ -75,16 +71,12 @@ describe('buildLiveWhere', () => {
 		expect(buildLiveWhere(null).OR).toEqual([{ contract: { status: { equals: 'rfa' } } }]);
 	});
 
-	it('adds the owner roster branch only when a team id is known', () => {
+	it('adds the whole owner team only when a team id is known', () => {
 		const where = buildLiveWhere('team-1');
 
 		expect(where.OR).toHaveLength(2);
-		expect(where.OR[1]).toEqual({
-			contract: {
-				team: { id: { equals: 'team-1' } },
-				status: { in: ['active', 'dts', 'ir'] }
-			}
-		});
+		// No status filter: the owner's waived dead cap belongs on the board too.
+		expect(where.OR[1]).toEqual({ contract: { team: { id: { equals: 'team-1' } } } });
 		expect(buildLiveWhere(undefined).OR).toHaveLength(1);
 		expect(buildLiveWhere('').OR).toHaveLength(1);
 	});
@@ -115,11 +107,11 @@ describe('classifyPlayer', () => {
 });
 
 describe('buildDraftBoard', () => {
-	it('orders groups by positionWeight and rows by projected overall rank', () => {
+	it('orders groups by positionWeight and rows by projected position rank', () => {
 		const groups = buildDraftBoard([
-			player({ name: 'Late QB', position: 'QB', overallRankProj: 40 }),
-			player({ name: 'Top RB', position: 'RB', overallRankProj: 3 }),
-			player({ name: 'Top QB', position: 'QB', overallRankProj: 2 })
+			player({ name: 'Late QB', position: 'QB', positionRankProj: 40 }),
+			player({ name: 'Top RB', position: 'RB', positionRankProj: 3 }),
+			player({ name: 'Top QB', position: 'QB', positionRankProj: 2 })
 		]);
 
 		expect(groups.map((g) => g.label)).toEqual(['Quarterbacks', 'Running Backs']);
@@ -128,9 +120,9 @@ describe('buildDraftBoard', () => {
 
 	it('sends unranked players to the bottom of their group', () => {
 		const groups = buildDraftBoard([
-			player({ name: 'Unranked', overallRankProj: null, pointsThisYearProj: 500 }),
-			player({ name: 'Rank Zero', overallRankProj: 0, pointsThisYearProj: 400 }),
-			player({ name: 'Ranked', overallRankProj: 90, pointsThisYearProj: 10 })
+			player({ name: 'Unranked', positionRankProj: null, pointsThisYearProj: 500 }),
+			player({ name: 'Rank Zero', positionRankProj: 0, pointsThisYearProj: 400 }),
+			player({ name: 'Ranked', positionRankProj: 90, pointsThisYearProj: 10 })
 		]);
 
 		expect(groups[0].rows.map((r) => r.name)).toEqual(['Ranked', 'Unranked', 'Rank Zero']);
@@ -138,10 +130,10 @@ describe('buildDraftBoard', () => {
 
 	it('merges shared-weight positions into one labeled group', () => {
 		const groups = buildDraftBoard([
-			player({ name: 'Edge', position: 'DE', overallRankProj: 10 }),
-			player({ name: 'Nose', position: 'DT', overallRankProj: 20 }),
-			player({ name: 'Corner', position: 'CB', overallRankProj: 5 }),
-			player({ name: 'Safety', position: 'S', overallRankProj: 15 })
+			player({ name: 'Edge', position: 'DE', positionRankProj: 10 }),
+			player({ name: 'Nose', position: 'DT', positionRankProj: 20 }),
+			player({ name: 'Corner', position: 'CB', positionRankProj: 5 }),
+			player({ name: 'Safety', position: 'S', positionRankProj: 15 })
 		]);
 
 		expect(groups.map((g) => g.label)).toEqual(['Defensive Line', 'Defensive Backs']);
@@ -151,9 +143,9 @@ describe('buildDraftBoard', () => {
 
 	it('computes dropoff against the row above within the group only', () => {
 		const groups = buildDraftBoard([
-			player({ name: 'QB1', position: 'QB', overallRankProj: 1, pointsThisYearProj: 320 }),
-			player({ name: 'QB2', position: 'QB', overallRankProj: 8, pointsThisYearProj: 286 }),
-			player({ name: 'RB1', position: 'RB', overallRankProj: 2, pointsThisYearProj: 300 })
+			player({ name: 'QB1', position: 'QB', positionRankProj: 1, pointsThisYearProj: 320 }),
+			player({ name: 'QB2', position: 'QB', positionRankProj: 8, pointsThisYearProj: 286 }),
+			player({ name: 'RB1', position: 'RB', positionRankProj: 2, pointsThisYearProj: 300 })
 		]);
 
 		const [qb1, qb2] = groups[0].rows;
@@ -168,8 +160,8 @@ describe('buildDraftBoard', () => {
 
 	it('can report a negative dropoff when rank order disagrees with projections', () => {
 		const groups = buildDraftBoard([
-			player({ name: 'QB1', overallRankProj: 1, pointsThisYearProj: 250 }),
-			player({ name: 'QB2', overallRankProj: 2, pointsThisYearProj: 280 })
+			player({ name: 'QB1', positionRankProj: 1, pointsThisYearProj: 250 }),
+			player({ name: 'QB2', positionRankProj: 2, pointsThisYearProj: 280 })
 		]);
 
 		expect(groups[0].rows[1].dropoffYear).toBeCloseTo(-30);
@@ -179,17 +171,17 @@ describe('buildDraftBoard', () => {
 		const groups = buildDraftBoard([
 			player({
 				name: 'Signed',
-				overallRankProj: 1,
+				positionRankProj: 1,
 				pointsThisYearProj: 320,
 				contract: contract({ salary: 15000 })
 			}),
 			player({
 				name: 'Tagged',
-				overallRankProj: 2,
+				positionRankProj: 2,
 				pointsThisYearProj: 200,
 				contract: contract({ status: 'rfa', salary: 12000 })
 			}),
-			player({ name: 'Unsigned', overallRankProj: 3, pointsThisYearProj: 100 })
+			player({ name: 'Unsigned', positionRankProj: 3, pointsThisYearProj: 100 })
 		]);
 
 		const [signed, tagged, unsigned] = groups[0].rows;
@@ -202,12 +194,12 @@ describe('buildDraftBoard', () => {
 		const groups = buildDraftBoard([
 			player({
 				name: 'Waived',
-				overallRankProj: 1,
+				positionRankProj: 1,
 				contract: contract({ status: 'waived' })
 			}),
 			player({
 				name: 'No Projection',
-				overallRankProj: 2,
+				positionRankProj: 2,
 				pointsThisYearProj: 0,
 				contract: contract()
 			})

@@ -47,12 +47,19 @@ test.describe('draft board', () => {
 		await expect(monroe).toContainText('RFA · NSH');
 	});
 
-	test('shows waived players as free agents without a live contract', async ({ page }) => {
+	test("shows the owner's waived dead cap but hides other teams' waived players", async ({
+		page
+	}) => {
 		await page.goto('/draft');
 
+		// Knox was waived by the owner's own team, so he rides the live pool.
 		const knox = row(page, 'Kellen Knox');
 		await expect(knox).toHaveAttribute('data-group', 'fa');
 		await expect(knox).toContainText('waived · SCR');
+
+		// Vale was waived by Portland: he still has a contract, so he's neither
+		// uncontracted nor the owner's, and stays off the board.
+		await expect(row(page, 'Victor Vale')).toHaveCount(0);
 	});
 
 	test('the projections toggle refetches and reveals unprojected players', async ({
@@ -76,8 +83,8 @@ test.describe('draft board', () => {
 		const staticWheres = api
 			.callsTo('draft-board')
 			.map((call) => (call.variables.where as { OR: Record<string, unknown>[] }).OR)
-			.filter((or) => or.length === 1 && 'NOT' in or[0]);
-		expect(staticWheres.at(0)?.[0]).toHaveProperty('pointsThisYearProj', { gt: 0 });
+			.filter((or) => or.length === 1 && or[0].contract === null);
+		expect(staticWheres.at(0)?.[0]).toHaveProperty('pointsThisYearProj', { gt: 50 });
 		expect(staticWheres.at(-1)?.[0]).not.toHaveProperty('pointsThisYearProj');
 	});
 });

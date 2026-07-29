@@ -8,7 +8,8 @@
 		buildLiveWhere,
 		type DraftBoardGroup,
 		type DraftBoardRow,
-		type DraftPlayer
+		type DraftPlayer,
+		PROJECTION_FLOOR
 	} from '../../utils/draftBoard';
 	import Table from '../../components/Table.svelte';
 	import StatsTrigger from '../../components/StatsTrigger.svelte';
@@ -17,13 +18,13 @@
 
 	let groups: DraftBoardGroup[] = $state([]);
 	let loaded = $state(false);
-	let includeUnprojected = $state(false);
+	let includeDeepPool = $state(false);
 	let teamID: string | number | null = null;
 
 	// The board is two pools with very different churn. The static pool
-	// (available players) doesn't move during the RFA auction, so it's fetched
-	// once per visit and again when the projections toggle changes. The live
-	// pool (RFA contracts + the owner's roster) is where bids land, so it's
+	// (uncontracted players) doesn't move during the RFA auction, so it's
+	// fetched once per visit and again when the deep-pool toggle changes. The
+	// live pool (RFA contracts + the owner's team) is where bids land, so it's
 	// small and polled frequently. Each pool guards against its own responses
 	// resolving out of order; only the most recently issued request may write.
 	let staticPool: DraftPlayer[] = [];
@@ -39,7 +40,7 @@
 	let staticSeq = 0;
 	const fetchStaticPool = () => {
 		const seq = ++staticSeq;
-		const where = buildAvailableWhere(includeUnprojected);
+		const where = buildAvailableWhere(includeDeepPool);
 		runQuery(queries['draft-board'], { where }).then(({ data }) => {
 			if (seq !== staticSeq || !data?.players) return;
 			staticPool = data.players;
@@ -60,8 +61,8 @@
 		});
 	};
 
-	const onProjectedToggle = (event: Event) => {
-		includeUnprojected = (event.target as HTMLInputElement).checked;
+	const onDeepPoolToggle = (event: Event) => {
+		includeDeepPool = (event.target as HTMLInputElement).checked;
 		fetchStaticPool();
 	};
 
@@ -120,8 +121,8 @@
 		<li data-group="rfa">Restricted free agent</li>
 		<li data-group="fa">Free agent</li>
 	</ul>
-	<sl-switch size="small" onsl-change={onProjectedToggle}>
-		Include players without projections
+	<sl-switch size="small" onsl-change={onDeepPoolToggle}>
+		Include players under {PROJECTION_FLOOR} projected points
 	</sl-switch>
 </div>
 

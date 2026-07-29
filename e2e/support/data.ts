@@ -248,6 +248,19 @@ export const draftPoolExtras: MockPlayer[] = [
 		overallRankProj: 0,
 		pointsLastYear: 5,
 		pointsThisYearProj: 0
+	}),
+	// Waived by a team that isn't the logged-in owner's: must never reach the
+	// board (not uncontracted, not rfa, not the owner's team).
+	player({
+		espn_id: 502,
+		name: 'Victor Vale',
+		team: 'SF',
+		position: 'WR',
+		positionRankProj: 18,
+		overallRankProj: 70,
+		pointsLastYear: 150,
+		pointsThisYearProj: 160,
+		contract: { id: 'c-pdx-w1', team: teams.portland, salary: 2000, years: 1, status: 'waived' }
 	})
 ];
 

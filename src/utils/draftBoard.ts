@@ -6,12 +6,11 @@ export const GAMES_PER_SEASON = 17;
 /** Contract statuses that keep a player on a team's roster. */
 const ROSTER_STATUSES = ['active', 'dts', 'ir'];
 
-/**
- * Statuses that make a player unavailable for the draft. Waived contracts are
- * deliberately absent: a waived player is dead cap for the old team but a free
- * agent on the board (same semantics as the players page availability filter).
- */
-const UNAVAILABLE_STATUSES = [...ROSTER_STATUSES, 'rfa'];
+/** Contract statuses whose salary is a live commitment, worth a $/pt figure. */
+const CAP_STATUSES = [...ROSTER_STATUSES, 'rfa'];
+
+/** Free agents projected under this are deep-pool noise, hidden by default. */
+export const PROJECTION_FLOOR = 50;
 
 /** Player shape returned by the draft-board query. */
 export interface DraftPlayer {
@@ -53,38 +52,33 @@ export interface DraftBoardGroup {
 }
 
 /**
- * PlayerWhereInput for the board's static pool: available players — no
- * contract, or only a waived one. This pool doesn't move during the RFA
- * auction (all the action is rfa → active), so it's fetched once per visit.
- * Until the projections toggle is flipped, players with no projected points
- * are filtered out server-side — they're practice-squad noise on a big board.
+ * PlayerWhereInput for the board's static pool: strictly uncontracted players
+ * (waived players carry a contract, so another team's waived dead cap stays
+ * off the board). This pool doesn't move during the RFA auction — all the
+ * action is rfa → active — so it's fetched once per visit. Until the deep-pool
+ * toggle is flipped, free agents under PROJECTION_FLOOR are filtered out
+ * server-side.
  */
-export function buildAvailableWhere(includeUnprojected: boolean) {
-	const available: Record<string, unknown> = {
-		NOT: { contract: { status: { in: UNAVAILABLE_STATUSES } } }
-	};
-	if (!includeUnprojected) {
-		available.pointsThisYearProj = { gt: 0 };
+export function buildAvailableWhere(includeDeepPool: boolean) {
+	const available: Record<string, unknown> = { contract: null };
+	if (!includeDeepPool) {
+		available.pointsThisYearProj = { gt: PROJECTION_FLOOR };
 	}
 
 	return { OR: [available] };
 }
 
 /**
- * PlayerWhereInput for the board's live pool: RFA contracts plus the owner's
- * roster. This is the small, fast-moving slice — auction bids convert these
- * rows from rfa to active — so it's the one worth polling frequently.
+ * PlayerWhereInput for the board's live pool: RFA contracts plus everything on
+ * the owner's team, waived dead cap included. This is the small, fast-moving
+ * slice — auction bids convert these rows from rfa to active — so it's the
+ * one worth polling frequently.
  */
 export function buildLiveWhere(teamID: string | number | null | undefined) {
 	const OR: Record<string, unknown>[] = [{ contract: { status: { equals: 'rfa' } } }];
 
 	if (teamID != null && teamID !== '') {
-		OR.push({
-			contract: {
-				team: { id: { equals: teamID } },
-				status: { in: ROSTER_STATUSES }
-			}
-		});
+		OR.push({ contract: { team: { id: { equals: teamID } } } });
 	}
 
 	return { OR };
@@ -128,7 +122,7 @@ export function buildDraftBoard(players: DraftPlayer[]): DraftBoardGroup[] {
 	const sorted = [...players].sort(
 		(a, b) =>
 			a.positionWeight - b.positionWeight ||
-			rankOrLast(a.overallRankProj) - rankOrLast(b.overallRankProj) ||
+			rankOrLast(a.positionRankProj) - rankOrLast(b.positionRankProj) ||
 			(b.pointsThisYearProj ?? 0) - (a.pointsThisYearProj ?? 0) ||
 			a.name.localeCompare(b.name)
 	);
@@ -148,7 +142,7 @@ export function buildDraftBoard(players: DraftPlayer[]): DraftBoardGroup[] {
 			: null;
 
 		const { contract, pointsThisYearProj } = player;
-		const countsAgainstCap = contract && UNAVAILABLE_STATUSES.includes(contract.status);
+		const countsAgainstCap = contract && CAP_STATUSES.includes(contract.status);
 		const centsPerPoint =
 			countsAgainstCap && pointsThisYearProj ? contract.salary / pointsThisYearProj : null;
 

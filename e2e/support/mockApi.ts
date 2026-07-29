@@ -78,8 +78,7 @@ interface DraftBoardBranch {
 	contract?: {
 		status?: { equals?: string; in?: string[] };
 		team?: { id?: { equals?: string } };
-	};
-	NOT?: { contract?: { status?: { in?: string[] } } };
+	} | null;
 	pointsThisYearProj?: { gt?: number };
 }
 
@@ -421,8 +420,8 @@ export class MockApi {
 	}
 
 	// Interprets the OR-of-branches filters the draft page builds (see
-	// buildAvailableWhere/buildLiveWhere): available players optionally floored
-	// to those with a projection, and rfa contracts + the owner's roster.
+	// buildAvailableWhere/buildLiveWhere): uncontracted players optionally
+	// floored to a minimum projection, and rfa contracts + the owner's team.
 	private resolveDraftBoard(variables: Vars): object {
 		const where = (variables.where ?? {}) as { OR?: DraftBoardBranch[] };
 		const branches = where.OR ?? [];
@@ -441,8 +440,14 @@ export class MockApi {
 		};
 
 		const branchMatches = (player: data.MockPlayer, branch: DraftBoardBranch) => {
-			if (branch.contract && !contractMatches(player, branch.contract)) return false;
-			if (branch.NOT?.contract && contractMatches(player, branch.NOT.contract)) return false;
+			if ('contract' in branch) {
+				// `contract: null` is Keystone's "has no contract at all".
+				if (branch.contract === null) {
+					if (player.contract) return false;
+				} else if (!contractMatches(player, branch.contract!)) {
+					return false;
+				}
+			}
 			if (
 				branch.pointsThisYearProj?.gt !== undefined &&
 				player.pointsThisYearProj <= branch.pointsThisYearProj.gt
