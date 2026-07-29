@@ -68,6 +68,18 @@
 				{/if}
 			</sl-tooltip>
 		</li>
+		{#if offSeason.includes(phase)}
+			<li>
+				<sl-tooltip content="Draft Board" placement="right">
+					<sl-icon-button
+						src="/icons/draft-board.svg"
+						label="Draft Board"
+						href="/draft"
+						class:is-active={isActive('/draft')}
+					></sl-icon-button>
+				</sl-tooltip>
+			</li>
+		{/if}
 		<li>
 			<sl-tooltip content="Rulebook" placement="right">
 				<sl-icon-button

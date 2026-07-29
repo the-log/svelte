@@ -10,6 +10,7 @@ test.describe('site navigation', () => {
 		await expect(page.getByLabel('Rulebook')).toBeVisible();
 		await expect(page.getByLabel('Free Agency', { exact: true })).toBeVisible();
 		await expect(page.getByLabel('Restricted Free Agency')).toHaveCount(0);
+		await expect(page.getByLabel('Draft Board')).toHaveCount(0);
 	});
 
 	test('off-season nav swaps Free Agency for RFA', async ({ page, api }) => {
@@ -18,6 +19,7 @@ test.describe('site navigation', () => {
 		await page.goto('/');
 
 		await expect(page.getByLabel('Restricted Free Agency')).toBeVisible();
+		await expect(page.getByLabel('Draft Board')).toBeVisible();
 		await expect(page.getByLabel('Free Agency', { exact: true })).toHaveCount(0);
 	});
 

@@ -234,6 +234,36 @@ export default {
       }
     }
   `,
+	'draft-board': `
+    query ($where: PlayerWhereInput!) {
+      players (
+        where: $where
+      ) {
+        espn_id
+        name
+        team
+        position
+        positionWeight
+        injuryStatus
+        positionRankProj
+        overallRankProj
+        pointsLastYear
+        pointsThisYearProj
+        contract {
+          id
+          status
+          salary
+          years
+          isFranchiseTagged
+          team {
+            id
+            name
+            abbreviation
+          }
+        }
+      }
+    }
+  `,
 	'stats-by-player': `
     query ($id: Int) {
       player (
