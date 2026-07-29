@@ -1,32 +1,46 @@
 import { expect, test } from './support/mockApi';
 
-// The draft board unions three player pools (RFA contracts, the owner's
-// roster, uncontracted free agents), sorts them into position groups, and
+// The draft board unions three player pools (RFA contracts, the owner's team,
+// uncontracted free agents), splits them into position-group tabs, and
 // computes dropoff and $/pt columns client-side (src/utils/draftBoard.ts).
 test.describe('draft board', () => {
 	const row = (page: import('@playwright/test').Page, name: string) =>
 		page.locator('.tablegrid-row[data-player-id]', { hasText: name });
 
-	test('unions RFAs, the owner roster, and free agents; hides other rosters', async ({ page }) => {
+	test('unions RFAs, the owner team, and free agents; hides other rosters', async ({ page }) => {
 		await page.goto('/draft');
 
-		// One player from each pool, each tagged with its group.
+		// One player from each pool, each tagged with its group. The owner's own
+		// RFAs are distinguished from the rest of the league's.
 		await expect(row(page, 'Aaron Ashford')).toHaveAttribute('data-group', 'roster');
 		await expect(row(page, 'Marcus Monroe')).toHaveAttribute('data-group', 'rfa');
+		await expect(row(page, 'Nolan Nash')).toHaveAttribute('data-group', 'rfa-team');
 		await expect(row(page, 'Blake Bradford')).toHaveAttribute('data-group', 'fa');
 
 		// Players under contract with other teams stay off the board.
 		await expect(row(page, 'Carter Callahan')).toHaveCount(0);
 		await expect(row(page, 'Felix Fontaine')).toHaveCount(0);
+	});
 
-		await expect(page.locator('h2', { hasText: 'Quarterbacks' })).toBeVisible();
-		await expect(page.locator('h2', { hasText: 'Defensive Line' })).toBeVisible();
+	test('splits position groups into tabs', async ({ page }) => {
+		await page.goto('/draft');
+
+		await expect(page.getByRole('tab', { name: 'Quarterbacks' })).toBeVisible();
+		await expect(page.getByRole('tab', { name: 'Defensive Line' })).toBeVisible();
+
+		// The first tab (QBs) is active; other groups exist but are hidden.
+		await expect(row(page, 'Aaron Ashford')).toBeVisible();
+		await expect(row(page, 'Blake Bradford')).not.toBeVisible();
+
+		await page.getByRole('tab', { name: 'Running Backs' }).click();
+		await expect(row(page, 'Blake Bradford')).toBeVisible();
+		await expect(row(page, 'Aaron Ashford')).not.toBeVisible();
 	});
 
 	test('sorts by position weight then projected rank, with computed columns', async ({ page }) => {
 		await page.goto('/draft');
 
-		// QBs carry the lowest positionWeight, ordered by overallRankProj.
+		// QBs carry the lowest positionWeight, ordered by positionRankProj.
 		const playerRows = page.locator('.tablegrid-row[data-player-id]');
 		await expect(playerRows.nth(0)).toContainText('Aaron Ashford');
 		await expect(playerRows.nth(1)).toContainText('Marcus Monroe');
@@ -51,9 +65,11 @@ test.describe('draft board', () => {
 		page
 	}) => {
 		await page.goto('/draft');
+		await page.getByRole('tab', { name: 'Defensive Backs' }).click();
 
 		// Knox was waived by the owner's own team, so he rides the live pool.
 		const knox = row(page, 'Kellen Knox');
+		await expect(knox).toBeVisible();
 		await expect(knox).toHaveAttribute('data-group', 'fa');
 		await expect(knox).toContainText('waived · SCR');
 
@@ -62,13 +78,11 @@ test.describe('draft board', () => {
 		await expect(row(page, 'Victor Vale')).toHaveCount(0);
 	});
 
-	test('the projections toggle refetches and reveals unprojected players', async ({
-		page,
-		api
-	}) => {
+	test('the deep-pool toggle refetches and reveals unprojected players', async ({ page, api }) => {
 		await page.goto('/draft');
+		await page.getByRole('tab', { name: 'Defensive Line' }).click();
 
-		await expect(row(page, 'Aaron Ashford')).toBeVisible();
+		await expect(row(page, 'Elliot Eastwood')).toBeVisible();
 		await expect(row(page, 'Uri Underwood')).toHaveCount(0);
 
 		await page.locator('sl-switch').click();

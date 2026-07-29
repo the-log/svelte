@@ -8,6 +8,7 @@
 		buildLiveWhere,
 		type DraftBoardGroup,
 		type DraftBoardRow,
+		type DraftGroup,
 		type DraftPlayer,
 		PROJECTION_FLOOR
 	} from '../../utils/draftBoard';
@@ -33,7 +34,7 @@
 	let liveLoaded = false;
 
 	const rebuild = () => {
-		groups = buildDraftBoard([...staticPool, ...livePool]);
+		groups = buildDraftBoard([...staticPool, ...livePool], teamID);
 		loaded = staticLoaded && liveLoaded;
 	};
 
@@ -100,6 +101,12 @@
 
 	const oneDecimal = (value: number | null | undefined) => (value == null ? '—' : value.toFixed(1));
 
+	const GROUP_CHIPS: Partial<Record<DraftGroup, string>> = {
+		roster: 'Roster',
+		'rfa-team': 'Your RFA',
+		rfa: 'RFA'
+	};
+
 	function contractSummary(row: DraftBoardRow): string {
 		const { contract } = row;
 		if (!contract) return '';
@@ -118,7 +125,8 @@
 <div class="board-controls">
 	<ul class="legend">
 		<li data-group="roster">Your roster</li>
-		<li data-group="rfa">Restricted free agent</li>
+		<li data-group="rfa-team">Your RFAs</li>
+		<li data-group="rfa">League RFAs</li>
 		<li data-group="fa">Free agent</li>
 	</ul>
 	<sl-switch size="small" onsl-change={onDeepPoolToggle}>
@@ -130,83 +138,108 @@
 	<p>No draft-eligible players found.</p>
 {/if}
 
-<Table columns={isMobile ? 2 : 7}>
-	<div class="tablegrid-header tablegrid-row">
-		{#if !isMobile}
-			<div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
-		{/if}
-		<div class="tablegrid-cell">Name</div>
-		{#if !isMobile}
-			<div class="tablegrid-cell">Proj Rank</div>
-		{/if}
-		<div class="tablegrid-cell">Points<span class="text-minor">last yr / proj</span></div>
-		{#if !isMobile}
-			<div class="tablegrid-cell">Contract</div>
-			<div class="tablegrid-cell">Dropoff<span class="text-minor">season / game</span></div>
-			<div class="tablegrid-cell">$ / Pt</div>
-		{/if}
-	</div>
-	{#each groups as group (group.weight)}
-		<div class="tablegrid-row group-header">
-			<h2 class="tablegrid-cell">{group.label}</h2>
-		</div>
-		{#each group.rows as row (row.espn_id)}
-			{@const { espn_id, name, team, position, contract } = row}
-			<div class="tablegrid-row" data-group={row.group} data-player-id={espn_id}>
-				{#if !isMobile}
-					<div class="tablegrid-cell tablegrid-thumbcell" status={row.injuryStatus.toLowerCase()}>
-						{position}
-					</div>
-				{/if}
-				<div class="tablegrid-cell">
-					<StatsTrigger player={{ espn_id, name, team, position }} />
-					<span class="text-minor">
-						{team} - {position} #{row.positionRankProj || '—'}
-						{#if isMobile && contract}
-							· {contract.status === 'rfa' ? 'RFA' : contract.status}
-							{formatMoney(contract.salary)}{/if}
-					</span>
-				</div>
-				{#if !isMobile}
-					<div class="tablegrid-cell">
-						#{row.overallRankProj || '—'}
-						<span class="text-minor">#{row.positionRankProj || '—'} {position}</span>
-					</div>
-				{/if}
-				<div class="tablegrid-cell">
-					{oneDecimal(row.pointsLastYear)} / {oneDecimal(row.pointsThisYearProj)}
-					{#if isMobile}
-						<span class="text-minor">
-							drop {oneDecimal(row.dropoffYear)}
-						</span>
-					{/if}
-				</div>
-				{#if !isMobile}
-					<div class="tablegrid-cell">
-						{#if contract && contract.status !== 'waived'}
-							{formatMoney(contract.salary)}
-							{#if contract.isFranchiseTagged}<span class="ft">FT</span>{/if}
-						{:else}
-							—
-						{/if}
-						<span class="text-minor">{contractSummary(row)}</span>
-					</div>
-					<div class="tablegrid-cell">
-						{oneDecimal(row.dropoffYear)}
-						<span class="text-minor">
-							{row.dropoffPerGame == null ? '—' : row.dropoffPerGame.toFixed(2)} / gm
-						</span>
-					</div>
-					<div class="tablegrid-cell">
-						{row.centsPerPoint == null ? '—' : formatMoney(row.centsPerPoint)}
-					</div>
-				{/if}
-			</div>
+<!-- Mount the tab group only after both pools have loaded: a tab group that
+     upgrades empty never activates a tab, and one that renders from a partial
+     pool loses its active tab when the remaining groups splice in. Later
+     rebuilds keep the same keyed group set, so the active tab survives. -->
+{#if loaded && groups.length}
+	<sl-tab-group>
+		{#each groups as group (group.weight)}
+			<sl-tab slot="nav" panel="pos-{group.weight}">{group.label}</sl-tab>
 		{/each}
-	{/each}
-</Table>
+		{#each groups as group (group.weight)}
+			<sl-tab-panel name="pos-{group.weight}">
+				<Table columns={isMobile ? 2 : 7}>
+					<div class="tablegrid-header tablegrid-row">
+						{#if !isMobile}
+							<div class="tablegrid-cell"><span class="visually-hidden">Position</span></div>
+						{/if}
+						<div class="tablegrid-cell">Name</div>
+						{#if !isMobile}
+							<div class="tablegrid-cell">Proj Rank</div>
+						{/if}
+						<div class="tablegrid-cell">Points<span class="text-minor">last yr / proj</span></div>
+						{#if !isMobile}
+							<div class="tablegrid-cell">Contract</div>
+							<div class="tablegrid-cell">Dropoff<span class="text-minor">season / game</span></div>
+							<div class="tablegrid-cell">$ / Pt</div>
+						{/if}
+					</div>
+					{#each group.rows as row (row.espn_id)}
+						{@const { espn_id, name, team, position, contract } = row}
+						<div class="tablegrid-row" data-group={row.group} data-player-id={espn_id}>
+							{#if !isMobile}
+								<div
+									class="tablegrid-cell tablegrid-thumbcell"
+									status={row.injuryStatus.toLowerCase()}
+								>
+									{position}
+								</div>
+							{/if}
+							<div class="tablegrid-cell">
+								<StatsTrigger player={{ espn_id, name, team, position }} />
+								<span class="text-minor">
+									{team} - {position} #{row.positionRankProj || '—'}
+									{#if isMobile && contract}
+										· {contract.status === 'rfa' ? 'RFA' : contract.status}
+										{formatMoney(contract.salary)}{/if}
+								</span>
+								{#if GROUP_CHIPS[row.group]}
+									<span class="chip" data-group={row.group}>{GROUP_CHIPS[row.group]}</span>
+								{/if}
+							</div>
+							{#if !isMobile}
+								<div class="tablegrid-cell">
+									#{row.overallRankProj || '—'}
+									<span class="text-minor">#{row.positionRankProj || '—'} {position}</span>
+								</div>
+							{/if}
+							<div class="tablegrid-cell">
+								{oneDecimal(row.pointsLastYear)} / {oneDecimal(row.pointsThisYearProj)}
+								{#if isMobile}
+									<span class="text-minor">
+										drop {oneDecimal(row.dropoffYear)}
+									</span>
+								{/if}
+							</div>
+							{#if !isMobile}
+								<div class="tablegrid-cell">
+									{#if contract && contract.status !== 'waived'}
+										{formatMoney(contract.salary)}
+										{#if contract.isFranchiseTagged}<span class="ft">FT</span>{/if}
+									{:else}
+										—
+									{/if}
+									<span class="text-minor">{contractSummary(row)}</span>
+								</div>
+								<div class="tablegrid-cell">
+									{oneDecimal(row.dropoffYear)}
+									<span class="text-minor">
+										{row.dropoffPerGame == null ? '—' : row.dropoffPerGame.toFixed(2)} / gm
+									</span>
+								</div>
+								<div class="tablegrid-cell">
+									{row.centsPerPoint == null ? '—' : formatMoney(row.centsPerPoint)}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</Table>
+			</sl-tab-panel>
+		{/each}
+	</sl-tab-group>
+{/if}
 
 <style lang="scss">
+	// One hue per pool, used consistently by the legend, row edges, and chips.
+	// Both --color-accent vars are primary blues, so the RFA pools pull from
+	// the Shoelace palette instead to stay distinguishable.
+	$group-colors: (
+		'roster': var(--sl-color-primary-400),
+		'rfa-team': var(--sl-color-success-500),
+		'rfa': var(--sl-color-warning-500)
+	);
+
 	.board-controls {
 		display: flex;
 		flex-wrap: wrap;
@@ -235,23 +268,10 @@
 			background: var(--color-bg--3);
 		}
 
-		li[data-group='roster']::before {
-			background: var(--color-accent--1);
-		}
-
-		li[data-group='rfa']::before {
-			background: goldenrod;
-		}
-	}
-
-	.group-header {
-		background: none;
-
-		h2 {
-			margin: 0;
-			padding-top: 2rem;
-			grid-column: 1 / -1;
-			font-size: 1.1rem;
+		@each $group, $color in $group-colors {
+			li[data-group='#{$group}']::before {
+				background: #{$color};
+			}
 		}
 	}
 
@@ -259,16 +279,43 @@
 		font-weight: normal;
 	}
 
+	.chip {
+		margin-top: 0.25rem;
+		font-size: 0.7rem;
+		line-height: 1.4;
+		padding: 0 0.5em;
+		border: 1px solid currentColor;
+		border-radius: 1em;
+		width: fit-content;
+	}
+
+	.tablegrid-row[data-group] {
+		border-left: 4px solid transparent;
+	}
+
+	@each $group, $color in $group-colors {
+		.tablegrid-row[data-group='#{$group}'] {
+			border-left-color: #{$color};
+		}
+
+		.chip[data-group='#{$group}'] {
+			color: #{$color};
+		}
+	}
+
+	// Tint only the owner's rows: the league-wide RFA pool is most of the
+	// board, and tinting it too would just move the noise floor up.
 	.tablegrid-row[data-group='roster'] {
-		border-left: 3px solid var(--color-accent--1);
+		background: color-mix(in srgb, var(--sl-color-primary-400) 9%, var(--color-bg--3));
 	}
 
-	.tablegrid-row[data-group='rfa'] {
-		border-left: 3px solid goldenrod;
+	.tablegrid-row[data-group='rfa-team'] {
+		background: color-mix(in srgb, var(--sl-color-success-500) 9%, var(--color-bg--3));
 	}
 
-	.tablegrid-row[data-group='fa'] {
-		border-left: 3px solid transparent;
+	sl-tab-panel::part(base) {
+		padding: 0;
+		padding-top: 1rem;
 	}
 
 	[status] {

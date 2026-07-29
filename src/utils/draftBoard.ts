@@ -34,7 +34,8 @@ export interface DraftPlayer {
 	} | null;
 }
 
-export type DraftGroup = 'roster' | 'rfa' | 'fa';
+/** rfa-team: an RFA contract held by the owner's own team. */
+export type DraftGroup = 'roster' | 'rfa-team' | 'rfa' | 'fa';
 
 export interface DraftBoardRow extends DraftPlayer {
 	group: DraftGroup;
@@ -84,10 +85,13 @@ export function buildLiveWhere(teamID: string | number | null | undefined) {
 	return { OR };
 }
 
-export function classifyPlayer(player: DraftPlayer): DraftGroup {
-	const status = player.contract?.status;
-	if (status === 'rfa') return 'rfa';
-	if (status && ROSTER_STATUSES.includes(status)) return 'roster';
+export function classifyPlayer(player: DraftPlayer, teamID?: string | number | null): DraftGroup {
+	const { contract } = player;
+	if (contract?.status === 'rfa') {
+		const isOwn = teamID != null && String(contract.team.id) === String(teamID);
+		return isOwn ? 'rfa-team' : 'rfa';
+	}
+	if (contract && ROSTER_STATUSES.includes(contract.status)) return 'roster';
 	return 'fa';
 }
 
@@ -114,11 +118,14 @@ function groupLabel(positions: Set<string>): string {
 const rankOrLast = (rank: number | null | undefined) => (rank ? rank : Number.MAX_SAFE_INTEGER);
 
 /**
- * Sort players by positionWeight then projected overall rank (unranked players
+ * Sort players by positionWeight then projected position rank (unranked players
  * last), compute the per-row dropoff and $/pt values, and split the result
  * into position groups ready to render.
  */
-export function buildDraftBoard(players: DraftPlayer[]): DraftBoardGroup[] {
+export function buildDraftBoard(
+	players: DraftPlayer[],
+	teamID?: string | number | null
+): DraftBoardGroup[] {
 	const sorted = [...players].sort(
 		(a, b) =>
 			a.positionWeight - b.positionWeight ||
@@ -148,7 +155,7 @@ export function buildDraftBoard(players: DraftPlayer[]): DraftBoardGroup[] {
 
 		group.rows.push({
 			...player,
-			group: classifyPlayer(player),
+			group: classifyPlayer(player, teamID),
 			dropoffYear,
 			dropoffPerGame: dropoffYear === null ? null : dropoffYear / GAMES_PER_SEASON,
 			centsPerPoint

@@ -104,6 +104,14 @@ describe('classifyPlayer', () => {
 			'fa'
 		);
 	});
+
+	it("marks the owner's own RFA contracts when a team id is provided", () => {
+		const rfa = player({ name: 'G', contract: contract({ status: 'rfa' }) });
+
+		expect(classifyPlayer(rfa, 'team-1')).toBe('rfa-team');
+		expect(classifyPlayer(rfa, 'team-2')).toBe('rfa');
+		expect(classifyPlayer(rfa)).toBe('rfa');
+	});
 });
 
 describe('buildDraftBoard', () => {
@@ -139,6 +147,15 @@ describe('buildDraftBoard', () => {
 		expect(groups.map((g) => g.label)).toEqual(['Defensive Line', 'Defensive Backs']);
 		expect(groups[0].rows.map((r) => r.name)).toEqual(['Edge', 'Nose']);
 		expect(groups[1].rows.map((r) => r.name)).toEqual(['Corner', 'Safety']);
+	});
+
+	it('passes the team id through to row classification', () => {
+		const groups = buildDraftBoard(
+			[player({ name: 'Own RFA', contract: contract({ status: 'rfa' }) })],
+			'team-1'
+		);
+
+		expect(groups[0].rows[0].group).toBe('rfa-team');
 	});
 
 	it('computes dropoff against the row above within the group only', () => {
