@@ -420,9 +420,9 @@ export class MockApi {
 		};
 	}
 
-	// Interprets the OR-of-branches filter the draft page builds (see
-	// buildDraftBoardWhere): rfa contracts, the owner's roster, and available
-	// players, optionally floored to those with a projection.
+	// Interprets the OR-of-branches filters the draft page builds (see
+	// buildAvailableWhere/buildLiveWhere): available players optionally floored
+	// to those with a projection, and rfa contracts + the owner's roster.
 	private resolveDraftBoard(variables: Vars): object {
 		const where = (variables.where ?? {}) as { OR?: DraftBoardBranch[] };
 		const branches = where.OR ?? [];

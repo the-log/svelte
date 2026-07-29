@@ -64,18 +64,20 @@ test.describe('draft board', () => {
 		await expect(row(page, 'Aaron Ashford')).toBeVisible();
 		await expect(row(page, 'Uri Underwood')).toHaveCount(0);
 
-		const callsBefore = api.callsTo('draft-board').length;
 		await page.locator('sl-switch').click();
-		const call = await api.waitForCall('draft-board', callsBefore + 1);
-
-		// The projection floor is gone from the "available players" branch.
-		const where = call.variables.where as { OR: Record<string, unknown>[] };
-		expect(where.OR[1]).toEqual({
-			NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } }
-		});
 
 		await expect(row(page, 'Uri Underwood')).toBeVisible();
 		// Unranked players sink to the bottom of their position group.
 		await expect(row(page, 'Uri Underwood')).toHaveAttribute('data-group', 'fa');
+
+		// The toggle refetched the static pool without the projection floor.
+		// (Live-pool polls land in the same call log, so match on shape rather
+		// than call order.)
+		const staticWheres = api
+			.callsTo('draft-board')
+			.map((call) => (call.variables.where as { OR: Record<string, unknown>[] }).OR)
+			.filter((or) => or.length === 1 && 'NOT' in or[0]);
+		expect(staticWheres.at(0)?.[0]).toHaveProperty('pointsThisYearProj', { gt: 0 });
+		expect(staticWheres.at(-1)?.[0]).not.toHaveProperty('pointsThisYearProj');
 	});
 });

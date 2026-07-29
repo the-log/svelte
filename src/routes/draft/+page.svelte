@@ -3,10 +3,12 @@
 	import runQuery from '../../utils/runQuery';
 	import queries from '../../utils/queries';
 	import {
+		buildAvailableWhere,
 		buildDraftBoard,
-		buildDraftBoardWhere,
+		buildLiveWhere,
 		type DraftBoardGroup,
-		type DraftBoardRow
+		type DraftBoardRow,
+		type DraftPlayer
 	} from '../../utils/draftBoard';
 	import Table from '../../components/Table.svelte';
 	import StatsTrigger from '../../components/StatsTrigger.svelte';
@@ -18,41 +20,67 @@
 	let includeUnprojected = $state(false);
 	let teamID: string | number | null = null;
 
-	// The mount fetch and the session-arrival fetch can resolve out of order;
-	// only the most recently issued request may write the board.
-	let fetchSeq = 0;
-	const fetchBoard = () => {
-		const seq = ++fetchSeq;
-		const where = buildDraftBoardWhere(teamID, includeUnprojected);
+	// The board is two pools with very different churn. The static pool
+	// (available players) doesn't move during the RFA auction, so it's fetched
+	// once per visit and again when the projections toggle changes. The live
+	// pool (RFA contracts + the owner's roster) is where bids land, so it's
+	// small and polled frequently. Each pool guards against its own responses
+	// resolving out of order; only the most recently issued request may write.
+	let staticPool: DraftPlayer[] = [];
+	let livePool: DraftPlayer[] = [];
+	let staticLoaded = false;
+	let liveLoaded = false;
+
+	const rebuild = () => {
+		groups = buildDraftBoard([...staticPool, ...livePool]);
+		loaded = staticLoaded && liveLoaded;
+	};
+
+	let staticSeq = 0;
+	const fetchStaticPool = () => {
+		const seq = ++staticSeq;
+		const where = buildAvailableWhere(includeUnprojected);
 		runQuery(queries['draft-board'], { where }).then(({ data }) => {
-			if (seq !== fetchSeq || !data?.players) return;
-			groups = buildDraftBoard(data.players);
-			loaded = true;
+			if (seq !== staticSeq || !data?.players) return;
+			staticPool = data.players;
+			staticLoaded = true;
+			rebuild();
+		});
+	};
+
+	let liveSeq = 0;
+	const fetchLivePool = () => {
+		const seq = ++liveSeq;
+		const where = buildLiveWhere(teamID);
+		runQuery(queries['draft-board'], { where }).then(({ data }) => {
+			if (seq !== liveSeq || !data?.players) return;
+			livePool = data.players;
+			liveLoaded = true;
+			rebuild();
 		});
 	};
 
 	const onProjectedToggle = (event: Event) => {
 		includeUnprojected = (event.target as HTMLInputElement).checked;
-		fetchBoard();
+		fetchStaticPool();
 	};
 
-	// The owner's roster branch of the query needs the team id, so refetch when
-	// the session arrives (the store emits again on every auth re-check).
+	// The live pool's roster branch needs the team id, so refetch when the
+	// session arrives (the store emits again on every auth re-check).
 	const unsubscribeUser = userStore.subscribe((value) => {
 		if (!value) return;
 		const nextTeamID = value.teamID ?? null;
 		if (nextTeamID !== teamID) {
 			teamID = nextTeamID;
-			fetchBoard();
+			fetchLivePool();
 		}
 	});
 
 	let interval: ReturnType<typeof setInterval>;
 	onMount(() => {
-		fetchBoard();
-		// Contracts change as picks are made; refresh like the RFA page does,
-		// just slower — this query returns the whole board.
-		interval = setInterval(fetchBoard, 15000);
+		fetchStaticPool();
+		fetchLivePool();
+		interval = setInterval(fetchLivePool, 5000);
 
 		return () => clearInterval(interval);
 	});

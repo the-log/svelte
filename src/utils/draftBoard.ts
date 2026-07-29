@@ -53,15 +53,13 @@ export interface DraftBoardGroup {
 }
 
 /**
- * Build the PlayerWhereInput for the draft board: RFA contracts, the owner's
- * roster, and available players (no contract, or only a waived one). Until the
- * projections toggle is flipped, available players with no projected points are
- * filtered out server-side — they're practice-squad noise on a big board.
+ * PlayerWhereInput for the board's static pool: available players — no
+ * contract, or only a waived one. This pool doesn't move during the RFA
+ * auction (all the action is rfa → active), so it's fetched once per visit.
+ * Until the projections toggle is flipped, players with no projected points
+ * are filtered out server-side — they're practice-squad noise on a big board.
  */
-export function buildDraftBoardWhere(
-	teamID: string | number | null | undefined,
-	includeUnprojected: boolean
-) {
+export function buildAvailableWhere(includeUnprojected: boolean) {
 	const available: Record<string, unknown> = {
 		NOT: { contract: { status: { in: UNAVAILABLE_STATUSES } } }
 	};
@@ -69,7 +67,16 @@ export function buildDraftBoardWhere(
 		available.pointsThisYearProj = { gt: 0 };
 	}
 
-	const OR: Record<string, unknown>[] = [{ contract: { status: { equals: 'rfa' } } }, available];
+	return { OR: [available] };
+}
+
+/**
+ * PlayerWhereInput for the board's live pool: RFA contracts plus the owner's
+ * roster. This is the small, fast-moving slice — auction bids convert these
+ * rows from rfa to active — so it's the one worth polling frequently.
+ */
+export function buildLiveWhere(teamID: string | number | null | undefined) {
+	const OR: Record<string, unknown>[] = [{ contract: { status: { equals: 'rfa' } } }];
 
 	if (teamID != null && teamID !== '') {
 		OR.push({

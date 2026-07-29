@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+	buildAvailableWhere,
 	buildDraftBoard,
-	buildDraftBoardWhere,
+	buildLiveWhere,
 	classifyPlayer,
 	GAMES_PER_SEASON,
 	type DraftPlayer
@@ -52,12 +53,9 @@ function contract(overrides: Partial<NonNullable<DraftPlayer['contract']>> = {})
 	};
 }
 
-describe('buildDraftBoardWhere', () => {
-	it('always includes RFA contracts and available players with projections', () => {
-		const where = buildDraftBoardWhere(null, false);
-
-		expect(where.OR).toEqual([
-			{ contract: { status: { equals: 'rfa' } } },
+describe('buildAvailableWhere', () => {
+	it('floors available players to those with a projection by default', () => {
+		expect(buildAvailableWhere(false).OR).toEqual([
 			{
 				NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } },
 				pointsThisYearProj: { gt: 0 }
@@ -66,25 +64,29 @@ describe('buildDraftBoardWhere', () => {
 	});
 
 	it('drops the projection floor when unprojected players are requested', () => {
-		const where = buildDraftBoardWhere(null, true);
+		expect(buildAvailableWhere(true).OR).toEqual([
+			{ NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } } }
+		]);
+	});
+});
 
-		expect(where.OR[1]).toEqual({
-			NOT: { contract: { status: { in: ['active', 'dts', 'ir', 'rfa'] } } }
-		});
+describe('buildLiveWhere', () => {
+	it('always includes RFA contracts', () => {
+		expect(buildLiveWhere(null).OR).toEqual([{ contract: { status: { equals: 'rfa' } } }]);
 	});
 
 	it('adds the owner roster branch only when a team id is known', () => {
-		const where = buildDraftBoardWhere('team-1', false);
+		const where = buildLiveWhere('team-1');
 
-		expect(where.OR).toHaveLength(3);
-		expect(where.OR[2]).toEqual({
+		expect(where.OR).toHaveLength(2);
+		expect(where.OR[1]).toEqual({
 			contract: {
 				team: { id: { equals: 'team-1' } },
 				status: { in: ['active', 'dts', 'ir'] }
 			}
 		});
-		expect(buildDraftBoardWhere(undefined, false).OR).toHaveLength(2);
-		expect(buildDraftBoardWhere('', false).OR).toHaveLength(2);
+		expect(buildLiveWhere(undefined).OR).toHaveLength(1);
+		expect(buildLiveWhere('').OR).toHaveLength(1);
 	});
 });
 
