@@ -56,6 +56,16 @@ test.describe('visual regression', () => {
 		});
 	});
 
+	test('draft board', async ({ page }) => {
+		await page.goto('/draft');
+		await expect(page.locator('.tablegrid-row[data-player-id]').first()).toBeVisible();
+		await settle(page);
+		await expect(page).toHaveScreenshot('draft.png', {
+			fullPage: true,
+			mask: [footer(page)]
+		});
+	});
+
 	test('rulebook', async ({ page }) => {
 		await page.goto('/rulebook');
 		await page.locator('sl-tab-group').waitFor();

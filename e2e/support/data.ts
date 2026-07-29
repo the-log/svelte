@@ -47,6 +47,7 @@ export interface MockPlayer {
 		salary: number;
 		years: number;
 		status: string;
+		isFranchiseTagged?: boolean;
 	} | null;
 }
 
@@ -168,6 +169,99 @@ export const players: MockPlayer[] = [
 			isRookie: i === 3
 		})
 	)
+];
+
+// Extra players visible only to the draft-board query, kept out of `players`
+// so the players-page pagination counts stay at 30. The RFA entries mirror
+// rfaContracts below (same ids/names) and Kellen Knox mirrors the waived
+// Scranton contract, so cross-page data stays coherent.
+export const draftPoolExtras: MockPlayer[] = [
+	player({
+		espn_id: 301,
+		name: 'Marcus Monroe',
+		team: 'LAC',
+		position: 'QB',
+		positionRankProj: 5,
+		overallRankProj: 40,
+		pointsLastYear: 295,
+		pointsThisYearProj: 280,
+		contract: {
+			id: 'rfa-1',
+			team: teams.nashville,
+			salary: 12000,
+			years: 0,
+			status: 'rfa',
+			isFranchiseTagged: true
+		}
+	}),
+	player({
+		espn_id: 302,
+		name: 'Nolan Nash',
+		team: 'HOU',
+		position: 'RB',
+		positionRankProj: 8,
+		overallRankProj: 22,
+		pointsLastYear: 240,
+		pointsThisYearProj: 230,
+		contract: { id: 'rfa-2', team: teams.scranton, salary: 8000, years: 0, status: 'rfa' }
+	}),
+	player({
+		espn_id: 303,
+		name: 'Omar Otis',
+		team: 'JAX',
+		position: 'WR',
+		positionRankProj: 12,
+		overallRankProj: 55,
+		pointsLastYear: 180,
+		pointsThisYearProj: 210,
+		injuryStatus: 'QUESTIONABLE',
+		contract: { id: 'rfa-3', team: teams.portland, salary: 6000, years: 0, status: 'rfa' }
+	}),
+	player({
+		espn_id: 304,
+		name: 'Pierce Palmer',
+		team: 'NO',
+		position: 'QB',
+		positionRankProj: 9,
+		overallRankProj: 80,
+		pointsLastYear: 200,
+		pointsThisYearProj: 240,
+		contract: { id: 'rfa-4', team: teams.portland, salary: 4000, years: 0, status: 'rfa' }
+	}),
+	player({
+		espn_id: 114,
+		name: 'Kellen Knox',
+		team: 'ATL',
+		position: 'CB',
+		positionRankProj: 30,
+		overallRankProj: 210,
+		pointsLastYear: 88,
+		pointsThisYearProj: 95,
+		contract: { id: 'c-waived-1', team: teams.scranton, salary: 1200, years: 1, status: 'waived' }
+	}),
+	player({
+		espn_id: 501,
+		name: 'Uri Underwood',
+		team: 'TEN',
+		position: 'DT',
+		positionRankProj: 0,
+		overallRankProj: 0,
+		pointsLastYear: 5,
+		pointsThisYearProj: 0
+	}),
+	// Waived by a team that isn't the logged-in owner's: must never reach the
+	// board (not uncontracted, not rfa, not the owner's team).
+	player({
+		espn_id: 502,
+		name: 'Victor Vale',
+		team: 'SF',
+		position: 'WR',
+		positionRankProj: 18,
+		overallRankProj: 70,
+		pointsLastYear: 150,
+		pointsThisYearProj: 160,
+		contract: { id: 'c-pdx-w1', team: teams.portland, salary: 2000, years: 1, status: 'waived' }
+	})
 ];
 
 export interface MockContract {

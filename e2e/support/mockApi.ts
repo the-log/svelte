@@ -11,6 +11,7 @@ export type OperationKey =
 	| 'begin-session'
 	| 'end-session'
 	| 'all-players'
+	| 'draft-board'
 	| 'all-teams'
 	| 'team-options'
 	| 'contracts-by-team-id'
@@ -36,6 +37,7 @@ const OPERATION_MATCHERS: Array<[OperationKey, RegExp]> = [
 	['authenticated-item', /authenticatedItem/],
 	['league-settings', /leagueSetting\s*\{/],
 	['all-players', /playersCount/],
+	['draft-board', /\$where:\s*PlayerWhereInput/],
 	['all-bids', /pending:\s*bids/],
 	['new-bid', /createBid/],
 	['update-bid', /updateBid/],
@@ -70,6 +72,14 @@ interface PlayerFilters {
 	isRookie?: { equals?: boolean };
 	contract?: { status?: { in?: string[] } };
 	NOT?: { contract?: { status?: { in?: string[] } } };
+}
+
+interface DraftBoardBranch {
+	contract?: {
+		status?: { equals?: string; in?: string[] };
+		team?: { id?: { equals?: string } };
+	} | null;
+	pointsThisYearProj?: { gt?: number };
 }
 
 interface RecordedCall {
@@ -193,6 +203,9 @@ export class MockApi {
 
 			case 'all-players':
 				return this.resolvePlayers(variables);
+
+			case 'draft-board':
+				return this.resolveDraftBoard(variables);
 
 			case 'all-teams':
 				return { data: { teams: data.leagueStandings } };
@@ -402,6 +415,50 @@ export class MockApi {
 			data: {
 				playersCount: list.length,
 				players: list.slice(skip, skip + take)
+			}
+		};
+	}
+
+	// Interprets the OR-of-branches filters the draft page builds (see
+	// buildAvailableWhere/buildLiveWhere): uncontracted players optionally
+	// floored to a minimum projection, and rfa contracts + the owner's team.
+	private resolveDraftBoard(variables: Vars): object {
+		const where = (variables.where ?? {}) as { OR?: DraftBoardBranch[] };
+		const branches = where.OR ?? [];
+		const pool = [...data.players, ...data.draftPoolExtras];
+
+		const contractMatches = (
+			player: data.MockPlayer,
+			filter: NonNullable<DraftBoardBranch['contract']>
+		) => {
+			if (!player.contract) return false;
+			if (filter.status?.equals && player.contract.status !== filter.status.equals) return false;
+			if (filter.status?.in && !filter.status.in.includes(player.contract.status)) return false;
+			if (filter.team?.id?.equals && player.contract.team.id !== filter.team.id.equals)
+				return false;
+			return true;
+		};
+
+		const branchMatches = (player: data.MockPlayer, branch: DraftBoardBranch) => {
+			if ('contract' in branch) {
+				// `contract: null` is Keystone's "has no contract at all".
+				if (branch.contract === null) {
+					if (player.contract) return false;
+				} else if (!contractMatches(player, branch.contract!)) {
+					return false;
+				}
+			}
+			if (
+				branch.pointsThisYearProj?.gt !== undefined &&
+				player.pointsThisYearProj <= branch.pointsThisYearProj.gt
+			)
+				return false;
+			return true;
+		};
+
+		return {
+			data: {
+				players: pool.filter((player) => branches.some((branch) => branchMatches(player, branch)))
 			}
 		};
 	}
